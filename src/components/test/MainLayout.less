@@ -15,25 +15,36 @@
 
 .header {
   background-color: #fff;
-  height: 48px;
-  position: fixed;
   width: 100%;
-  z-index: 9999;
-
-  .header_menu {
-    height: 100%;
-    text-align: right;
-  }
+  height: 48px;
+  padding: 0;
+  // 固定头部
+  //position: fixed;
+  //z-index: 9999;
 }
 
 .sider {
   // 固定sidebar
-  overflow: auto;
-  height: 100vh;
-  position: fixed;
-  left: 0;
+  //min-height: 100vh;
+  //position: absolute;
+  //overflow: visible;
+  //height: 100vh;
+  //padding-bottom: 0;
 }
 
 .content {
-  margin-top: 48px;
+  // 固定头部
+  //margin-top: 48px;
+}
+
+
+.trigger {
+  font-size: 18px;
+  line-height: 48px;
+  padding: 0 16px;
+  cursor: pointer;
+  transition: color .3s;
+  :hover {
+    color: #108ee9;
+  }
 }

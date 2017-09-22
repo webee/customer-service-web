@@ -9,6 +9,7 @@ const {SubMenu, ItemGroup} = Menu;
 import styles from './MainLayout.less';
 
 // components
+import NotFoundPage from './NotFound';
 import HomePage from './Home';
 import GeneralPage from './General';
 import LayoutPage from './Layout';
@@ -38,29 +39,45 @@ class MainLayout extends React.Component {
   state = {
     collapsed: false,
   };
-  onCollapse = (collapsed) => {
-    console.log(collapsed);
-    this.setState({ collapsed });
+  onCollapse = (collapsed, type) => {
+    console.log('sider collapsed: ', collapsed, type);
+    this.setState({collapsed});
+  };
+
+  toggleCollapse = () => {
+    this.setState({
+      collapsed: !this.state.collapsed
+    });
   };
 
   render() {
     const { match } = this.props;
     return (
-      <Layout style={{ minHeight: '100vh' }}>
+      <Layout>
         <Sider className={styles.sider}
-          collapsed={this.state.collapsed}
-          onCollapse={this.onCollapse}
+               collapsible
+               breakpoint="lg"
+               collapsed={this.state.collapsed}
+               onCollapse={this.onCollapse}
         >
           <div className={styles.logo}>
             <Link to={`${match.path}`}>
-							<span>测试应用</span>
-						</Link>
-					</div>
+              <span>测试应用</span>
+            </Link>
+          </div>
+          <div className="logo" />
           <SiderMenuComp menuConfigs={siderMenuConfigs}/>
         </Sider>
-        <Layout style={{ marginLeft: 200 }}>
+        {/*<Layout style={{ marginLeft: collapsed ? 64 : 200 }}>*/}
+        <Layout>
           <Header className={styles.header}>
-            <Menu mode="horizontal" selectedKeys={[]}>
+            <Icon className={styles.trigger}
+              type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
+              onClick={this.toggleCollapse}
+            />
+            <Menu
+              style={{ lineHeight: '48px', float: 'right' }}
+              mode="horizontal" selectedKeys={[]}>
               <Menu.Item key="home">
                 <Icon type="home" /><span>Home</span>
               </Menu.Item>
@@ -81,7 +98,7 @@ class MainLayout extends React.Component {
                 <Route exact path={`${match.path}`} component={HomePage}/>
 								<Route path={`${match.path}/general`} component={GeneralPage}/>
                 <Route path={`${match.path}/layout`} component={LayoutPage}/>
-                <Redirect to={`${match.path}`} />
+                <Route component={NotFoundPage} />
 							</Switch>
             </div>
           </Content>

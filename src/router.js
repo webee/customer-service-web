@@ -9,9 +9,8 @@ function RouterConfig({ history }) {
   return (
     <ConnectedRouter history={history}>
       <Switch>
-        <Route path="/" exact component={App} />
         <Route path="/_" component={TestApp} />
-        <Redirect to="/" />
+        <Route path="/" component={App} />
       </Switch>
     </ConnectedRouter>
   );
