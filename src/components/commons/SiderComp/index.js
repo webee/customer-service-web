@@ -1,7 +1,10 @@
 import { withRouter, Link } from 'dva/router';
-import { Menu, Icon } from 'antd';
+import { Menu, Icon, Layout } from 'antd';
+const { Sider } = Layout;
+import MediaQuery from 'react-responsive';
+import Media from 'react-media';
 const {SubMenu, ItemGroup} = Menu;
-import styles from './index.css';
+import styles from './index.less';
 
 
 /*
@@ -51,7 +54,7 @@ function genMenuItems(items) {
 }
 
 
-export default withRouter(({match, location, menuConfigs}) => {
+export const SiderMenuComp = withRouter(({match, location, menuConfigs}) => {
   const { theme, mode, items } = menuConfigs;
   const itemConfigs = genMenuItemConfigs(match.path, items);
   const pathname = location.pathname.replace(/\/*$/,'');
@@ -62,5 +65,29 @@ export default withRouter(({match, location, menuConfigs}) => {
     <Menu theme={theme||'dark'} defaultSelectedKeys={selectedKeys} selectedKeys={selectedKeys} defaultOpenKeys={openKeys} mode={mode}>
       {genMenuItems(itemConfigs)}
 		</Menu>
+  );
+});
+
+
+export default withRouter(({match, collapsed, onCollapse, menuConfigs}) => {
+  return (
+    <Media query="(max-width: 992px)">{matches => (
+      <Sider className={styles.sider}
+             collapsible
+             breakpoint="lg"
+             collapsedWidth={matches ? 0:64}
+             trigger={matches ? null:undefined}
+             collapsed={collapsed}
+             onCollapse={onCollapse}
+      >
+        <div className={styles.logo}>
+          <Link to={`${match.path}`}>
+            <Icon type="rocket" style={{color:'green', fontSize:'32px'}}/>
+            {!collapsed?<span>测试应用</span>:''}
+          </Link>
+        </div>
+        <SiderMenuComp menuConfigs={menuConfigs}/>
+      </Sider>
+    )}</Media>
   );
 });

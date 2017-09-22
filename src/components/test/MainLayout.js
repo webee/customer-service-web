@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { withRouter, Route, Link, Switch, Redirect } from 'dva/router';
 import { Layout, Menu, Icon } from 'antd';
 import BreadcrumbComp from '../commons/BreadcrumbComp';
-import SiderMenuComp from '../commons/SiderMenuComp';
+import SiderComp from '../commons/SiderComp';
 import { urlNameMap } from '../TestApp';
-const { Sider, Header, Content, Footer } = Layout;
+const { Header, Content, Footer } = Layout;
 const {SubMenu, ItemGroup} = Menu;
 import styles from './MainLayout.less';
 
@@ -53,21 +53,8 @@ class MainLayout extends React.Component {
   render() {
     const { match } = this.props;
     return (
-      <Layout>
-        <Sider className={styles.sider}
-               collapsible
-               breakpoint="lg"
-               collapsed={this.state.collapsed}
-               onCollapse={this.onCollapse}
-        >
-          <div className={styles.logo}>
-            <Link to={`${match.path}`}>
-              <span>测试应用</span>
-            </Link>
-          </div>
-          <div className="logo" />
-          <SiderMenuComp menuConfigs={siderMenuConfigs}/>
-        </Sider>
+      <Layout className="ant-layout-has-sider">
+        <SiderComp collapsed={this.state.collapsed} onCollapse={this.onCollapse} menuConfigs={siderMenuConfigs} />
         {/*<Layout style={{ marginLeft: collapsed ? 64 : 200 }}>*/}
         <Layout>
           <Header className={styles.header}>
@@ -75,8 +62,7 @@ class MainLayout extends React.Component {
               type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
               onClick={this.toggleCollapse}
             />
-            <Menu
-              style={{ lineHeight: '48px', float: 'right' }}
+            <Menu className={styles.header_menu}
               mode="horizontal" selectedKeys={[]}>
               <Menu.Item key="home">
                 <Icon type="home" /><span>Home</span>
@@ -93,7 +79,7 @@ class MainLayout extends React.Component {
 					</Header>
           <Content className={styles.content}>
             <BreadcrumbComp urlNameMap={urlNameMap}/>
-            <div style={{ padding: 24, background: '#f8f8f8', minHeight: 480 }}>
+            <div style={{ padding: 24, background: '#f8f8f8', minHeight: '90vh' }}>
               <Switch>
                 <Route exact path={`${match.path}`} component={HomePage}/>
 								<Route path={`${match.path}/general`} component={GeneralPage}/>
@@ -102,7 +88,7 @@ class MainLayout extends React.Component {
 							</Switch>
             </div>
           </Content>
-          <Footer style={{ textAlign: 'center' }}>
+          <Footer style={{ textAlign: 'center', paddingBottom: '18px' }}>
             webee.yw(webee.yw@gmail.com) @2017
           </Footer>
         </Layout>
