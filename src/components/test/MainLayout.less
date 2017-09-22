@@ -1,0 +1,39 @@
+.logo {
+  height: 48px;
+  background: #aaa;
+  text-align: center;
+  font-size: 24px;
+  // 垂直居中
+  display         : flex;
+  justify-content : center;
+  align-items     : center;
+  a {
+    color: #fff;
+  }
+
+}
+
+.header {
+  background-color: #fff;
+  height: 48px;
+  position: fixed;
+  width: 100%;
+  z-index: 9999;
+
+  .header_menu {
+    height: 100%;
+    text-align: right;
+  }
+}
+
+.sider {
+  // 固定sidebar
+  overflow: auto;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+}
+
+.content {
+  margin-top: 48px;
+}
