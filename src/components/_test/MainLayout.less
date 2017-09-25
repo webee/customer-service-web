@@ -1,0 +1,46 @@
+.trigger {
+  font-size: 18px;
+  line-height: 48px;
+  padding: 0 16px;
+  cursor: pointer;
+  transition: color .3s;
+}
+
+.main {
+}
+
+.header {
+  background-color: #fff;
+  width: 100%;
+  height: 48px;
+  padding: 0;
+  // 固定头部
+  //position: fixed;
+  //z-index: 9999;
+  .header_menu {
+    float: right;
+  }
+}
+
+.content {
+  // 固定头部
+  //margin-top: 48px;
+  height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.contentMain {
+  flex-grow: 1;
+  margin: 0 8px 8px;
+  padding: 8px;
+  // content区域背景
+  background: #f8f8f8;
+}
+
+.footer {
+  text-align: center;
+  padding: 10px 50px;
+  background-color: #FDFDFD;
+}

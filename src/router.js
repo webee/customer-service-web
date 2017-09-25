@@ -1,7 +1,7 @@
 import React from 'react';
 import { routerRedux, Route, Switch, Redirect } from 'dva/router';
+import _TestApp from './components/_TestApp';
 import App from './components/App';
-import TestApp from './components/TestApp';
 
 const { ConnectedRouter } = routerRedux;
 
@@ -9,7 +9,7 @@ function RouterConfig({ history }) {
   return (
     <ConnectedRouter history={history}>
       <Switch>
-        <Route path="/_" component={TestApp} />
+        <Route path="/_" component={_TestApp} />
         <Route path="/" component={App} />
       </Switch>
     </ConnectedRouter>

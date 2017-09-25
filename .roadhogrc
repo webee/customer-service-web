@@ -3,6 +3,7 @@
   "hash": true,
   "extraBabelPlugins": [
     "transform-runtime",
+    ["root-import"],
     ["import", {"libraryName": "antd", "style": "css"}]
   ],
   "env": {
@@ -10,7 +11,13 @@
       "extraBabelPlugins": [
         "dva-hmr",
         "transform-runtime"
-      ]
+      ],
+      "proxy": {
+        "/api": {
+          "target": "http://localhost:5000",
+          "changeOrigin": true
+        }
+      }
     },
     "production": {
       "extraBabelPlugins": [

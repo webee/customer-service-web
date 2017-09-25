@@ -12,12 +12,16 @@ import styles from './index.less';
  */
 function genMenuItemConfigs(path, items) {
   return items.map((item, _) => {
-    let {icon, title, pathname, items} = item;
+    let {icon, title, pathname, open, items} = item;
     if (!pathname.startsWith('/')) {
-      pathname = pathname ? `${path}/${pathname}`: path;
+      if (path.endsWith('/')) {
+        pathname = pathname ? `${path}${pathname}`: path;
+      } else {
+        pathname = pathname ? `${path}/${pathname}`: path;
+      }
     }
 
-    const new_item = {key: pathname, icon, title, pathname};
+    const new_item = {key: pathname, icon, title, pathname, open};
     if (item.items) {
       new_item['items'] = genMenuItemConfigs(pathname, item.items);
     }
@@ -29,7 +33,7 @@ function findOpenKeys(path, items) {
   const openKeys = [];
   for (let i in items) {
     const item = items[i];
-    if (item.items && path.startsWith(item.pathname)) {
+    if (item.items && (item.open || path.startsWith(item.pathname))) {
       openKeys.push(item.key);
       openKeys.push(...findOpenKeys(path, item.items));
     }
@@ -57,9 +61,12 @@ function genMenuItems(items) {
 export const SiderMenuComp = withRouter(({match, location, menuConfigs}) => {
   const { theme, mode, items } = menuConfigs;
   const itemConfigs = genMenuItemConfigs(match.path, items);
-  const pathname = location.pathname.replace(/\/*$/,'');
+  const pathname = location.pathname.replace(/\/*$/,'') || '/';
   const openKeys = findOpenKeys(pathname, itemConfigs);
   const selectedKeys = [pathname];
+  console.debug('itemConfigs', itemConfigs);
+  console.debug('openKeys', openKeys);
+  console.debug('selectedKeys', selectedKeys);
 
   return (
     <Menu theme={theme||'dark'} defaultSelectedKeys={selectedKeys} selectedKeys={selectedKeys} defaultOpenKeys={openKeys} mode={mode}>
@@ -69,7 +76,7 @@ export const SiderMenuComp = withRouter(({match, location, menuConfigs}) => {
 });
 
 
-export default withRouter(({match, collapsed, onCollapse, menuConfigs}) => {
+export default withRouter(({app_name, match, collapsed, onCollapse, menuConfigs}) => {
   return (
     <Media query="(max-width: 992px)">{matches => (
       <Sider className={styles.sider}
@@ -83,7 +90,7 @@ export default withRouter(({match, collapsed, onCollapse, menuConfigs}) => {
         <div className={styles.logo}>
           <Link to={`${match.path}`}>
             <Icon type="rocket" style={{color:'green', fontSize:'32px'}}/>
-            {!collapsed?<span>测试应用</span>:''}
+            {!collapsed?<span>{app_name}</span>:''}
           </Link>
         </div>
         <SiderMenuComp menuConfigs={menuConfigs}/>

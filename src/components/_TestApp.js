@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'dva';
-import styles from './TestApp.css';
-import MainLayout from './test/MainLayout';
+import styles from './_TestApp.css';
+import MainLayout from './_test/MainLayout';
 
 
 function App() {
