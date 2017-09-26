@@ -4,7 +4,6 @@ import { Layout, Menu, Icon } from 'antd';
 import BreadcrumbComp from '../commons/BreadcrumbComp';
 import SiderComp from '../commons/SiderComp';
 import { RootRoute } from '../commons/router';
-import { urlNameMap } from '../_TestApp';
 const { Header, Content, Footer } = Layout;
 const {SubMenu, ItemGroup} = Menu;
 import styles from './MainLayout.less';
@@ -14,6 +13,17 @@ import NotFoundPage from './NotFound';
 import HomePage from './Home';
 import GeneralPage from './General';
 import LayoutPage from './Layout';
+
+
+const urlNameMap = {
+  '/_': '首页',
+  '/_/general': '普通组件',
+  '/_/general/button': '按钮',
+  '/_/general/icon': '图标',
+  '/_/layout': '布局组件',
+  '/_/layout/grid': '栅格',
+  '/_/layout/layout': '布局',
+};
 
 
 const siderMenuConfigs = {
@@ -63,7 +73,7 @@ class MainLayout extends React.Component {
             <Menu className={styles.header_menu}
               mode="horizontal" selectedKeys={[]}>
               <Menu.Item key="home">
-                <Link to="/"><Icon type="home" /><span>Home</span></Link>
+                <Link to="/"><Icon type="home" /><span>App</span></Link>
               </Menu.Item>
               <SubMenu title={<span><Icon type="user" />webee</span>}>
                   <Menu.Item key="setting:1">Option 1</Menu.Item>
@@ -96,4 +106,4 @@ class MainLayout extends React.Component {
 }
 
 
-export default withRouter(MainLayout);
+export default MainLayout;

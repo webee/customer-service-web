@@ -3,7 +3,7 @@
   "hash": true,
   "extraBabelPlugins": [
     "transform-runtime",
-    ["root-import"],
+    ["root-import", {"rootPathSuffix": "src"}],
     ["import", {"libraryName": "antd", "style": "css"}]
   ],
   "env": {

@@ -4,6 +4,7 @@ import createLoading from 'dva-loading';
 import { message } from 'antd';
 import './index.css';
 
+const ERROR_MSG_DURATION = 3; // 3 seconds
 // 1. Initialize
 const app = dva({
   history: createHistory(),
@@ -16,7 +17,7 @@ const app = dva({
 app.use(createLoading());
 
 // 3. Model
-// app.model(require('./models/example'));
+app.model(require('./models/auth'));
 
 // 4. Router
 app.router(require('./router'));

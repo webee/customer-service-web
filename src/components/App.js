@@ -1,18 +1,16 @@
 import React from 'react';
-import styles from './App.css';
+import { Switch, Route } from 'dva/router';
 import MainLayout from './MainLayout';
+import AuthPage from './AuthPage';
+import NotFound from './NotFound';
 
 
 export default function App() {
   return (
-    <div className={styles.normal}>
-      <MainLayout />
-    </div>
+    <Switch>
+      <Route path="/auth" component={AuthPage}/>
+      <Route path="" component={MainLayout}/>
+      <Route component={NotFound}/>
+    </Switch>
   );
-};
-
-
-export const urlNameMap = {
-  '/': '首页',
-  '/setting': '设置',
 };
