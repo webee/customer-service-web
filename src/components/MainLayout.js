@@ -8,27 +8,55 @@ import SiderComp from './commons/SiderComp';
 const { Header, Content, Footer } = Layout;
 const {SubMenu, ItemGroup} = Menu;
 import styles from './MainLayout.less';
-import * as authService from '../services/auth';
 import { env } from '~/config';
 
 // components
 import NotFoundPage from './NotFound';
 import HomePage from './Home';
+import ProjectsPage from './Projects';
 import SettingPage from './Setting';
 
-export const urlNameMap = {
-  '/': '首页',
-  '/setting': '设置',
-};
 
-const siderMenuConfigs = {
-	theme: 'dark',
-	mode: 'inline',
-	items: [
-		{icon: 'home', title: '首页', pathname: ''},
-    {icon: 'setting', title: '设置', pathname: 'setting'},
-	],
-};
+function genProjectDomainUrlNameMap(root, project_domains) {
+  const urlNameMap = {};
+  project_domains.forEach(d => {
+    const dUrl = `${root}/${d.name}`;
+    urlNameMap[dUrl] = {name: d.title, noLink: true};
+    d.types.forEach(t => {
+      const tUrl = `${dUrl}/${t.name}`;
+      urlNameMap[tUrl] = t.title;
+    });
+  });
+  return urlNameMap;
+}
+
+function genUrlNameMap(root, project_domains) {
+  return {
+    [`${root}/`]: '首页',
+    [`${root}/projects`]: {name: '项目', noLink: true},
+    ...genProjectDomainUrlNameMap(`${root}/projects`, project_domains),
+    [`${root}/setting`]: '设置',
+  };
+}
+
+function genProjectDomainMenuItemConfigs(root, project_domains) {
+  return project_domains.map(d => ({
+    icon: 'star-o', title: d.title, pathname: `${root}/${d.name}`, open: true,
+    items: d.types.map(t => ({title: t.title, pathname: t.name}))
+  }));
+}
+
+function genSiderMenuConfigs(project_domains) {
+  return {
+    theme: 'dark',
+    mode: 'inline',
+    items: [
+      {icon: 'home', title: '首页', pathname: ''},
+      ...genProjectDomainMenuItemConfigs('projects', project_domains),
+      {icon: 'setting', title: '设置', pathname: 'setting'},
+    ],
+  };
+}
 
 
 class MainLayout extends React.Component {
@@ -46,57 +74,65 @@ class MainLayout extends React.Component {
     });
   };
 
-  componentDidMount() {
-    const { dispatch, authenticated } = this.props;
-    if (!authenticated) {
-      dispatch({type: 'auth/authenticate'});
+  handleMenuClick = (item) => {
+    console.debug("click menu: ", item);
+    if (item.key === 'user/logout') {
+      const { dispatch } = this.props;
+      dispatch({type: 'auth/logout'});
     }
+  };
+
+  componentDidMount() {
+    console.log('props: ', this.props);
+    // fetch data
+    this.props.dispatch({type: 'app/fetch'});
   }
 
   render() {
-    const { location } = this.props;
-    if (!authService.isAuthenticated()) {
-      return (
-        <Redirect to={{pathname: '/auth', state: { from: location }}}/>
-      );
-    }
-    const { match, authenticated } = this.props;
+    const { match } = this.props;
     const root_path = match.path.endsWith('/') ? match.path.substr(0, match.path.length - 1) : match.path;
+    const {staff, app, project_domains } = this.props;
+    const loaded = staff && app && project_domains;
+    if (!loaded) {
+      return <Loader loaded={false}/>
+    }
     return (
-      <Loader loaded={authenticated}>
-      <Layout loading={true} className="ant-layout-has-sider">
-        <SiderComp app_name="测试应用" collapsed={this.state.collapsed} onCollapse={this.onCollapse} menuConfigs={siderMenuConfigs} />
-        {/*<Layout style={{ marginLeft: this.state.collapsed ? 64 : 200 }}>*/}
+      <Layout className="ant-layout-has-sider">
+        <SiderComp app_name={app.title} collapsed={this.state.collapsed} onCollapse={this.onCollapse}
+                   menuConfigs={genSiderMenuConfigs(project_domains)} />
 				<Layout className={styles.main}>
           <Header className={styles.header}>
             <Icon className={styles.trigger}
               type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
               onClick={this.toggleCollapse}
             />
+            {/* 顶部导航设置 */}
             <Menu className={styles.header_menu}
-              mode="horizontal" selectedKeys={[]}>
-              <Menu.Item key="home">
-                <Link to="/"><Icon type="home" /><span>Home</span></Link>
-              </Menu.Item>
+                  onClick={this.handleMenuClick}
+                  mode="horizontal" selectedKeys={[]}>
               {env == "dev" ? <Menu.Item key="test">
                 <Link to="/_"><Icon type="code" /><span>Test</span></Link>
               </Menu.Item> : ""}
 
-              <SubMenu title={<span><Icon type="user" />webee</span>}>
-                  <Menu.Item key="setting:1">Option 1</Menu.Item>
-                  <Menu.Item key="setting:2">Option 2</Menu.Item>
-                  <ItemGroup title="设置">
-										<Menu.Item key="setting:3">Option 1</Menu.Item>
-										<Menu.Item key="setting:4">Option 2</Menu.Item>
+              <SubMenu title={<span><Icon type="user" />{staff.name}</span>}
+                       key="user"
+              >
+                  <Menu.Item key="user/logout">退出</Menu.Item>
+                  <ItemGroup title="常用位置">
+										<Menu.Item key="user/common/baidu">
+                      <a href="https://baidu.com" target="_blank">百度</a>
+                    </Menu.Item>
 									</ItemGroup>
               </SubMenu>
             </Menu>
 					</Header>
           <Content className={styles.content}>
-            <BreadcrumbComp urlNameMap={urlNameMap}/>
+            <BreadcrumbComp urlNameMap={genUrlNameMap(root_path, project_domains)}/>
             <div className={styles.contentMain}>
+              {/* 主内容区路由设置 */}
               <Switch>
                 <Route exact path={`${root_path}/`} component={HomePage} />
+                <Route path={`${root_path}/projects/:projectDomain/:projectType`} component={ProjectsPage} />
 								<Route path={`${root_path}/setting`} component={SettingPage}/>
                 <Route component={NotFoundPage} />
 							</Switch>
@@ -107,16 +143,13 @@ class MainLayout extends React.Component {
           </Content>
         </Layout>
       </Layout>
-      </Loader>
     );
   }
 }
 
 
 function mapStateToProps(state) {
-  return {
-    authenticated: state.auth.authenticated,
-  };
+  return {...state.app};
 }
 
 export default connect(mapStateToProps)(MainLayout);

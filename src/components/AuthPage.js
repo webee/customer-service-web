@@ -4,6 +4,7 @@ import { connect } from 'dva';
 import { Card } from 'antd';
 import { Form, Input, Button, Checkbox } from 'antd';
 import { Route, Redirect } from 'dva/router';
+import { asValidator } from './commons/form';
 import * as authService from '../services/auth';
 import styles from './AuthPage.less';
 import queryString from 'query-string';
@@ -27,12 +28,25 @@ const formTailLayout = {
 class AuthPageForm extends React.Component {
   state = {
     loaded: true,
+    login: false
   };
 
   handleSubmit = (e) => {
+    e.preventDefault();
+    const { dispatch, form } = this.props;
+    const {jwt} = form.getFieldsValue();
+    this.setState({loaded: false});
+    dispatch({type: 'auth/login', payload: {jwt: jwt}}).then(() => {
+      this.setState({login: true, loaded: true});
+    }).catch((e) => {
+      console.error(e);
+      this.setState({loaded: true});
+    });
   };
 
-  componentWillMount() {
+  componentDidMount() {
+    this.props.form.validateFields();
+
     const { dispatch, location, history } = this.props;
     const query = queryString.parse(location.search);
     const jwt = query.jwt;
@@ -51,40 +65,37 @@ class AuthPageForm extends React.Component {
     }
   }
 
-  componentDidMount() {
-    this.props.form.validateFields();
-  }
-
   render() {
+    const { from } = this.props.location.state || { from: { pathname: '/' } }
+    if (this.state.login) {
+      return (<Redirect to={from}/>);
+    }
+
     const { location, form } = this.props;
     const query = queryString.parse(location.search);
     const jwt = query.jwt;
-    const { getFieldDecorator, isFieldTouched, getFieldError, getFieldsError } = form;
-    const jwtError = isFieldTouched('jwt') && getFieldError('jwt');
+    const jwtError = form.isFieldTouched('jwt') && form.getFieldError('jwt');
     return (
       <div className={styles.main}>
         <Loader loaded={this.state.loaded}>
 				<Card className={styles.card}>
-          <Form>
+          <Form onSubmit={this.handleSubmit}>
             <Form.Item {...formItemLayout}
               label="JWT"
               validateStatus={jwtError ? 'error' : ''}
               help={jwtError || ''}
               hasFeedback
             >
-              {getFieldDecorator('jwt', {
-                rules: [{
-                  required: true,
-                  message: '请输入客服jwt',
-                }],
-              })(
-                <Input.TextArea rows={6} placeholder="请输入客服jwt" />
-              )}
+              {form.getFieldDecorator('jwt', { validateFirst: true, rules:[
+                  { required: true, message: '请输入客服jwt' },
+                  { pattern: /[^.]+\.[^.]+\.[^.]+/g, message: 'jwt格式错误' },
+                  { validator: asValidator(authService.validateJWT) },
+                ]})(< Input.TextArea rows={6} placeholder="请输入客服jwt" />)
+              }
             </Form.Item>
             <Form.Item {...formTailLayout}>
               <Button type="primary" htmlType="submit" style={{width: '100%'}}
-                      disabled={hasErrors(getFieldsError())}
-              >
+                      disabled={hasErrors(form.getFieldsError())}>
                 登录
               </Button>
             </Form.Item>

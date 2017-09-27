@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'dva';
 import { withRouter, Route, Link, Switch, Redirect } from 'dva/router';
 import { Layout, Menu, Icon } from 'antd';
 import BreadcrumbComp from '../commons/BreadcrumbComp';
@@ -61,8 +62,16 @@ class MainLayout extends React.Component {
     });
   };
 
+  componentDidMount() {
+    console.log('test did mount');
+    console.log('props: ', this.props);
+    // fetch data
+    this.props.dispatch({type: 'app/fetch'});
+  }
+
   render() {
     const { match } = this.props;
+    const {staff, app, project_domains } = this.props;
     return (
       <Layout className="ant-layout-has-sider">
         <SiderComp app_name="测试应用" collapsed={this.state.collapsed} onCollapse={this.onCollapse} menuConfigs={siderMenuConfigs} />
@@ -75,7 +84,7 @@ class MainLayout extends React.Component {
               <Menu.Item key="home">
                 <Link to="/"><Icon type="home" /><span>App</span></Link>
               </Menu.Item>
-              <SubMenu title={<span><Icon type="user" />webee</span>}>
+              <SubMenu title={<span><Icon type="user" />{staff?staff.name:'webee'}</span>}>
                   <Menu.Item key="setting:1">Option 1</Menu.Item>
                   <Menu.Item key="setting:2">Option 2</Menu.Item>
                   <ItemGroup title="设置">
@@ -106,4 +115,8 @@ class MainLayout extends React.Component {
 }
 
 
-export default MainLayout;
+function mapStateToProps(state) {
+  return {...state.app};
+}
+
+export default connect(mapStateToProps)(MainLayout);

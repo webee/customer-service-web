@@ -43,7 +43,7 @@ function findOpenKeys(path, items) {
 
 function genMenuItems(items) {
   return items.map((item) => item.items ? (
-      <SubMenu key={item.key} title={<span>{item.icon?<Icon type="appstore"/>:''}<span>{item.title}</span></span>}>
+      <SubMenu key={item.key} title={<span>{item.icon?<Icon type={item.icon}/>:''}<span>{item.title}</span></span>}>
         {genMenuItems(item.items)}
       </SubMenu>
   ) : (
@@ -69,7 +69,7 @@ export const SiderMenuComp = withRouter(({match, location, menuConfigs}) => {
   console.debug('selectedKeys', selectedKeys);
 
   return (
-    <Menu theme={theme||'dark'} defaultSelectedKeys={selectedKeys} selectedKeys={selectedKeys} defaultOpenKeys={openKeys} mode={mode}>
+    <Menu style={{zIndex: 9999}} theme={theme||'dark'} defaultSelectedKeys={selectedKeys} selectedKeys={selectedKeys} defaultOpenKeys={openKeys} mode={mode}>
       {genMenuItems(itemConfigs)}
 		</Menu>
   );
@@ -93,7 +93,7 @@ export default withRouter(({app_name, match, collapsed, onCollapse, menuConfigs}
             {!collapsed?<span>{app_name}</span>:''}
           </Link>
         </div>
-        <SiderMenuComp menuConfigs={menuConfigs}/>
+				<SiderMenuComp menuConfigs={menuConfigs}/>
       </Sider>
     )}</Media>
   );

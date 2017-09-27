@@ -1,23 +1,27 @@
+import * as appService from '../services/app';
+
 
 export default {
   namespace: 'app',
 
-  state: {},
-
-  subscriptions: {
-    setup({ dispatch, history }) {  // eslint-disable-line
+  state: {
+    staff: null,
+    app: null,
+    project_domains: null,
+  },
+  reducers: {
+    save(state, {payload}) {
+      return { ...state, ...payload };
     },
   },
-
   effects: {
     *fetch({ payload }, { call, put }) {  // eslint-disable-line
-      yield put({ type: 'save' });
+      const staffAppTree = yield call(appService.fetchStaffAppTree);
+      yield put({ type: 'save', payload: staffAppTree });
     },
   },
-
-  reducers: {
-    save(state, action) {
-      return { ...state, ...action.payload };
+  subscriptions: {
+    setup({ dispatch, history }) {  // eslint-disable-line
     },
   },
 };
