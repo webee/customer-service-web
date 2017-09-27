@@ -66,7 +66,8 @@ class AuthPageForm extends React.Component {
   }
 
   render() {
-    const { from } = this.props.location.state || { from: { pathname: '/' } }
+    const {match} = this.props;
+    const { from } = this.props.location.state || { from: { pathname: `${match.path.substr(0, match.path.length-5)}` } }
     if (this.state.login) {
       return (<Redirect to={from}/>);
     }
@@ -108,8 +109,9 @@ class AuthPageForm extends React.Component {
 }
 
 
-function mapStateToProps(state) {
-  return {};
-}
-
-export default connect(mapStateToProps)(Form.create()(AuthPageForm));
+//function mapStateToProps(state) {
+//  return {};
+//}
+//
+//export default connect(mapStateToProps)(Form.create()(AuthPageForm));
+export default Form.create()(AuthPageForm);

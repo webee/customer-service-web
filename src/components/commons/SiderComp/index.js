@@ -76,9 +76,12 @@ export const SiderMenuComp = withRouter(({match, location, menuConfigs}) => {
 });
 
 
-export default withRouter(({app_name, match, collapsed, onCollapse, menuConfigs}) => {
+const noOp = () => {};
+
+export default withRouter(({app_name, match, collapsed, onCollapse, menuConfigs, onLogoClick=noOp}) => {
   return (
-    <Media query="(max-width: 992px)">{matches => (
+    // 992px
+    <Media query="(max-width: 768px)">{matches => (
       <Sider className={styles.sider}
              collapsible
              breakpoint="lg"
@@ -88,8 +91,8 @@ export default withRouter(({app_name, match, collapsed, onCollapse, menuConfigs}
              onCollapse={onCollapse}
       >
         <div className={styles.logo}>
-          <Link to={`${match.path}`}>
-            <Icon type="rocket" style={{color:'green', fontSize:'32px'}}/>
+          <Link to={`${match.path}`} style={{textDecoration: null}}>
+            <Icon type="rocket" style={{color:'green', fontSize:'32px'}} onClick={onLogoClick}/>
             {!collapsed?<span>{app_name}</span>:''}
           </Link>
         </div>

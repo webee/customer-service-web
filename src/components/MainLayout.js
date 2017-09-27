@@ -3,6 +3,7 @@ import Loader from 'react-loader';
 import { connect } from 'dva';
 import { withRouter, Route, Link, Switch, Redirect } from 'dva/router';
 import { Layout, Menu, Icon } from 'antd';
+import {getRootPath} from './commons/router';
 import BreadcrumbComp from './commons/BreadcrumbComp';
 import SiderComp from './commons/SiderComp';
 const { Header, Content, Footer } = Layout;
@@ -76,10 +77,15 @@ class MainLayout extends React.Component {
 
   handleMenuClick = (item) => {
     console.debug("click menu: ", item);
+    const root_path = getRootPath(this.props.match.path);
     if (item.key === 'user/logout') {
       const { dispatch } = this.props;
-      dispatch({type: 'auth/logout'});
+      dispatch({type: 'auth/logout', payload: `${root_path}/auth`});
     }
+  };
+
+  onLogoClick = () => {
+    this.props.dispatch({type: 'app/fetch'});
   };
 
   componentDidMount() {
@@ -90,7 +96,7 @@ class MainLayout extends React.Component {
 
   render() {
     const { match } = this.props;
-    const root_path = match.path.endsWith('/') ? match.path.substr(0, match.path.length - 1) : match.path;
+    const root_path = getRootPath(match.path);
     const {staff, app, project_domains } = this.props;
     const loaded = staff && app && project_domains;
     if (!loaded) {
@@ -98,7 +104,8 @@ class MainLayout extends React.Component {
     }
     return (
       <Layout className="ant-layout-has-sider">
-        <SiderComp app_name={app.title} collapsed={this.state.collapsed} onCollapse={this.onCollapse}
+        <SiderComp app_name={app.title} collapsed={this.state.collapsed}
+                   onCollapse={this.onCollapse} onLogoClick={this.onLogoClick}
                    menuConfigs={genSiderMenuConfigs(project_domains)} />
 				<Layout className={styles.main}>
           <Header className={styles.header}>

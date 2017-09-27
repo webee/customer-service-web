@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import Loader from 'react-loader';
 import { connect } from 'dva';
 import { withRouter, Route, Link, Switch, Redirect } from 'dva/router';
+import {getRootPath} from '../commons/router';
 import { Layout, Menu, Icon } from 'antd';
 import BreadcrumbComp from '../commons/BreadcrumbComp';
 import SiderComp from '../commons/SiderComp';
@@ -64,17 +66,15 @@ class MainLayout extends React.Component {
 
   componentDidMount() {
     console.log('test did mount');
-    console.log('props: ', this.props);
-    // fetch data
-    this.props.dispatch({type: 'app/fetch'});
   }
 
   render() {
     const { match } = this.props;
-    const {staff, app, project_domains } = this.props;
+    const root_path = getRootPath(match.path);
     return (
       <Layout className="ant-layout-has-sider">
-        <SiderComp app_name="测试应用" collapsed={this.state.collapsed} onCollapse={this.onCollapse} menuConfigs={siderMenuConfigs} />
+        <SiderComp app_name="测试应用" collapsed={this.state.collapsed} onCollapse={this.onCollapse}
+                   menuConfigs={siderMenuConfigs} />
         {/*<Layout style={{ marginLeft: this.state.collapsed ? 64 : 200 }}>*/}
 				<Layout className={styles.main}>
           <Header className={styles.header}>
@@ -84,7 +84,7 @@ class MainLayout extends React.Component {
               <Menu.Item key="home">
                 <Link to="/"><Icon type="home" /><span>App</span></Link>
               </Menu.Item>
-              <SubMenu title={<span><Icon type="user" />{staff?staff.name:'webee'}</span>}>
+              <SubMenu title={<span><Icon type="user" />test</span>}>
                   <Menu.Item key="setting:1">Option 1</Menu.Item>
                   <Menu.Item key="setting:2">Option 2</Menu.Item>
                   <ItemGroup title="设置">
@@ -98,9 +98,9 @@ class MainLayout extends React.Component {
             <BreadcrumbComp urlNameMap={urlNameMap}/>
             <div className={styles.contentMain}>
               <Switch>
-                <Route exact path={`${match.path}`} component={HomePage}/>
-                <Route path={`${match.path}/general`} component={GeneralPage}/>
-                <Route path={`${match.path}/layout`} component={LayoutPage}/>
+                <Route exact path={`${root_path}`} component={HomePage}/>
+                <Route path={`${root_path}/general`} component={GeneralPage}/>
+                <Route path={`${root_path}/layout`} component={LayoutPage}/>
                 <Route component={NotFoundPage} />
               </Switch>
             </div>

@@ -1,11 +1,11 @@
-import { withRouter, Redirect } from 'dva/router';
+import { Redirect } from 'dva/router';
 import * as authService from '../services/auth';
 
 export function authRequired(Component) {
-  return withRouter(({location, ...props}) => {
+  return (props) => {
     if (authService.isAuthenticated()) {
-      return <Component {...props} key="xx"/>;
+      return <Component {...props}/>;
     }
-    return <Redirect to={{pathname: '/auth', state: { from: location }}}/>;
-  });
+    return <Redirect to={{pathname: `/auth`, state: { from: props.location }}}/>;
+  };
 }

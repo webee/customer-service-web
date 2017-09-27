@@ -30,10 +30,10 @@ export default {
         throw error;
       }
     },
-    *logout(action, {call, put}) {
+    *logout({payload: authPath='/auth'}, {call, put}) {
       yield call(authService.clearJWT);
       yield put({type: 'RESET', payload: ['app']});
-      yield put(routerRedux.push({pathname: '/auth'}));
+      yield put(routerRedux.push({pathname: authPath}));
     },
   },
   subscriptions: {
