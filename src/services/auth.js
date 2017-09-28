@@ -60,6 +60,8 @@ export function loadJWTExp() {
 export function saveLoginURL(login_url) {
   if (login_url) {
     localStorage.setItem('login_url', login_url);
+  } else {
+    localStorage.removeItem('login_url');
   }
 }
 

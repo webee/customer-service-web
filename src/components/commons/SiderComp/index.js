@@ -69,7 +69,7 @@ export const SiderMenuComp = withRouter(({match, location, menuConfigs}) => {
   console.debug('selectedKeys', selectedKeys);
 
   return (
-    <Menu style={{zIndex: 9999}} theme={theme||'dark'} defaultSelectedKeys={selectedKeys} selectedKeys={selectedKeys} defaultOpenKeys={openKeys} mode={mode}>
+    <Menu theme={theme||'dark'} defaultSelectedKeys={selectedKeys} selectedKeys={selectedKeys} defaultOpenKeys={openKeys} mode={mode}>
       {genMenuItems(itemConfigs)}
 		</Menu>
   );
@@ -96,7 +96,7 @@ export default withRouter(({app_name, match, collapsed, onCollapse, menuConfigs,
             {!collapsed?<span>{app_name}</span>:''}
           </Link>
         </div>
-				<SiderMenuComp menuConfigs={menuConfigs}/>
+				<SiderMenuComp className={styles.menu} menuConfigs={menuConfigs}/>
       </Sider>
     )}</Media>
   );

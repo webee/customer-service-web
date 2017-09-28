@@ -6,6 +6,11 @@
   min-height: 100vh;
   // 固定sidebar
   // TODO:
+
+  // FIXME:
+  // solution#2
+  //position: relative;
+  //overflow: auto;
 }
 
 .logo {
@@ -22,6 +27,19 @@
   }
 }
 
+:global(.ant-layout-sider-children) {
+  height: calc(~"100vh - 48px");
+  overflow-y: auto;
+}
+
+.menu {
+}
+
 :global(.ant-layout-sider-trigger) {
-  z-index: 0;
+  // FIXME:
+  // solution#2
+  //position: absolute;
+  //bottom: 0;
+
+  //background-color: rgba(1, 1, 1, 0);
 }

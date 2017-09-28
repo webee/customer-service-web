@@ -27,8 +27,8 @@ const formTailLayout = {
 
 class AuthPageForm extends React.Component {
   state = {
-    loaded: true,
-    login: false
+    loaded: false,
+    authed: false
   };
 
   handleSubmit = (e) => {
@@ -37,9 +37,8 @@ class AuthPageForm extends React.Component {
     const {jwt} = form.getFieldsValue();
     this.setState({loaded: false});
     dispatch({type: 'auth/login', payload: {jwt: jwt}}).then(() => {
-      this.setState({login: true, loaded: true});
-    }).catch((e) => {
-      console.error(e);
+      this.setState({authed: true, loaded: true});
+    }).catch(() => {
       this.setState({loaded: true});
     });
   };
@@ -47,28 +46,35 @@ class AuthPageForm extends React.Component {
   componentDidMount() {
     this.props.form.validateFields();
 
-    const { dispatch, location, history } = this.props;
+    const { dispatch, location } = this.props;
     const query = queryString.parse(location.search);
     const jwt = query.jwt;
     if (jwt) {
       // 提供了jwt, 则尝试登录
-      this.setState({loaded: false});
       dispatch({type: 'auth/login', payload: {jwt, login_url: query.login_url}}).then(() => {
+        this.setState({authed: true});
+      }).catch(() => {
         this.setState({loaded: true});
       });
     } else {
-      const login_url = authService.loadLoginURL();
+      let login_url = query.login_url;
+      if (login_url === undefined) {
+        login_url = authService.loadLoginURL();
+      }
       if (login_url) {
         // 提供了login_url, 则到指定的地址登录
-        history.replace(`${login_url}?auth_url=${location.href}`);
+        window.location.href=`${login_url}?auth_url=${window.location.href}`;
+      } else {
+        this.setState({loaded: true});
       }
     }
   }
 
   render() {
     const {match} = this.props;
-    const { from } = this.props.location.state || { from: { pathname: `${match.path.substr(0, match.path.length-5)}` } }
-    if (this.state.login) {
+    // /[root/]auth
+    const { from } = this.props.location.state || { from: { pathname: `${match.path.substr(0, match.path.length-5)}/` } };
+    if (this.state.authed) {
       return (<Redirect to={from}/>);
     }
 
@@ -114,4 +120,4 @@ class AuthPageForm extends React.Component {
 //}
 //
 //export default connect(mapStateToProps)(Form.create()(AuthPageForm));
-export default Form.create()(AuthPageForm);
+export default connect()(Form.create()(AuthPageForm));
