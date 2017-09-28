@@ -29,7 +29,24 @@
 
 :global(.ant-layout-sider-children) {
   height: calc(~"100vh - 48px");
-  overflow-y: auto;
+  // TODO FIXME: 解决收缩后hover不弹出子菜单的问题
+  //overflow-y: auto;
+}
+
+// NOTE: fix sub item title link color
+:global(.ant-menu-dark) {
+  :global(.ant-menu-submenu-title) {
+    > a {
+      color: rgba(255, 255, 255, 0.67);
+    }
+  }
+  :global(.ant-menu-submenu-selected) {
+    :global(.ant-menu-submenu-title) {
+      > a {
+        color: #fff;
+      }
+    }
+  }
 }
 
 .menu {

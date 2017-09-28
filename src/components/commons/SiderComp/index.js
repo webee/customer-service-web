@@ -41,10 +41,32 @@ function findOpenKeys(path, items) {
   return openKeys;
 }
 
-function genMenuItems(items) {
+function findSelectedKeys(root_path, path, items) {
+  const selectedKeys = [];
+  for (let i in items) {
+    const item = items[i];
+    if ((root_path != item.pathname && path.startsWith(item.pathname)) || path == item.pathname) {
+      // 除非path == root_path, 否则过滤掉root_path
+      selectedKeys.push(item.key);
+    }
+    if (item.items) {
+      selectedKeys.push(...findSelectedKeys(root_path, path, item.items));
+    }
+  }
+  return selectedKeys;
+}
+
+function genMenuItems(collapsed, items) {
   return items.map((item) => item.items ? (
-      <SubMenu key={item.key} title={<span>{item.icon?<Icon type={item.icon}/>:''}<span>{item.title}</span></span>}>
-        {genMenuItems(item.items)}
+      <SubMenu key={item.key} title={
+      collapsed ?
+        <Link to={item.pathname}>
+          {item.icon ? <Icon type={item.icon} /> : ''}
+          <span>{item.title}</span>
+        </Link>:
+        <span>{item.icon?<Icon type={item.icon}/>:''}<span>{item.title}</span></span>
+      }>
+        {genMenuItems(collapsed, item.items)}
       </SubMenu>
   ) : (
       <Menu.Item key={item.key}>
@@ -58,19 +80,22 @@ function genMenuItems(items) {
 }
 
 
-export const SiderMenuComp = withRouter(({match, location, menuConfigs}) => {
+export const SiderMenuComp = withRouter(({match, location, collapsed, menuConfigs}) => {
   const { theme, mode, items } = menuConfigs;
-  const itemConfigs = genMenuItemConfigs(match.path, items);
+  const root_path = match.path;
+  const itemConfigs = genMenuItemConfigs(root_path, items);
   const pathname = location.pathname.replace(/\/*$/,'') || '/';
   const openKeys = findOpenKeys(pathname, itemConfigs);
   const selectedKeys = [pathname];
+  //const selectedKeys = findSelectedKeys(root_path, pathname, itemConfigs);
+  console.debug('pathname', pathname);
   console.debug('itemConfigs', itemConfigs);
   console.debug('openKeys', openKeys);
   console.debug('selectedKeys', selectedKeys);
 
   return (
     <Menu theme={theme||'dark'} defaultSelectedKeys={selectedKeys} selectedKeys={selectedKeys} defaultOpenKeys={openKeys} mode={mode}>
-      {genMenuItems(itemConfigs)}
+      {genMenuItems(false, itemConfigs)}
 		</Menu>
   );
 });
@@ -96,7 +121,7 @@ export default withRouter(({app_name, match, collapsed, onCollapse, menuConfigs,
             {!collapsed?<span>{app_name}</span>:''}
           </Link>
         </div>
-				<SiderMenuComp className={styles.menu} menuConfigs={menuConfigs}/>
+				<SiderMenuComp className={styles.menu} collapsed={collapsed} menuConfigs={menuConfigs}/>
       </Sider>
     )}</Media>
   );

@@ -95,7 +95,7 @@ class MainLayout extends React.Component {
   }
 
   render() {
-    const { match } = this.props;
+    const { match, location } = this.props;
     const root_path = getRootPath(match.path);
     const {staff, app, project_domains } = this.props;
     const loaded = staff && app && project_domains;
@@ -139,7 +139,7 @@ class MainLayout extends React.Component {
               {/* 主内容区路由设置 */}
               <Switch>
                 <Route exact path={`${root_path}/`} component={HomePage} />
-                <Route path={`${root_path}/projects/:projectDomain/:projectType`} component={ProjectsPage} />
+                <Route path={`${root_path}/projects/:projectDomain/:projectType`} key={location.pathname} component={ProjectsPage} />
 								<Route path={`${root_path}/setting`} component={SettingPage}/>
                 <Route component={NotFoundPage} />
 							</Switch>
