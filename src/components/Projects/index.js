@@ -8,6 +8,9 @@ import MyHandlingSessionsView from './MyHandlingSessions';
 
 
 class View extends Component {
+  state = {
+  };
+
   componentDidMount() {
     console.log('projects did mount');
   }
@@ -18,17 +21,16 @@ class View extends Component {
   };
 
   render() {
-    const {match} = this.props;
-    const {params} = match;
     return (
-      <Tabs onChange={this.onTabChange} size="default"
-            defaultActiveKey="my_in_handling_sessions"
+      <Tabs className={styles.main}
+            onChange={this.onTabChange} size="default"
+            defaultActiveKey="my_handling_sessions"
             animated={false}
       >
-        <Tabs.TabPane tab="我接待中的会话" key="my_in_handling_sessions">
-          <MyHandlingSessionsView />
+        <Tabs.TabPane tab="我接待中的会话" key="my_handling_sessions">
+          <MyHandlingSessionsView {...this.props.match.params} />
 				</Tabs.TabPane>
-        <Tabs.TabPane tab="接待中的会话" key="in_handling_sessions">
+        <Tabs.TabPane tab="接待中的会话" key="other_handling_sessions">
           接待中的会话
         </Tabs.TabPane>
         <Tabs.TabPane tab="最近接待的会话" key="handled_sessions">
@@ -41,7 +43,7 @@ class View extends Component {
 
 
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
   return {};
 }
 

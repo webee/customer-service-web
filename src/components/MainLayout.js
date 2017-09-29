@@ -195,13 +195,13 @@ class MainLayout extends React.Component {
             onCancel={this.settingModalOnCancel}
           >
             <Form>
-              <Form.Item label="脚标" labelCol={{span:4}}>
-                <SwitchComp checkedChildren="显示" unCheckedChildren="隐藏"
-                            defaultChecked={!ui_settings.disable_footer} onChange={this.toggleFooter}/>
-              </Form.Item>
               <Form.Item label="面包屑" labelCol={{span:4}}>
                 <SwitchComp checkedChildren="显示" unCheckedChildren="隐藏"
                             defaultChecked={!ui_settings.disable_breadcrumb} onChange={this.toggleBreadcrumb}/>
+              </Form.Item>
+              <Form.Item label="脚标" labelCol={{span:4}}>
+                <SwitchComp checkedChildren="显示" unCheckedChildren="隐藏"
+                            defaultChecked={!ui_settings.disable_footer} onChange={this.toggleFooter}/>
               </Form.Item>
 						</Form>
           </Modal>

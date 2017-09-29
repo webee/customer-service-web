@@ -3,6 +3,8 @@ import createHistory from 'history/createBrowserHistory'
 import createLoading from 'dva-loading';
 import { message } from 'antd';
 import './index.css';
+// moment
+import 'moment/locale/zh-cn';
 
 const ERROR_MSG_DURATION = 3; // 3 seconds
 // 1. Initialize
@@ -30,6 +32,7 @@ app.use(createLoading());
 // 3. Model
 app.model(require('./models/auth'));
 app.model(require('./models/app'));
+app.model(require('./models/project'));
 
 // 4. Router
 app.router(require('./router'));

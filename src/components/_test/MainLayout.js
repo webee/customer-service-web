@@ -4,6 +4,7 @@ import { connect } from 'dva';
 import { withRouter, Route, Link, Switch, Redirect } from 'dva/router';
 import {getRootPath} from '../commons/router';
 import { Layout, Menu, Icon } from 'antd';
+import { Flex, Box, } from 'reflexbox'
 import BreadcrumbComp from '../commons/BreadcrumbComp';
 import SiderComp from '../commons/SiderComp';
 import { RootRoute } from '../commons/router';
@@ -26,6 +27,7 @@ const urlNameMap = {
   '/_/layout': '布局组件',
   '/_/layout/grid': '栅格',
   '/_/layout/layout': '布局',
+  '/_/layout/blocks': '区块',
 };
 
 
@@ -43,6 +45,7 @@ const siderMenuConfigs = {
     {icon: 'heart', title: 'Layout', pathname: 'layout', open: true,
       items: [
         {icon: 'bars', title: 'Grid', pathname: 'grid'},
+        {icon: 'bars', title: 'Blocks', pathname: 'blocks'},
       ]
     },
 	],
@@ -96,14 +99,14 @@ class MainLayout extends React.Component {
 					</Header>
           <Content className={styles.content}>
             <BreadcrumbComp urlNameMap={urlNameMap}/>
-            <div className={styles.contentMain}>
+            <Flex className={styles.contentMain} auto>
               <Switch>
                 <Route exact path={`${root_path}`} component={HomePage}/>
                 <Route path={`${root_path}/general`} component={GeneralPage}/>
                 <Route path={`${root_path}/layout`} component={LayoutPage}/>
                 <Route component={NotFoundPage} />
               </Switch>
-            </div>
+            </Flex>
             <Footer className={styles.footer}>
               webee.yw(webee.yw@gmail.com) @2017
             </Footer>

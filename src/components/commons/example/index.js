@@ -12,6 +12,9 @@ class View extends Component {
   }
 
   render() {
+    return (
+      <h1>Content</h1>
+    );
   }
 }
 
