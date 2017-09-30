@@ -4,6 +4,7 @@ import { connect } from 'dva';
 import { Input, Badge } from 'antd';
 import Moment from 'react-moment';
 import styles from './index.less';
+import {dispatchDomainType, dispatchDomainTypeEffect} from '~/services/project';
 
 
 class View extends Component {
@@ -14,25 +15,21 @@ class View extends Component {
     console.log(value);
   };
 
-  onClick = (s) => {
+  onClick = (id) => {
     // 加入到打开的会话中
-    const {dispatch} = this.props;
-    console.log(s);
+    dispatchDomainType(this.props, 'myHandling/openSession', id);
   };
 
   componentDidMount() {
   }
 
   render() {
-    let { sessions } = this.props;
-    if (sessions.length === 0) {
+    const { myHandling } = this.props;
+    const { sessions, list_sessions } = myHandling;
+    if (list_sessions.length === 0) {
       return (
         <p>暂时没有正在接待的会话</p>
       );
-    }
-
-    for (let i = 0; i < 4; i++) {
-      sessions.push(...sessions);
     }
 
     return (
@@ -42,8 +39,9 @@ class View extends Component {
           onSearch={this.onSearch}
         />
 			<ul className={styles.ul}>
-        {sessions.map((s, idx) => {
-          return (<li className={styles.li} key={idx} onClick={()=>this.onClick(s)}>
+        {list_sessions.map((id, idx) => {
+          const s = sessions[id];
+          return (<li className={styles.li} key={idx} onClick={()=>this.onClick(id)}>
             <Badge status="success"/>{s.owner}/<Moment locale="zh-cn" fromNow date={s.updated}/>
           </li>);
         })}

@@ -2,25 +2,26 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { Tabs } from 'antd';
 import styles from './index.less';
+import {dispatchDomainType, dispatchDomainTypeEffect} from '~/services/project';
 
 
 class View extends Component {
   state = {
-    activeKey: undefined
   };
 
   onChange = (activeKey) => {
-    this.setState({activeKey});
+    dispatchDomainType(this.props, 'myHandling/activateOpenedSession', parseInt(activeKey));
   };
 
   onEdit = (targetKey, action) => {
     this[action](targetKey);
   };
 
-  add = () => {
+  add = (targetKey) => {
   };
 
   remove = (targetKey) => {
+    dispatchDomainType(this.props, 'myHandling/closeOpenedSession', parseInt(targetKey));
   };
 
   componentDidMount() {
@@ -28,7 +29,7 @@ class View extends Component {
 
   render() {
     const { myHandling } = this.props;
-    const { opened_sessions } = myHandling;
+    const { sessions, opened_sessions, current_opened_session } = myHandling;
     if (opened_sessions.length === 0) {
       return (
         <p>请选择会话接待</p>
@@ -39,14 +40,17 @@ class View extends Component {
       <Tabs
         hideAdd
         onChange={this.onChange}
-        activeKey={this.state.activeKey}
+        activeKey={`${current_opened_session}`}
         type="editable-card"
         onEdit={this.onEdit}
       >
-        {opened_sessions.map(s => {
-          <Tabs.Pane key={s.id} tag={s.owner}>
-            {s.updated}
-          </Tabs.Pane>
+        {opened_sessions.map(id => {
+          const s = sessions[id];
+          return (
+            <Tabs.TabPane key={`${s.id}`} tab={s.owner}>
+              {s.updated}
+            </Tabs.TabPane>
+					);
         })}
       </Tabs>
     );

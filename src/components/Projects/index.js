@@ -21,6 +21,7 @@ class View extends Component {
   };
 
   render() {
+    const {projectDomain, projectType} = this.props.match.params;
     return (
       <Tabs className={styles.main}
             onChange={this.onTabChange} size="default"
@@ -28,7 +29,7 @@ class View extends Component {
             animated={false}
       >
         <Tabs.TabPane tab="我接待中的会话" key="my_handling_sessions">
-          <MyHandlingSessionsView {...this.props.match.params} />
+          <MyHandlingSessionsView projectDomain={projectDomain} projectType={projectType} />
 				</Tabs.TabPane>
         <Tabs.TabPane tab="接待中的会话" key="other_handling_sessions">
           接待中的会话

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { reduxRouter } from 'dva/router';
 import { connect } from 'dva';
 import { Row, Col } from 'antd';
+import {dispatchDomainTypeEffect} from '~/services/project';
 import styles from './index.less';
 
 import SessionListView from './SessionList';
@@ -14,20 +15,19 @@ class View extends Component {
 
   componentDidMount() {
     console.debug('my handling sessions did mount');
-    const { dispatch } = this.props;
-    const { projectDomain, projectType } = this.props;
-    dispatch({type: 'project/myHandlingFetchSessions', payload: {project_domain: projectDomain, project_type: projectType}});
+    dispatchDomainTypeEffect(this.props, 'myHandling/fetchSessions');
   }
 
   render() {
+    const {projectDomain, projectType} = this.props;
     const {myHandling} = this.props;
     return (
 			<Row className={styles.main}>
 				<Col span={4} className={styles.list}>
-          <SessionListView sessions={myHandling.sessions}/>
+          <SessionListView projectDomain={projectDomain} projectType={projectType} myHandling={myHandling}/>
         </Col>
 				<Col span={20} className={styles.detail}>
-          <SessionDetailView myHandling={myHandling}/>
+          <SessionDetailView projectDomain={projectDomain} projectType={projectType} myHandling={myHandling}/>
         </Col>
 			</Row>
     );
