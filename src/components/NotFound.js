@@ -1,4 +1,4 @@
-import { withRouter, Switch, Redirect } from 'dva/router';
+import { withRouter } from 'dva/router';
 
 
 export default withRouter(({location}) => {

@@ -13,7 +13,7 @@ function RouterConfig({ history, app }) {
       <Switch>
         <Route path="/_" component={_Test} />
         <Route path="/auth" component={Auth} />
-        <Route path="/" render={authRequired(Main)} />
+        <Route path="/" render={authRequired('/auth', Main)} />
       </Switch>
     </ConnectedRouter>
   );

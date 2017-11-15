@@ -30,6 +30,8 @@ export default class MainLayout extends React.Component {
 
   render() {
     const { match, location, name, headerMenu, navData, disableBreadcrumb, disableFooter } = this.props;
+    // 以navData为基础生成1. 导航菜单，2. 面包屑 3. routes
+    console.debug('navData: ', navData);
     const root_path = getRootPath(match.path);
     const path = location.pathname.replace(/\/*$/,'') || '/';
     const urlDataMap = getURLDataMapFromNavData(root_path, navData);

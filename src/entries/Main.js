@@ -10,9 +10,9 @@ import MainLayout from '../components/layouts/MainLayout';
 import MainLayoutStyles from '../components/layouts/MainLayout.less';
 
 
-function getProjectDomainNavData(root, project_domains) {
+function getProjectDomainNavData(project_domains) {
   return project_domains.map(d => ({
-    icon: 'star-o', title: d.title, pathname: `${root}/${d.name}`, open: true, noLink: true,
+    icon: 'message', title: d.title, pathname: d.name, open: true, noLink: true,
     items: d.types.map(t => ({title: t.title, pathname: t.name}))
   }));
 }
@@ -20,7 +20,13 @@ function getProjectDomainNavData(root, project_domains) {
 function getNavData(project_domains) {
   return [
 		{icon: 'home', title: '首页', pathname: '', component: require('../routes/Home')},
-    // ...getProjectDomainNavData('projects', project_domains),
+		{icon: 'message', title: '项目', pathname: 'projects', noLink: true,
+      instance: {
+        pathname: ':projectDomain/:projectType',
+        component: require('../routes/Projects'),
+        items: getProjectDomainNavData(project_domains),
+      }
+    },
 		{icon: 'setting', title: '设置', pathname: 'setting', component: require('../routes/Setting')},
   ];
 }
