@@ -6,14 +6,14 @@ import MainLayoutStyles from '../components/layouts/MainLayout.less';
 
 
 const navData = [
-		{icon: 'home', title: '首页', pathname: '', component: require('../routes/_Test/Home')},
+		{icon: 'home', title: '首页', pathname: '', noBreadcrumb: true, component: require('../routes/_Test/Home')},
     {icon: 'star', title: '普通组件', pathname: 'general', open: true, def: 'button',
       items: [
         {icon: 'gift', title: '按钮', pathname: 'button', component: require('../routes/_Test/General/Button')},
         {icon: 'gift', title: '图标', pathname: 'icon', component: require('../routes/_Test/General/Icon')},
       ]
     },
-    {icon: 'layout', title: '布局组件', pathname: 'layout', open: true, def: 'grid',
+    {icon: 'layout', title: '布局组件', pathname: 'layout', open: true, def: 'grid', noLink: true,
       items: [
         {icon: 'gift', title: '栅格', pathname: 'grid', component: require('../routes/_Test/Layout/Grid')},
         {icon: 'gift', title: '区块', pathname: 'blocks', component: require('../routes/_Test/Layout/Blocks')},

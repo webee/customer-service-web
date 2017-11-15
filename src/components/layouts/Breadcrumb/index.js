@@ -1,28 +1,25 @@
 import { withRouter, Link } from 'dva/router';
 import { Breadcrumb } from 'antd';
-import styles from './index.css';
+import styles from './index.less';
 
 
-export default ({root_path, path, urlNameMap}) => {
-  console.debug('Breadcrumb: ', {root_path, path, urlNameMap});
+export default ({root_path, path, urlDataMap}) => {
+  console.debug('Breadcrumb: ', {root_path, path, urlDataMap});
 
   const pathSnippets = path.substr(root_path.length).split('/').filter(i => i);
   const urls = pathSnippets.map((_, index) => {
     return `${root_path}/${pathSnippets.slice(0, index + 1).join('/')}`;
   });
 
-  if (urlNameMap.hasOwnProperty(root_path)) {
+  if (urlDataMap.hasOwnProperty(root_path)) {
     urls.unshift(root_path);
   }
 
   const breadcrumbItems = urls.map((url, index) => {
-    let item = urlNameMap[url] || {name:'_'};
-    if (typeof item === 'string') {
-      item = {name: item};
-    }
-    let link = item.name;
+    const item = urlDataMap[url] || {title: '_'};
+    let link = item.title;
     if (!item.noLink && index < urls.length -1 ) {
-      link = (<Link to={url}>{item.name}</Link>);
+      link = (<Link to={url}>{item.title}</Link>);
     }
     return (
       <Breadcrumb.Item key={url}>
@@ -31,7 +28,7 @@ export default ({root_path, path, urlNameMap}) => {
     );
   });
   return (
-    <Breadcrumb className={styles.normal}>
+    <Breadcrumb className={styles.main}>
       {breadcrumbItems}
     </Breadcrumb>
   );

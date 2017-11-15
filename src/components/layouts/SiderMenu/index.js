@@ -3,32 +3,11 @@ import { Menu, Icon, Layout } from 'antd';
 const { Sider } = Layout;
 import MediaQuery from 'react-responsive';
 import Media from 'react-media';
-const {SubMenu, ItemGroup} = Menu;
+import { genMenuDataFromNavData } from '../../../commons/nav';
 import styles from './index.less';
 
+const {SubMenu, ItemGroup} = Menu;
 
-/*
-{key, icon, title, pathname, open, [items]}
- */
-function genMenuDataFromNavData(root_path, navData) {
-  return navData.map((item, _) => {
-    let {icon, title, pathname, open, items} = item;
-    let path = pathname;
-    if (!pathname.startsWith('/')) {
-      if (root_path.endsWith('/')) {
-        path = pathname ? `${root_path}${pathname}`: root_path;
-      } else {
-        path = pathname ? `${root_path}/${pathname}`: root_path;
-      }
-    }
-
-    const menuDataItem = {key: path, icon, title, path, open};
-    if (item.items) {
-      menuDataItem['items'] = genMenuDataFromNavData(path, item.items);
-    }
-    return menuDataItem;
-  });
-}
 
 function findOpenKeys(path, menuData) {
   const openKeys = [];
@@ -78,8 +57,7 @@ function genMenuItems(items) {
 }
 
 
-export const SiderMenuComp = ({root_path, path, theme, mode, navData}) => {
-  const menuData = genMenuDataFromNavData(root_path, navData);
+export const SiderMenuComp = ({root_path, path, theme, mode, menuData}) => {
   const openKeys = findOpenKeys(path, menuData);
   const selectedKeys = [findSelectedKey(path, menuData)];
   console.debug('path', path);
@@ -88,7 +66,7 @@ export const SiderMenuComp = ({root_path, path, theme, mode, navData}) => {
   console.debug('selectedKeys', selectedKeys);
 
   return (
-    <Menu theme={theme} selectedKeys={selectedKeys} defaultOpenKeys={openKeys} mode={mode}>
+    <Menu className={styles.menu} theme={theme} selectedKeys={selectedKeys} defaultOpenKeys={openKeys} mode={mode}>
       {genMenuItems(menuData)}
 		</Menu>
   );
@@ -97,11 +75,12 @@ export const SiderMenuComp = ({root_path, path, theme, mode, navData}) => {
 
 const noOp = () => {};
 
-export default withRouter(({root_path, path, name, collapsed, onCollapse, theme, mode, navData, onLogoClick=noOp}) => {
+export default ({root_path, path, name, collapsed, onCollapse, theme, mode, menuData, onLogoClick=noOp, withTrigger=false}) => {
   return (
       <Sider className={styles.sider}
              collapsible
              breakpoint="lg"
+             trigger={withTrigger ? undefined : null}
              collapsed={collapsed}
              onCollapse={onCollapse}
       >
@@ -111,7 +90,7 @@ export default withRouter(({root_path, path, name, collapsed, onCollapse, theme,
             <h1>{name}</h1>
           </Link>
         </div>
-				<SiderMenuComp root_path={root_path} path={path} theme={theme} mode={mode} navData={navData}/>
+				<SiderMenuComp root_path={root_path} path={path} theme={theme} mode={mode} menuData={menuData}/>
       </Sider>
     );
-});
+};

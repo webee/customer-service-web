@@ -4,76 +4,73 @@ import styles from './index.less';
 
 export default () => {
   return (
-    <div>
-      <h1>Grid栅格</h1>
-      <div>
-        <Row gutter={16}>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-          <Col span={8}>
-            <Card title="Card title" bordered={false}>Card content</Card>
-          </Col>
-        </Row>
-      </div>
-    </div>
+    <Card title='栅格展示'>
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+        <Col span={8}>
+          <Card title="Card title" bordered={false}>Card content</Card>
+        </Col>
+      </Row>
+    </Card>
   );
 };

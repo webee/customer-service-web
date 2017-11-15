@@ -1,14 +1,14 @@
-import { Icon } from 'antd';
-import styles from './index.css';
+import { Card, Icon } from 'antd';
+import styles from './index.less';
 
 
 export default () => {
   return (
-    <div className={styles.icon}>
+    <Card title="图标展示" className={styles.main}>
 			<Icon type="step-backward" />
       <Icon type="step-forward" />
       <Icon type="down" />
       <Icon type="up" />
-		</div>
+    </Card>
   );
 };
