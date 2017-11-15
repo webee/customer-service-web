@@ -18,7 +18,7 @@ const navData = [
         {icon: 'gift', title: '栅格', pathname: 'grid', component: require('../routes/_Test/Layout/Grid')},
         {icon: 'gift', title: '区块', pathname: 'blocks', component: require('../routes/_Test/Layout/Blocks')},
       ]
-    }, 
+    },
 ];
 
 
@@ -50,7 +50,7 @@ export default class _Test extends React.Component {
 
   render() {
     return (
-      <MainLayout name="测试应用" headerMenu={this.getHeaderMenu()} navData={navData}/>
+      <MainLayout name="测试页面" headerMenu={this.getHeaderMenu()} navData={navData}/>
     );
   }
 }

@@ -4,7 +4,7 @@
   "description": "Customer Service Web Site",
   "private": true,
   "scripts": {
-    "precommit": "npm run lint-staged",
+    "precommit": "echo \"npm run lint-staged\"",
     "start": "roadhog server",
     "start:no-proxy": "NO_PROXY=true roadhog server",
     "build": "roadhog build",

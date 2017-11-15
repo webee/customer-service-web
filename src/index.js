@@ -36,9 +36,9 @@ const app = dva({
 app.use(createLoading());
 
 // 3. Register models
-// app.model(require('./models/auth'));
-// app.model(require('./models/app'));
-// app.model(require('./models/project'));
+app.model(require('./models/auth'));
+app.model(require('./models/app'));
+app.model(require('./models/project'));
 
 // 4. Router
 app.router(require('./router'));

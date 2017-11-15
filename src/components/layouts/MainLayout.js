@@ -29,7 +29,7 @@ export default class MainLayout extends React.Component {
   };
 
   render() {
-    const { match, location, name, headerMenu, navData, disableBreadcrumb } = this.props;
+    const { match, location, name, headerMenu, navData, disableBreadcrumb, disableFooter } = this.props;
     const root_path = getRootPath(match.path);
     const path = location.pathname.replace(/\/*$/,'') || '/';
     const urlDataMap = getURLDataMapFromNavData(root_path, navData);

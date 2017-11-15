@@ -2,15 +2,16 @@ import { withRouter, Route, Link, Switch, Redirect } from 'dva/router';
 
 
 export function getRootPath(path) {
-  return path.endsWith('/') ? path.substr(0, path.length - 1) : path;
+  return path.replace(/\/*$/,'') || '/';
 }
 
 export function getRouteDataFromNavData(root_path, navData, NoMatch) {
+  const pathPrefix = root_path.replace(/\/*$/,'');
   return navData.map(item => {
     const { pathname, component } = item;
     let { render } = item;
     const exact = pathname === '';
-    const path =  exact ? root_path : `${root_path}/${pathname}`;
+    const path =  exact ? root_path : `${pathPrefix}/${pathname}`;
     if (item.items) {
       render = ({match}) => {
         const { path } = match;
@@ -19,6 +20,7 @@ export function getRouteDataFromNavData(root_path, navData, NoMatch) {
         );
       };
     }
+    console.debug('route: ', {exact, path, component, render});
     return {exact, path, component, render};
   });
 }
