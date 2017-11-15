@@ -39,6 +39,8 @@ export default class MainLayout extends React.Component {
     const urlDataMap = getURLDataMapFromNavData(root_path, navData);
     const menuData = getMenuDataFromNavData(root_path, navData);
     const urlData = urlDataMap[path] || {};
+
+    const contentStyle = {height: disableFooter ? 'calc(100vh - 64px)' : 'calc(100vh - 64px - 48px)'};
     const layout = (
       <Layout className={`ant-layout-has-sider ${styles.layout}`}>
         <SiderMenu root_path={root_path} path={path}
@@ -51,15 +53,17 @@ export default class MainLayout extends React.Component {
 						<Icon className={styles.trigger} type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'} onClick={this.toggleCollapse}/>
             {headerMenu}
 					</Header>
-          <Content className={styles.content}>
+          <Content className={styles.content} style={contentStyle}>
             { disableBreadcrumb || urlData.noBreadcrumb ? '' :
               <Breadcrumb root_path={root_path} path={path} urlDataMap={urlDataMap}/>
             }
             <Routes path={root_path} navData={navData} NoMatch={NotFound} />
           </Content>
+          {disableFooter ||
           <Footer className={styles.footer}>
             webee.yw(webee.yw@gmail.com) @2017
           </Footer>
+          }
           {bottom}
         </Layout>
       </Layout>
