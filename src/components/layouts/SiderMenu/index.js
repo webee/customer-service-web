@@ -57,7 +57,7 @@ function genMenuItems(items) {
 }
 
 
-export const SiderMenuComp = ({root_path, path, theme, mode, menuData}) => {
+export const SiderMenuComp = ({collapsed, root_path, path, theme, mode, menuData}) => {
   const openKeys = findOpenKeys(path, menuData);
   const selectedKeys = [findSelectedKey(path, menuData)];
   console.debug('path', path);
@@ -65,8 +65,15 @@ export const SiderMenuComp = ({root_path, path, theme, mode, menuData}) => {
   console.debug('openKeys', openKeys);
   console.debug('selectedKeys', selectedKeys);
 
+  // TODO: 解决弹出菜单hidden的问题,
+  //      目前在collapsed的时候不处理overflow, 大部分情况可以处理
+  const style = {};
+  if (!collapsed) {
+    style['overflow'] = "auto";
+  }
   return (
-    <Menu className={styles.menu} theme={theme} selectedKeys={selectedKeys} defaultOpenKeys={openKeys} mode={mode}>
+    <Menu className={styles.menu} style={style}
+      theme={theme} selectedKeys={selectedKeys} defaultOpenKeys={openKeys} mode={mode}>
       {genMenuItems(menuData)}
 		</Menu>
   );
@@ -90,7 +97,7 @@ export default ({root_path, path, name, collapsed, onCollapse, theme, mode, menu
             <h1>{name}</h1>
           </Link>
         </div>
-				<SiderMenuComp root_path={root_path} path={path} theme={theme} mode={mode} menuData={menuData}/>
+				<SiderMenuComp {...{ collapsed, root_path, path, theme, mode, menuData }}/>
       </Sider>
     );
 };

@@ -18,7 +18,7 @@ const navData = [
         {icon: 'gift', title: '栅格', pathname: 'grid', component: require('../routes/_Test/Layout/Grid')},
         {icon: 'gift', title: '区块', pathname: 'blocks', component: require('../routes/_Test/Layout/Blocks')},
       ]
-    },
+    }, 
 ];
 
 
