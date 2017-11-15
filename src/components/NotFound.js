@@ -1,10 +1,11 @@
+import { Card } from 'antd';
 import { withRouter } from 'dva/router';
 
 
 export default withRouter(({location}) => {
   return (
-    <div>
+    <Card title="not found">
       <h1>Pathname Not Found: {location.pathname}</h1>
-		</div>
+		</Card>
   );
 });

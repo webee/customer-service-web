@@ -30,6 +30,8 @@ export default class MainLayout extends React.Component {
 
   render() {
     const { match, location, name, headerMenu, navData, disableBreadcrumb, disableFooter } = this.props;
+    const { onLogoClick } = this.props;
+    const { bottom } = this.props;
     // 以navData为基础生成1. 导航菜单，2. 面包屑 3. routes
     console.debug('navData: ', navData);
     const root_path = getRootPath(match.path);
@@ -41,6 +43,7 @@ export default class MainLayout extends React.Component {
       <Layout className={`ant-layout-has-sider ${styles.layout}`}>
         <SiderMenu root_path={root_path} path={path}
                   name={name} collapsed={this.state.collapsed} onCollapse={this.onCollapse}
+                  onLogoClick={onLogoClick}
                   theme="dark" mode="inline"
                   menuData={menuData} />
 				<Layout className={styles.main}>
@@ -57,6 +60,7 @@ export default class MainLayout extends React.Component {
           <Footer className={styles.footer}>
             webee.yw(webee.yw@gmail.com) @2017
           </Footer>
+          {bottom}
         </Layout>
       </Layout>
     );

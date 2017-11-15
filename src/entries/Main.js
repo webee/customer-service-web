@@ -34,32 +34,7 @@ function getNavData(project_domains) {
 
 class Main extends React.Component {
   state = {
-    collapsed: false,
     showSettingModal: false,
-  };
-  onCollapse = (collapsed, type) => {
-    console.debug('sider collapsed: ', collapsed, type);
-    this.setState({collapsed});
-  };
-
-  toggleCollapse = () => {
-    this.setState({
-      collapsed: !this.state.collapsed
-    });
-  };
-
-  handleMenuClick = (item) => {
-    console.debug("click menu: ", item);
-    const root_path = getRootPath(this.props.match.path);
-    switch (item.key) {
-      case 'user/logout':
-        const { dispatch } = this.props;
-        dispatch({type: 'auth/logout', payload: `${root_path}/auth`});
-        break;
-      case 'ui-setting':
-        this.setState({showSettingModal:true});
-        break;
-    }
   };
 
   onLogoClick = () => {
@@ -74,6 +49,10 @@ class Main extends React.Component {
   toggleFooter = (checked) => {
     const {dispatch} = this.props;
     dispatch({type: 'app/setUISettings', payload: {disable_footer: !checked}});
+  };
+
+  handleSettingUI = () => {
+      this.setState({showSettingModal:true});
   };
 
   settingModalOnOk = (e) => {
@@ -97,7 +76,7 @@ class Main extends React.Component {
       <Menu className={MainLayoutStyles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
         <Menu.Item disabled><Icon type="user/home" />个人中心</Menu.Item>
         <Menu.Item disabled><Icon type="user/setting" />设置</Menu.Item>
-        <Menu.Item key="user/logout"><Icon type="logout" />退出登录</Menu.Item>
+        <Menu.Item key="user/logout"><Link to="/auth/logout"><Icon type="logout" />退出登录</Link></Menu.Item>
         <Menu.Divider />
         <ItemGroup title="常用位置">
           <Menu.Item key="user/common/baidu">
@@ -110,7 +89,7 @@ class Main extends React.Component {
     return (
       <div className={MainLayoutStyles.right}>
           <Link to="/_" className={MainLayoutStyles.action}><Icon type="code" />Test</Link>
-          <span className={MainLayoutStyles.action}><Icon type="setting" />界面设置</span>
+          <span className={MainLayoutStyles.action} onClick={this.handleSettingUI}><Icon type="setting" />界面设置</span>
           <Dropdown overlay={menu}>
             <span className={`${MainLayoutStyles.action} ${MainLayoutStyles.account}`}>
             <Avatar size="small" className={MainLayoutStyles.avatar} icon="user" />
@@ -118,6 +97,32 @@ class Main extends React.Component {
             </span>
           </Dropdown>
       </div>
+    );
+  }
+
+  getBottom() {
+    const { showSettingModal } = this.state;
+    const { ui_settings } = this.props;
+    return (
+      showSettingModal ?
+          <Modal
+            title="界面设置"
+            visible={showSettingModal}
+            onOk={this.settingModalOnOk}
+            onCancel={this.settingModalOnCancel}
+          >
+            <Form>
+              <Form.Item label="面包屑" labelCol={{span:4}}>
+                <SwitchComp checkedChildren="显示" unCheckedChildren="隐藏"
+                            defaultChecked={!ui_settings.disable_breadcrumb} onChange={this.toggleBreadcrumb}/>
+              </Form.Item>
+              <Form.Item label="脚标" labelCol={{span:4}}>
+                <SwitchComp checkedChildren="显示" unCheckedChildren="隐藏"
+                            defaultChecked={!ui_settings.disable_footer} onChange={this.toggleFooter}/>
+              </Form.Item>
+						</Form>
+          </Modal>
+            :''
     );
   }
 
@@ -136,6 +141,8 @@ class Main extends React.Component {
       <MainLayout name={app.title} headerMenu={this.getHeaderMenu(staff.name)} navData={navData}
                   disableBreadcrumb={ui_settings.disable_breadcrumb}
                   disableFooter={ui_settings.disable_footer}
+                  onLogoClick={this.onLogoClick}
+                  bottom={this.getBottom()}
       />
     );
   }
