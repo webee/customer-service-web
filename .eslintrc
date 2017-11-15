@@ -49,5 +49,8 @@
     "ecmaFeatures": {
       "experimentalObjectRestSpread": true
     }
+  },
+  "settings": {
+    "import/resolver": "babel-plugin-root-import"
   }
 }

@@ -1,15 +1,22 @@
 {
   "entry": "src/index.js",
+  "hash": true,
   "extraBabelPlugins": [
     "transform-runtime",
     "transform-decorators-legacy",
     "transform-class-properties",
+    ["root-import", {"rootPathSuffix": "src"}],
     ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": true }]
   ],
   "env": {
     "development": {
       "extraBabelPlugins": [
-        "dva-hmr"
+        "dva-hmr",
+        "transform-runtime"
+      ]
+    },
+    "production": {
+      "extraBabelPlugins": [
       ]
     }
   },
