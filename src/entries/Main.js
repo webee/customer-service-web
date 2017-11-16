@@ -71,12 +71,14 @@ class Main extends React.Component {
     this.props.dispatch({type: 'app/fetch'});
   }
 
-  getHeaderMenu(username) {
+  getHeaderMenu() {
+    const { staff, location } = this.props;
+    console.log('location:', location);
     const menu = (
       <Menu className={MainLayoutStyles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
         <Menu.Item disabled><Icon type="user/home" />个人中心</Menu.Item>
         <Menu.Item disabled><Icon type="user/setting" />设置</Menu.Item>
-        <Menu.Item key="user/logout"><Link to="/auth/logout"><Icon type="logout" />退出登录</Link></Menu.Item>
+        <Menu.Item key="user/logout"><Link to={{pathname: "/auth/logout", state: { from: location }}}><Icon type="logout" />退出登录</Link></Menu.Item>
         <Menu.Divider />
         <ItemGroup title="常用位置">
           <Menu.Item key="user/common/baidu">
@@ -93,7 +95,7 @@ class Main extends React.Component {
           <Dropdown overlay={menu}>
             <span className={`${MainLayoutStyles.action} ${MainLayoutStyles.account}`}>
             <Avatar size="small" className={MainLayoutStyles.avatar} icon="user" />
-              {username}
+              {staff.name}
             </span>
           </Dropdown>
       </div>
@@ -129,7 +131,7 @@ class Main extends React.Component {
   render() {
     const { match, location } = this.props;
     const root_path = getRootPath(match.path);
-    const {staff, app, project_domains, ui_settings } = this.props;
+    const { staff, app, project_domains, ui_settings } = this.props;
     const loaded = staff && app && project_domains;
     if (!loaded) {
       return <Loader loaded={false}/>
@@ -138,7 +140,7 @@ class Main extends React.Component {
     const navData = getNavData(project_domains);
 
     return (
-      <MainLayout name={app.title} headerMenu={this.getHeaderMenu(staff.name)} navData={navData}
+      <MainLayout name={app.title} headerMenu={this.getHeaderMenu()} navData={navData}
                   disableBreadcrumb={ui_settings.disable_breadcrumb}
                   disableFooter={ui_settings.disable_footer}
                   onLogoClick={this.onLogoClick}

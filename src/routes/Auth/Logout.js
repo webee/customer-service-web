@@ -7,7 +7,9 @@ import { connect } from 'dva';
 @connect()
 export default class Logout extends React.PureComponent {
   componentDidMount() {
-    this.props.dispatch({type: 'auth/logout', payload: '/auth'});
+    const { dispatch, location } = this.props;
+    console.log('Logout: ', location);
+    dispatch({type: 'auth/logout', payload: location.state});
   }
 
   render() {

@@ -20,11 +20,19 @@ const app = dva({
   },
   onReducer(reducer) {
     return (state, action) => {
-      const newState = { ...state };
-      if (action.type === 'RESET') {
-        action.payload.forEach((ns) => {
-          newState[ns] = undefined;
-        });
+      let newState = state;
+      const { type, payload } = action; 
+      if (type === 'RESET') {
+        if (payload === '*') {
+          // 清空所有
+          newState = {};
+        } else {
+          // 清空指定的分支
+          newState = { ...state };
+          payload.forEach((ns) => {
+            newState[ns] = undefined;
+          });
+        }
       }
 
       return reducer(newState, action);

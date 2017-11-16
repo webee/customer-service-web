@@ -3,6 +3,7 @@ import request from '~/utils/request';
 import envConfig from '~/config';
 import { STAFF_JWT_HEADER } from '~/constants'
 import * as authService from '../services/auth';
+import { authPath } from '../config';
 
 
 export default {
@@ -16,7 +17,7 @@ export default {
         yield call(authService.saveJWT, jwt);
       } catch(error) {
         console.error(error);
-        yield call(authService.clearJWT);
+        yield put({type: 'logout'});
       }
     },
     *login({payload: {jwt, login_url}}, { call }) {
@@ -30,10 +31,13 @@ export default {
         throw error;
       }
     },
-    *logout({payload: authPath='/auth'}, {call, put}) {
+    *resetState(action, {call, put}) {
       yield call(authService.clearJWT);
-      yield put({type: 'RESET', payload: ['app']});
-      yield put(routerRedux.push({pathname: authPath}));
+      yield put({type: 'RESET', payload: '*'});
+    },
+    *logout({payload: state}, {call, put}) {
+      yield put({type: 'resetState'});
+      yield put(routerRedux.push({pathname: authPath, state}));
     },
   },
   subscriptions: {
@@ -47,7 +51,9 @@ export default {
         }
         const jwt = authService.loadJWT();
         const jwt_exp = authService.loadJWTExp();
-        if (!(jwt_exp - new Date() > envConfig.jwtRefreshTime)) {
+        if (!(jwt && jwt_exp)) {
+            dispatch({type: 'logout', payload: {from: history.location}});
+        } else if (!(jwt_exp - new Date() > envConfig.jwtRefreshTime)) {
           dispatch({type: 'refreshJWT', payload: jwt});
         }
         return {...config, headers: {...headers, [STAFF_JWT_HEADER]: jwt}};
@@ -68,7 +74,7 @@ export default {
           // that falls out of the range of 2xx
           done(new Error(response.data.message));
           if (response.status == 401) {
-            dispatch(routerRedux.push({pathname: '/auth'}));
+            dispatch({type: 'logout', payload: {from: history.location}});
           }
         } else if (error.request) {
           // The request was made but no response was received

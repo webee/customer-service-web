@@ -38,7 +38,9 @@ export default class MainLayout extends React.Component {
     const path = location.pathname.replace(/\/*$/,'') || '/';
     const urlDataMap = getURLDataMapFromNavData(root_path, navData);
     const menuData = getMenuDataFromNavData(root_path, navData);
-    const urlData = urlDataMap[path] || {};
+    console.debug('urlDatamap: ', urlDataMap);
+    console.debug('path: ', path);
+    const urlData = urlDataMap[path === '/' ? '' : path] || {};
 
     const contentStyle = {height: disableFooter ? 'calc(100vh - 64px)' : 'calc(100vh - 64px - 48px)'};
     const layout = (

@@ -13,10 +13,15 @@ const navData = [
         {icon: 'gift', title: '图标', pathname: 'icon', component: require('../routes/_Test/General/Icon')},
       ]
     },
-    {icon: 'layout', title: '布局组件', pathname: 'layout', open: true, def: 'grid', noLink: true,
+    {icon: 'layout', title: '布局组件', pathname: 'layout', def: 'grid', noLink: true,
       items: [
         {icon: 'gift', title: '栅格', pathname: 'grid', component: require('../routes/_Test/Layout/Grid')},
         {icon: 'gift', title: '区块', pathname: 'blocks', component: require('../routes/_Test/Layout/Blocks')},
+      ]
+    },
+    {icon: 'layout', title: '数据展示', pathname: 'dataDisplay', def: 'etc',
+      items: [
+        {icon: 'gift', title: '杂项', pathname: 'etc', component: require('../routes/_Test/DataDisplay')},
       ]
     },
 ];
