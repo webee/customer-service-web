@@ -59,7 +59,9 @@ export default class MainLayout extends React.Component {
             { disableBreadcrumb || urlData.noBreadcrumb ? '' :
               <Breadcrumb root_path={root_path} path={path} urlDataMap={urlDataMap}/>
             }
-            <Routes path={root_path} navData={navData} NoMatch={NotFound} />
+            <div className={styles.contentMain}> 
+              <Routes path={root_path} navData={navData} NoMatch={NotFound} />
+            </div>
           </Content>
           {disableFooter ||
           <Footer className={styles.footer}>
