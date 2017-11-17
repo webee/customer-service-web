@@ -29,7 +29,7 @@ export default class MainLayout extends React.Component {
   };
 
   render() {
-    const { match, location, name, headerMenu, navData, disableBreadcrumb, disableFooter } = this.props;
+    const { match, location, name, headerMenu, navData } = this.props;
     const { onLogoClick } = this.props;
     const { bottom } = this.props;
     // 以navData为基础生成1. 导航菜单，2. 面包屑 3. routes
@@ -42,7 +42,18 @@ export default class MainLayout extends React.Component {
     console.debug('path: ', path);
     const urlData = urlDataMap[path === '/' ? '' : path] || {};
 
-    const contentStyle = {height: disableFooter ? 'calc(100vh - 64px)' : 'calc(100vh - 64px - 48px)'};
+    const disableBreadcrumb = this.props.disableBreadcrumb || urlData.noBreadcrumb;
+    const disableFooter = this.props.disableFooter || urlData.noFooter;
+
+    let contentClassName = styles.content;
+    let contentMainClassName = styles.contentMain;
+    let contentStyle = {};
+    if (urlData.fixed) {
+      contentClassName = `${styles.content} ${styles.fixedContent}`;
+      contentMainClassName = `${styles.contentMain} ${styles.fixedContentMain}`;
+      contentStyle = {height: disableFooter ? 'calc(100vh - 64px)' : 'calc(100vh - 64px - 48px)'};
+    }
+
     const layout = (
       <Layout className={`ant-layout-has-sider ${styles.layout}`}>
         <SiderMenu root_path={root_path} path={path}
@@ -55,11 +66,11 @@ export default class MainLayout extends React.Component {
 						<Icon className={styles.trigger} type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'} onClick={this.toggleCollapse}/>
             {headerMenu}
 					</Header>
-          <Content className={styles.content} style={contentStyle}>
-            { disableBreadcrumb || urlData.noBreadcrumb ? '' :
+          <Content className={contentClassName} style={contentStyle}>
+            { disableBreadcrumb ? '' :
               <Breadcrumb root_path={root_path} path={path} urlDataMap={urlDataMap}/>
             }
-            <div className={styles.contentMain}> 
+            <div className={contentMainClassName}>
               <Routes path={root_path} navData={navData} NoMatch={NotFound} />
             </div>
           </Content>

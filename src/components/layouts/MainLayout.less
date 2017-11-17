@@ -54,12 +54,20 @@
       }
     }
 
+    height: 100vh;
+    overflow: auto;
     .content {
       margin: 8px 8px 0;
+      .contentMain {
+        // for test
+        background-color: SkyBlue;
+      }
+    }
+    .fixedContent {
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      .contentMain {
+      .fixedContentMain {
         // 1.
         // flex-grow: 1;
         // height: 100%;
@@ -68,8 +76,9 @@
 
         overflow: auto;
 
-        // for test
-        // background-color: SkyBlue;
+        // for children
+        display: flex;
+        flex-direction: column;
       }
     }
 
@@ -77,7 +86,7 @@
       height: 48px;
       text-align: center;
       padding: 10px 50px;
-      background-color: #FDFDFD;
+      background-color: #F0F2F5;
     }
   }
 }
