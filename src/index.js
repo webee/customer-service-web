@@ -3,6 +3,7 @@ import createHistory from 'history/createBrowserHistory';
 import 'moment/locale/zh-cn';
 import createLoading from 'dva-loading';
 import { message } from 'antd';
+import 'ant-design-pro/dist/ant-design-pro.css';
 import envConfig from './config';
 import './polyfill';
 import './g2';
@@ -21,7 +22,7 @@ const app = dva({
   onReducer(reducer) {
     return (state, action) => {
       let newState = state;
-      const { type, payload } = action; 
+      const { type, payload } = action;
       if (type === 'RESET') {
         if (payload === '*') {
           // 清空所有
