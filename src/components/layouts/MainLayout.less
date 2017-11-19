@@ -64,21 +64,15 @@
       }
     }
     .fixedContent {
-      overflow: hidden;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
       .fixedContentMain {
-        // 1.
-        // flex-grow: 1;
-        // height: 100%;
-        // 2.
-        flex: 1;
-
-        overflow: auto;
+        flex: auto;
 
         // for children
         display: flex;
-        flex-direction: column;
+        overflow: hidden;
       }
     }
 
@@ -86,7 +80,7 @@
       height: 48px;
       text-align: center;
       padding: 10px 50px;
-      background-color: #F0F2F5;
+      background-color: @layout-body-background;
     }
   }
 }
