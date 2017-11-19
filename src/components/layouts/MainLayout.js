@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Loader from 'react-loader';
 import { connect } from 'dva';
+import classNames from 'classnames';
 import DocumentTitle from 'react-document-title';
 import { withRouter, Route, Link, Switch, Redirect } from 'dva/router';
 import { getRootPath, Routes } from '../../commons/router';
@@ -45,13 +46,11 @@ export default class MainLayout extends React.Component {
     const disableBreadcrumb = this.props.disableBreadcrumb || urlData.noBreadcrumb;
     const disableFooter = this.props.disableFooter || urlData.noFooter;
 
-    let contentClassName = styles.content;
-    let contentMainClassName = styles.contentMain;
-    let contentStyle = {};
+    const contentClassName = classNames(styles.content, { [styles.fixedContent]: urlData.fixed });
+    const contentMainClassName = classNames(styles.contentMain, { [styles.fixedContentMain]: urlData.fixed });
+    const contentStyle = {};
     if (urlData.fixed) {
-      contentClassName = `${styles.content} ${styles.fixedContent}`;
-      contentMainClassName = `${styles.contentMain} ${styles.fixedContentMain}`;
-      contentStyle = {height: disableFooter ? 'calc(100vh - 64px)' : 'calc(100vh - 64px - 48px)'};
+      contentStyle['height'] = disableFooter ? 'calc(100vh - 64px)' : 'calc(100vh - 64px - 48px)';
     }
 
     const layout = (
