@@ -3,7 +3,10 @@ import createHistory from 'history/createBrowserHistory';
 import 'moment/locale/zh-cn';
 import createLoading from 'dva-loading';
 import { message } from 'antd';
+// lib csses
 import 'ant-design-pro/dist/ant-design-pro.css';
+import 'react-chat-elements/dist/main.css';
+import 'react-virtualized/styles.css'
 import envConfig from './config';
 import './polyfill';
 import './g2';

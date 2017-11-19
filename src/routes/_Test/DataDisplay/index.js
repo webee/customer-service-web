@@ -18,13 +18,15 @@ export default () => {
           <a href="#" className={styles.head} />
         </Badge>
         <br />
-        <Badge dot={true} status="success">
+        <Badge dot={true}>
           <Icon type="code" className={styles.icon} />
         </Badge>
         <br />
         <Badge status="success" text="小明" />
         <br />
         <Badge status="processing" text="小王" />
+        <br />
+        <Badge status="error" text="小易" />
       </Card>
       <Card>
         <Badge count={25} />

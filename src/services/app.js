@@ -1,4 +1,5 @@
 import request from '../utils/request';
+// FIXME: replace localStorage by localforage.
 
 
 export async function fetchStaffAppTree() {
