@@ -3,6 +3,7 @@ import { reduxRouter } from 'dva/router';
 import { connect } from 'dva';
 import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
 import List from 'react-virtualized/dist/commonjs/List';
+import SessionItem from './SessionItem';
 import { Input, Avatar, Badge, Tag } from "antd";
 import Moment from 'react-moment';
 import styles from './SessionList.less';
@@ -10,202 +11,232 @@ import styles from './SessionList.less';
 const data = [
   {
     status: "success",
-    title: "易旺",
+    name: "易旺",
     description: "文字: 来了吗？一二三四五六七八九十",
-    ts: "1分钟前"
+    ts: "1分钟前",
+    unread: 1,
   },
   {
     status: "processing",
-    title: "张三丰",
+    name: "张三丰",
     description: "语音: 13秒",
     active: true,
     ts: "16分钟前",
-    online: true
+    online: true,
+    unread: 0,
   },
   {
     status: "error",
-    title: "赵伟",
+    name: "赵伟",
     description: "图片",
     ts: "1小时前",
+    unread: 10,
     online: true
   },
   {
     status: "warning",
-    title: "小明",
+    name: "小明",
     description: "文件: xxx.jpg",
-    ts: "昨天"
+    ts: "昨天",
+    unread: 3,
   },
   {
     status: "error",
-    title: "安卓",
+    name: "安卓",
     description: "图片",
     ts: "昨天",
+    unread: 4,
     online: true
   },
   {
     status: "warning",
-    title: "IOS",
+    name: "IOS",
+    unread: 8,
     description: "文件: xxx.jpg",
     ts: "前天"
   },
   {
     status: "success",
-    title: "易旺",
+    name: "易旺",
     description: "文字: 来了吗？一二三四五六七八九十",
+    unread: 13,
     ts: "1分钟前"
   },
   {
     status: "processing",
-    title: "张三丰",
+    name: "张三丰",
     description: "语音: 13秒",
     active: true,
     ts: "16分钟前",
+    unread: 4,
     online: true
   },
   {
     status: "error",
-    title: "赵伟",
+    name: "赵伟",
     description: "图片",
     ts: "1小时前",
+    unread: 7,
     online: true
   },
   {
     status: "warning",
-    title: "小明",
+    name: "小明",
     description: "文件: xxx.jpg",
+    unread: 2,
     ts: "昨天"
   },
   {
     status: "error",
-    title: "安卓",
+    name: "安卓",
     description: "图片",
     ts: "昨天",
+    unread: 0,
     online: true
   },
   {
     status: "warning",
-    title: "IOS",
+    name: "IOS",
     description: "文件: xxx.jpg",
+    unread: 3,
     ts: "前天"
   },
   {
     status: "success",
-    title: "易旺",
+    name: "易旺",
     description: "文字: 来了吗？一二三四五六七八九十",
+    unread: 3,
     ts: "1分钟前"
   },
   {
     status: "processing",
-    title: "张三丰",
+    name: "张三丰",
     description: "语音: 13秒",
     active: true,
     ts: "16分钟前",
+    unread: 3,
     online: true
   },
   {
     status: "error",
-    title: "赵伟",
+    name: "赵伟",
     description: "图片",
     ts: "1小时前",
+    unread: 3,
     online: true
   },
   {
     status: "warning",
-    title: "小明",
+    name: "小明",
     description: "文件: xxx.jpg",
+    unread: 3,
     ts: "昨天"
   },
   {
     status: "error",
-    title: "安卓",
+    name: "安卓",
     description: "图片",
     ts: "昨天",
+    unread: 3,
     online: true
   },
   {
     status: "warning",
-    title: "IOS",
+    name: "IOS",
     description: "文件: xxx.jpg",
+    unread: 3,
     ts: "前天"
   },
   {
     status: "success",
-    title: "易旺",
+    name: "易旺",
+    unread: 3,
     description: "文字: 来了吗？一二三四五六七八九十",
     ts: "1分钟前"
   },
   {
     status: "processing",
-    title: "张三丰",
+    name: "张三丰",
     description: "语音: 13秒",
     active: true,
     ts: "16分钟前",
+    unread: 3,
     online: true
   },
   {
     status: "error",
-    title: "赵伟",
+    name: "赵伟",
     description: "图片",
     ts: "1小时前",
+    unread: 3,
     online: true
   },
   {
     status: "warning",
-    title: "小明",
+    name: "小明",
     description: "文件: xxx.jpg",
+    unread: 3,
     ts: "昨天"
   },
   {
     status: "error",
-    title: "安卓",
+    name: "安卓",
     description: "图片",
     ts: "昨天",
+    unread: 3,
     online: true
   },
   {
     status: "warning",
-    title: "IOS",
+    name: "IOS",
     description: "文件: xxx.jpg",
+    unread: 3,
     ts: "前天"
   },
   {
     status: "success",
-    title: "易旺",
+    name: "易旺",
     description: "文字: 来了吗？一二三四五六七八九十",
+    unread: 3,
     ts: "1分钟前"
   },
   {
     status: "processing",
-    title: "张三丰",
+    name: "张三丰",
     description: "语音: 13秒",
     active: true,
     ts: "16分钟前",
+    unread: 3,
     online: true
   },
   {
     status: "error",
-    title: "赵伟",
+    name: "赵伟",
     description: "图片",
     ts: "1小时前",
+    unread: 3,
     online: true
   },
   {
     status: "warning",
-    title: "小明",
+    name: "小明",
     description: "文件: xxx.jpg",
+    unread: 3,
     ts: "昨天"
   },
   {
     status: "error",
-    title: "安卓",
+    name: "安卓",
     description: "图片",
     ts: "昨天",
+    unread: 3,
     online: true
   },
   {
     status: "warning",
-    title: "IOS",
+    name: "IOS",
     description: "文件: xxx.jpg",
+    unread: 3,
     ts: "前天"
   },
 ];
@@ -216,7 +247,10 @@ export default class View extends Component {
     const item = data[index];
     return (
       <div key={key} className={styles.item} style={style}>
-        {item.title}
+        <SessionItem
+        name={item.name} description={item.description} ts={item.ts}
+        unread={item.unread} online={item.online}
+        />
       </div>
     );
   }
@@ -227,7 +261,7 @@ export default class View extends Component {
         <List className={styles.list}
         width={width} height={height}
         rowCount={data.length}
-        rowHeight={30}
+        rowHeight={60}
         rowRenderer={this.rowRenderer}
         />
       )}</AutoSizer>

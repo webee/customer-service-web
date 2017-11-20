@@ -1,0 +1,53 @@
+.main {
+    height: 60px;
+    display: flex;
+
+    .avatar {
+      flex: 0 0 60px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      .active {
+        background-color: #87d068;
+      }
+    }
+
+    .description {
+      flex: auto;
+      overflow: hidden;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+
+      .top {
+        flex: auto;
+
+        margin-right: 10px;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .bottom {
+        font-size: 12px;
+
+        flex: auto;
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .title {
+      line-height: 1.5em;
+      font-size: 14px;
+    }
+
+    .body {
+      line-height: 1.5em;
+      font-size: 12px;
+    }
+  }

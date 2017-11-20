@@ -1,4 +1,5 @@
 import { Card, Badge, Icon } from "antd";
+import SessionItem from '../Home/MyHandlingSessions/SessionItem';
 import styles from "./index.less";
 
 export default () => {
@@ -53,6 +54,10 @@ export default () => {
         <Badge count={1000} overflowCount={999}>
           <Icon type="code" className={styles.icon} />
         </Badge>
+      </Card>
+      <Card>
+        <SessionItem name="测试" description="你妹的，好麻烦。。。" ts="刚刚"/>
+        <SessionItem name="测试" description="你妹的，好麻烦。。。" ts="刚刚"/>
       </Card>
     </div>
   );
