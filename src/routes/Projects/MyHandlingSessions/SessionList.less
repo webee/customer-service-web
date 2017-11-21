@@ -12,11 +12,17 @@
     min-height: 60px;
     border-bottom: 1px solid rgba(100, 100, 100, 0.5);
   }
-  .list {
+  .body {
     flex: auto;
 
-    .item {
-      // border: 1px solid black;
+    .list {
+      &:focus {
+        outline: none;
+      }
+
+      .item {
+        // border: 1px solid black;
+      }
     }
   }
 }

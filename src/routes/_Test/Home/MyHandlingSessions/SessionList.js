@@ -1,12 +1,14 @@
-import React, { Component } from 'react';
-import { reduxRouter } from 'dva/router';
-import { connect } from 'dva';
-import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
-import List from 'react-virtualized/dist/commonjs/List';
-import SessionItem from './SessionItem';
-import { Input, Avatar, Badge, Tag } from "antd";
-import Moment from 'react-moment';
-import styles from './SessionList.less';
+import React, { Component } from "react";
+import { reduxRouter } from "dva/router";
+import { connect } from "dva";
+import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
+import List from "react-virtualized/dist/commonjs/List";
+import SessionItem from "./SessionItem";
+import { Input, Checkbox } from "antd";
+import Moment from "react-moment";
+import styles from "./SessionList.less";
+
+const Search = Input.Search;
 
 const data = [
   {
@@ -14,7 +16,7 @@ const data = [
     name: "易旺",
     description: "文字: 来了吗？一二三四五六七八九十",
     ts: "1分钟前",
-    unread: 1,
+    unread: 1
   },
   {
     status: "processing",
@@ -23,7 +25,7 @@ const data = [
     active: true,
     ts: "16分钟前",
     online: true,
-    unread: 0,
+    unread: 0
   },
   {
     status: "error",
@@ -38,7 +40,7 @@ const data = [
     name: "小明",
     description: "文件: xxx.jpg",
     ts: "昨天",
-    unread: 3,
+    unread: 3
   },
   {
     status: "error",
@@ -238,33 +240,51 @@ const data = [
     description: "文件: xxx.jpg",
     unread: 3,
     ts: "前天"
-  },
+  }
 ];
 
-
 export default class View extends Component {
-  rowRenderer = ({index, key, style}) => {
+  rowRenderer = ({ index, key, style }) => {
     const item = data[index];
     return (
       <div key={key} className={styles.item} style={style}>
         <SessionItem
-        name={item.name} description={item.description} ts={item.ts}
-        unread={item.unread} online={item.online}
+          name={item.name}
+          description={item.description}
+          ts={item.ts}
+          unread={item.unread}
+          online={item.online}
         />
       </div>
     );
-  }
+  };
 
   render() {
     return (
-      <AutoSizer>{({width, height}) => (
-        <List className={styles.list}
-        width={width} height={height}
-        rowCount={data.length}
-        rowHeight={60}
-        rowRenderer={this.rowRenderer}
-        />
-      )}</AutoSizer>
+      <div className={styles.main}>
+        <div className={styles.header}>
+          <Search
+            placeholder="uid/name"
+            style={{ width: "100%" }}
+            onSearch={value => console.log(value)}
+          />
+          <Checkbox>在线</Checkbox>
+          <Checkbox>待回</Checkbox>
+        </div>
+        <div className={styles.list}>
+        <AutoSizer>
+          {({ width, height }) => (
+            <List
+              width={width}
+              height={height}
+              rowCount={data.length}
+              rowHeight={60}
+              rowRenderer={this.rowRenderer}
+            />
+          )}
+        </AutoSizer>
+        </div>
+      </div>
     );
   }
 }

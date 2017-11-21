@@ -1,46 +1,45 @@
-import React, { Component } from 'react';
-import { reduxRouter } from 'dva/router';
-import { connect } from 'dva';
-import { Row, Col } from 'antd';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { reduxRouter } from "dva/router";
+import { connect } from "dva";
 import {dispatchDomainTypeEffect} from '~/services/project';
-import styles from './index.less';
+import { List, Avatar, Badge, Tag } from "antd";
+import SplitPane from "react-split-pane";
+import styles from "./index.less";
 
-import SessionListView from './SessionList';
-import SessionDetailView from './SessionDetail';
+import SessionList from "./SessionList";
+import SessionDetails from "./SessionDetails";
 
-
-class View extends Component {
-  state = {
+@connect()
+export default class View extends Component {
+  static contextTypes = {
+    projectDomain: PropTypes.string,
+    projectType: PropTypes.string,
   };
 
   componentDidMount() {
-    console.debug('my handling sessions did mount');
-    dispatchDomainTypeEffect(this.props, 'myHandling/fetchSessions');
+    dispatchDomainTypeEffect(this.context, this.props, 'myHandling/fetchSessions');
+    this.fetchSessionsInterval = setInterval(() => dispatchDomainTypeEffect(this.context, this.props, 'myHandling/fetchSessions'), 3000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.fetchSessionsInterval);
   }
 
   render() {
-    const {projectDomain, projectType} = this.props;
-    const {myHandling} = this.props;
+    const { data } = this.props;
     return (
-			<Row className={styles.main}>
-				<Col span={4} className={styles.list}>
-          <SessionListView projectDomain={projectDomain} projectType={projectType} myHandling={myHandling}/>
-        </Col>
-				<Col span={20} className={styles.detail}>
-          <SessionDetailView projectDomain={projectDomain} projectType={projectType} myHandling={myHandling}/>
-        </Col>
-			</Row>
+      <SplitPane
+        className={styles.splitPane}
+        split="vertical"
+        defaultSize={250}
+        minSize={250}
+        maxSize={300}
+        paneClassName={styles.main}
+      >
+        <SessionList data={data}/>
+        <SessionDetails data={data}/>
+      </SplitPane>
     );
   }
 }
-
-
-function mapStateToProps(state, ownProps) {
-  const {projectDomain, projectType} = ownProps;
-  const typeState = state.project[[projectDomain, projectType]];
-  return {
-    myHandling: typeState.myHandling
-  };
-}
-
-export default connect(mapStateToProps)(View);

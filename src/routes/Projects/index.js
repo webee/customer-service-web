@@ -1,51 +1,106 @@
-import React, { Component } from 'react';
-import { reduxRouter } from 'dva/router';
-import { connect } from 'dva';
-import { Tabs } from 'antd';
-import styles from './index.less';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "dva";
+import { Tabs, Button, Icon } from "antd";
+import styles from "./index.less";
 
-import MyHandlingSessionsView from './MyHandlingSessions';
+import TopRightButton from "../../components/TopRightButton";
+import MyHandlingSessionsView from "./MyHandlingSessions";
 
+@connect((state, ownProps) => {
+  const {projectDomain, projectType} = ownProps;
+  const data = state.project[[projectDomain, projectType]];
+  return {data};
+})
+export default class View extends Component {
+  constructor(props) {
+    super(props);
 
-class View extends Component {
-  state = {
-  };
-
-  componentDidMount() {
-    console.log('projects did mount');
+    this.state = {
+      activeKey: "my_handling_sessions",
+      expanded: false
+    };
   }
 
-  onTabChange = (key) => {
-    const { dispatch } = this.props;
-    console.log(`tab ${key} selected`);
+  static childContextTypes = {
+    projectDomain: PropTypes.string,
+    projectType: PropTypes.string,
   };
 
-  render() {
-    const {projectDomain, projectType} = this.props.match.params;
+  getChildContext() {
+    const { projectDomain, projectType } = this.props;
+    return { projectDomain, projectType };
+  }
+
+  onTabChange = activeKey => {
+    this.setState({ activeKey });
+  };
+
+  onToggleExpand = () => {
+    this.setState({ expanded: !this.state.expanded });
+  };
+
+  getPureTabContent(key) {
+    const { projectDomain, projectType, data } = this.props;
+    switch (key) {
+      case "my_handling_sessions":
+        return <MyHandlingSessionsView data={data.myHandling} />;
+      case "other_handling_sessions":
+        return (
+          <h1>
+            {projectDomain}/{projectType}: 接待中的会话
+          </h1>
+        );
+      case "handled_sessions":
+        return (
+          <div style={{ flex: "1 0 auto" }}>
+            <h1>
+              {projectDomain}/{projectType}:
+              最近接待的会话叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉
+            </h1>
+          </div>
+        );
+    }
+  }
+
+  getTabContent(key) {
+    const { expanded } = this.state;
+    const icon = expanded ? "shrink" : "arrows-alt";
     return (
-      <Tabs className={styles.main}
-            onChange={this.onTabChange} size="default"
-            defaultActiveKey="my_handling_sessions"
-            animated={false}
+      <TopRightButton
+        icon={icon}
+        style={{ flex: "auto" }}
+        contentStyle={{ height: "100%", display: "flex" }}
+        onClick={this.onToggleExpand}
+      >
+        {this.getPureTabContent(key)}
+      </TopRightButton>
+    );
+  }
+
+  render() {
+    const { activeKey, expanded } = this.state;
+    return expanded ? (
+      this.getTabContent(activeKey)
+    ) : (
+      <Tabs
+        className={styles.main}
+        onChange={this.onTabChange}
+        size="default"
+        activeKey={activeKey}
+        defaultActiveKey="my_handling_sessions"
+        animated={false}
       >
         <Tabs.TabPane tab="我接待中的会话" key="my_handling_sessions">
-          <MyHandlingSessionsView projectDomain={projectDomain} projectType={projectType} />
-				</Tabs.TabPane>
+          {this.getTabContent("my_handling_sessions")}
+        </Tabs.TabPane>
         <Tabs.TabPane tab="接待中的会话" key="other_handling_sessions">
-          接待中的会话
+          {this.getTabContent("other_handling_sessions")}
         </Tabs.TabPane>
         <Tabs.TabPane tab="最近接待的会话" key="handled_sessions">
-          最近接待的会话
+          {this.getTabContent("handled_sessions")}
         </Tabs.TabPane>
-			</Tabs>
+      </Tabs>
     );
   }
 }
-
-
-
-function mapStateToProps(state, ownProps) {
-  return {};
-}
-
-export default connect(mapStateToProps)(View);
