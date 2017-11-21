@@ -57,17 +57,13 @@ export const reducer = createNSSubReducer(
       return { ...state, openedSessions, currentOpenedSession };
     },
     clearSessionMsgs(state, { payload: { id } }) {
-      const sessionsMsgs = {};
-      for (let i in state.sessionsMsgs) {
-        if (i !== id) {
-          sessionsMsgs[i] = state.sessionsMsgs[i];
-        }
-      }
-      return { ...state, sessionsMsgs };
+      const newSessionsMsgs = {...state.sessionsMsgs};
+      delete newSessionsMsgs[id];
+      return { ...state, sessionsMsgs: newSessionsMsgs };
     },
     appendSessionMsgs(state, { payload: { id, msgs } }) {
       const newSessionsMsgs = { ...state.sessionsMsgs };
-      let { lid, rid, _msgs } = newSessionsMsgs[id] || { msgs: [] };
+      let { lid, rid, msgs: _msgs } = newSessionsMsgs[id] || { msgs: [] };
       let newMsgs = [..._msgs];
       msgs.forEach(msg => {
         if (!lid) {
@@ -79,12 +75,12 @@ export const reducer = createNSSubReducer(
           newMsgs.push(msg);
         }
       });
-      newSessionsMsgs[id] = { lid, rid, newMsgs };
-      return { ...state, sessionsMsgs };
+      newSessionsMsgs[id] = { lid, rid, msgs: newMsgs };
+      return { ...state, sessionsMsgs: newSessionsMsgs };
     },
-    insertSessionMsgs(state, { payload: { id, msgs } }) {
+    insertSessionMsgs(state, { payload: { id, msgs, noMore } }) {
       const newSessionsMsgs = { ...state.sessionsMsgs };
-      let { lid, rid, _msgs } = newSessionsMsgs[id] || { msgs: [] };
+      let { lid, rid, msgs: _msgs } = newSessionsMsgs[id] || { msgs: [] };
       let newMsgs = [..._msgs];
       msgs.forEach(msg => {
         if (!lid || msg.msg_id < lid) {
@@ -96,8 +92,8 @@ export const reducer = createNSSubReducer(
           rid = msg.msg_id;
         }
       });
-      newSessionsMsgs[id] = { lid, rid, newMsgs };
-      return { ...state, sessionsMsgs };
+      newSessionsMsgs[id] = { lid, rid, msg: newMsgs, noMore };
+      return { ...state, sessionsMsgs: newSessionsMsgs };
     }
   }
 );
@@ -108,8 +104,25 @@ export const effectFunc = createNSSubEffectFunc("myHandling", {
     const sessions = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
     yield put(createAction("myHandling/saveSessions", sessions));
   },
-  *fetchSessionMsgs({ createAction, payload: { projectID, sessionID, params } }, { call, put }) {
-    const { msgs, has_more } = yield call(projectService.fetchSessionMsgs, projectID, sessionID, params);
+  *loadSessionHistoryMsgs({ key, createAction, payload: { projectID, sessionID, limit } }, { select, call, put }) {
+    const data = yield select(state => state.project[key].myHandling.sessionsMsgs);
+    const { lid } = data[sessionID] || {};
+    const { msgs } = yield call(projectService.fetchSessionMsgs, projectID, sessionID, {
+      rid: lid,
+      limit,
+      desc: true
+    });
+    const noMore = limit > 0 && msgs.length == 0;
+    yield put(createAction("myHandling/insertSessionMsgs", { id: sessionID, msgs, noMore }));
+  },
+  *fetchSessionNewMsgs({ key, createAction, payload: { projectID, sessionID, limit } }, { select, call, put }) {
+    const data = yield select(state => state.project[key].myHandling.sessionsMsgs);
+    const { rid } = data[sessionID] || {};
+    const { msgs, has_more } = yield call(projectService.fetchSessionMsgs, projectID, sessionID, {
+      lid: rid,
+      limit,
+      desc: false
+    });
     yield put(createAction("myHandling/appendSessionMsgs", { id: sessionID, msgs: msgs }));
   }
 });

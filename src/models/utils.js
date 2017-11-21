@@ -18,7 +18,8 @@ export function createNSSubEffectFunc(ns, effectFuncs) {
     const type = parseNSSubType(ns, action.type);
     const effectFunc = effectFuncs[type];
     if (effectFunc) {
-      yield effectFunc(action, effects);
+      const { call } = effects;
+      yield call(effectFunc, action, effects);
     }
   };
 }

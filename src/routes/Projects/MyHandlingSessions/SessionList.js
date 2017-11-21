@@ -2,10 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
-import {
-  dispatchDomainType,
-  dispatchDomainTypeEffect
-} from "~/services/project";
+import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
 import SessionItem from "./SessionItem";
@@ -65,11 +62,7 @@ export default class View extends Component {
     return (
       <div className={styles.main}>
         <div className={styles.header}>
-          <Search
-            placeholder="uid/name"
-            style={{ width: "100%" }}
-            onSearch={value => console.log(value)}
-          />
+          <Search placeholder="uid/name" style={{ width: "100%" }} onSearch={value => console.log(value)} />
           <Checkbox>在线</Checkbox>
           <Checkbox>待回</Checkbox>
         </div>

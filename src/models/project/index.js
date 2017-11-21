@@ -1,4 +1,4 @@
-import { reducer as myHandlingReducer, effectFunc as myHandlingEffectFunc } from './myHandling';
+import { reducer as myHandlingReducer, effectFunc as myHandlingEffectFunc } from "./myHandling";
 
 function domainTypeReducer(state = {}, action) {
   return {
@@ -7,7 +7,8 @@ function domainTypeReducer(state = {}, action) {
 }
 
 function* domainTypeEffectFunc(action, effects) {
-  yield myHandlingEffectFunc(action, effects);
+  const { all, call } = effects;
+  yield all([call(myHandlingEffectFunc, action, effects)]);
 }
 
 export default {
@@ -15,15 +16,18 @@ export default {
 
   state: {},
   reducers: {
-    dispatchDomainType(state, { payload: { projectDomain, projectType, type, payload } }) {
+    dispatchDomainType(state, { payload }) {
+      const { projectDomain, projectType } = payload;
       const key = [projectDomain, projectType];
-      return { ...state, [key]: domainTypeReducer(state[key], { type, payload }) };
+      return { ...state, [key]: domainTypeReducer(state[key], { ...payload, key }) };
     }
   },
   effects: {
     *dispatchDomainTypeEffect({ payload }, effects) {
+      const { projectDomain, projectType } = payload;
+      const key = [projectDomain, projectType];
       const { call } = effects;
-      yield domainTypeEffectFunc(payload, effects);
+      yield call(domainTypeEffectFunc, { ...payload, key }, effects);
     }
   }
 };

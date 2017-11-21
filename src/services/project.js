@@ -71,12 +71,18 @@ export async function syncSessionMsgID(projectID, sessionID, msg_id) {
   });
 }
 
+function getQsArgBool(b, {t=true, f=false}) {
+  return b === undefined ? b : (b ? t : f);
+}
+
 export async function fetchSessionMsgs(projectID, sessionID, { lid, rid, limit, desc }) {
   const resp = await request.get(`/sessions/${projectID}/${sessionID}/msgs`, {
-    lid,
-    rid,
-    limit,
-    desc
+    params: {
+      lid,
+      rid,
+      limit,
+      desc: getQsArgBool(desc, {t: 't', f: ''}),
+    }
   });
   return resp.data;
 }
