@@ -42,11 +42,7 @@ export default class View extends Component {
   };
 
   render() {
-    const {
-      sessions,
-      opened_sessions: openedSessions,
-      current_opened_session: currentOpenedSession
-    } = this.props.data;
+    const { sessions, openedSessions, currentOpenedSession } = this.props.data;
     if (openedSessions.length === 0) {
       return <p>请选择会话进行接待</p>;
     }

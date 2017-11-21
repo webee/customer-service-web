@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
-import {dispatchDomainTypeEffect} from '~/services/project';
+import { dispatchDomainTypeEffect } from "../../../services/project";
 import { List, Avatar, Badge, Tag } from "antd";
 import SplitPane from "react-split-pane";
 import styles from "./index.less";
@@ -14,12 +14,15 @@ import SessionDetails from "./SessionDetails";
 export default class View extends Component {
   static contextTypes = {
     projectDomain: PropTypes.string,
-    projectType: PropTypes.string,
+    projectType: PropTypes.string
   };
 
   componentDidMount() {
-    dispatchDomainTypeEffect(this.context, this.props, 'myHandling/fetchSessions');
-    this.fetchSessionsInterval = setInterval(() => dispatchDomainTypeEffect(this.context, this.props, 'myHandling/fetchSessions'), 3000);
+    dispatchDomainTypeEffect(this.context, this.props, "myHandling/fetchSessions");
+    this.fetchSessionsInterval = setInterval(
+      () => dispatchDomainTypeEffect(this.context, this.props, "myHandling/fetchSessions"),
+      6000
+    );
   }
 
   componentWillUnmount() {
@@ -37,8 +40,8 @@ export default class View extends Component {
         maxSize={300}
         paneClassName={styles.main}
       >
-        <SessionList data={data}/>
-        <SessionDetails data={data}/>
+        <SessionList data={data} />
+        <SessionDetails data={data} />
       </SplitPane>
     );
   }

@@ -52,7 +52,7 @@ function getProjectDomainNavData(project_domains) {
   return project_domains.map(d => ({
     icon: "message",
     title: d.title,
-    pathname: d.name,
+    pathname: `projects/${d.name}`,
     open: true,
     noLink: true,
     items: d.types.map(t => ({

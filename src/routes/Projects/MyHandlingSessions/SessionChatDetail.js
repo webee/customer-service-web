@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
 import SplitPane from "react-split-pane";
+import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
+import List from "react-virtualized/dist/commonjs/List";
 import styles from "./SessionChatDetail.less";
 
 export default class View extends Component {
@@ -10,6 +12,19 @@ export default class View extends Component {
     projectDomain: PropTypes.string,
     projectType: PropTypes.string
   };
+
+  getRowRenderer() {
+    const { session } = this.props;
+    return ({ index, key, style }) => {
+      return (
+        <div key={key} className={styles.item} style={style}>
+          <p>消息#{index}</p>
+        </div>
+      );
+    };
+  }
+
+  noRowsRenderer = () => <p>没有对话消息</p>;
 
   render() {
     const { projectDomain, projectType } = this.context;
@@ -36,7 +51,21 @@ export default class View extends Component {
             maxSize={400}
             paneClassName={styles.main}
           >
-            <div>消息列表区域</div>
+            <div style={{flex: 'auto'}}>
+              <AutoSizer>
+                {({ width, height }) => (
+                  <List
+                    className={styles.msgList}
+                    width={width}
+                    height={height}
+                    rowCount={100}
+                    rowHeight={20}
+                    rowRenderer={this.getRowRenderer()}
+                    noRowsRenderer={this.noRowsRenderer}
+                  />
+                )}
+              </AutoSizer>;
+            </div>
             <div>消息发送区域</div>
           </SplitPane>
             <div>会话信息区域</div>

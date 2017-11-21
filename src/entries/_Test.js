@@ -6,7 +6,8 @@ import MainLayoutStyles from '../components/layouts/MainLayout.less';
 
 
 const navData = [
-		{icon: 'home', title: '首页', pathname: '', fixed: true, noHeader: true, noBreadcrumb: true, noFooter: true, component: require('../routes/_Test/Home')},
+		{icon: 'home', title: '首页', pathname: '', component: require('../routes/_Test/Home')},
+		{icon: 'chat', title: '会话', pathname: 'chat', fixed: true, noHeader: true, noBreadcrumb: true, noFooter: true, component: require('../routes/_Test/Chat')},
     {icon: 'star', title: '普通组件', pathname: 'general', open: true, def: 'button',
       items: [
         {icon: 'gift', title: '按钮', pathname: 'button', noBreadcrumb: true, component: require('../routes/_Test/General/Button')},

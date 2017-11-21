@@ -24,13 +24,9 @@ export default class View extends Component {
 
   getRowRenderer() {
     const { data } = this.props;
-    const {
-      sessions,
-      list_sessions,
-      current_opened_session: currentOpenedSession
-    } = data;
+    const { sessions, listSessions, currentOpenedSession } = data;
     return ({ index, key, style }) => {
-      const session = sessions[list_sessions[index]];
+      const session = sessions[listSessions[index]];
       const item = {
         id: session.id,
         name: session.owner.name,
@@ -65,7 +61,7 @@ export default class View extends Component {
   render() {
     const { projectDomain, projectType } = this.context;
     const { data } = this.props;
-    const { sessions, list_sessions } = data;
+    const { sessions, listSessions } = data;
     return (
       <div className={styles.main}>
         <div className={styles.header}>
@@ -80,10 +76,11 @@ export default class View extends Component {
         <div className={styles.body}>
           <AutoSizer>
             {({ width, height }) => (
-              <List className={styles.list}
+              <List
+                className={styles.list}
                 width={width}
                 height={height}
-                rowCount={list_sessions.length}
+                rowCount={listSessions.length}
                 rowHeight={60}
                 rowRenderer={this.getRowRenderer()}
                 noRowsRenderer={this.noRowsRenderer}
