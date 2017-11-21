@@ -1,34 +1,8 @@
-import {} from "redux";
-import * as projectService from "../services/project";
-
-function parseSubType(ns, type) {
-  return (type && type.startsWith(ns)) ? type.substr(ns.length + 1) : type;
-}
-
-function createSubReducer(name, defaultState, reducers) {
-  return (state = defaultState, action) => {
-    const type = parseSubType(name, action.type);
-    const reducer = reducers[type];
-    if (reducer) {
-      return reducer(state, action);
-    }
-    return state;
-  };
-}
-
-function createSubEffectFunc(name, effectFuncs) {
-  return function*(action, effects) {
-    const type = parseSubType(name, action.type);
-    const effectFunc = effectFuncs[type];
-    if (effectFunc) {
-      yield effectFunc(action, effects);
-    }
-  };
-}
+import { createNSSubEffectFunc, createNSSubReducer } from "../utils";
+import * as projectService from "../../services/project";
 
 // reducers
-// 我接待的会话
-const domainTypeMyHandlingReducer = createSubReducer(
+export const reducer = createNSSubReducer(
   "myHandling",
   {
     // 所有会话by id
@@ -128,14 +102,8 @@ const domainTypeMyHandlingReducer = createSubReducer(
   }
 );
 
-function domainTypeReducer(state = {}, action) {
-  return {
-    myHandling: domainTypeMyHandlingReducer(state.myHandling, action)
-  };
-}
-
 // effects
-const domainTypeMyHandlingEffectFunc = createSubEffectFunc("myHandling", {
+export const effectFunc = createNSSubEffectFunc("myHandling", {
   *fetchSessions({ projectDomain, projectType, createAction, payload }, { call, put }) {
     const sessions = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
     yield put(createAction("myHandling/saveSessions", sessions));
@@ -145,25 +113,3 @@ const domainTypeMyHandlingEffectFunc = createSubEffectFunc("myHandling", {
     yield put(createAction("myHandling/appendSessionMsgs", { id: sessionID, msgs: msgs }));
   }
 });
-
-function* domainTypeEffectFunc(action, effects) {
-  yield domainTypeMyHandlingEffectFunc(action, effects);
-}
-
-export default {
-  namespace: "project",
-
-  state: {},
-  reducers: {
-    dispatchDomainType(state, { payload: { projectDomain, projectType, type, payload } }) {
-      const key = [projectDomain, projectType];
-      return { ...state, [key]: domainTypeReducer(state[key], { type, payload }) };
-    }
-  },
-  effects: {
-    *dispatchDomainTypeEffect({ payload }, effects) {
-      const { call } = effects;
-      yield domainTypeEffectFunc(payload, effects);
-    }
-  }
-};

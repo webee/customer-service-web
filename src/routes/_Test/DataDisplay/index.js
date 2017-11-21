@@ -1,5 +1,5 @@
 import { Card, Badge, Icon } from "antd";
-import SessionItem from '../Home/MyHandlingSessions/SessionItem';
+import SessionItem from '../Chat/MyHandlingSessions/SessionItem';
 import styles from "./index.less";
 
 export default () => {
