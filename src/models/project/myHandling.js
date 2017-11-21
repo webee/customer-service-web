@@ -56,7 +56,7 @@ export const reducer = createNSSubReducer(
 
       return { ...state, openedSessions, currentOpenedSession };
     },
-    clearSessionMsgs(state, { payload: { id } }) {
+    clearSessionMsgs(state, { payload: id }) {
       const newSessionsMsgs = {...state.sessionsMsgs};
       delete newSessionsMsgs[id];
       return { ...state, sessionsMsgs: newSessionsMsgs };

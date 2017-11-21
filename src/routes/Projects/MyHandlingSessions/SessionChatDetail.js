@@ -23,6 +23,10 @@ export default class View extends Component {
       limit: 100
     });
   }
+  componentWillUnmount() {
+    const { session } = this.props;
+    dispatchDomainType(this.context, this.props, "myHandling/clearSessionMsgs", session.id);
+  }
 
   getRowRenderer() {
     const { session } = this.props;

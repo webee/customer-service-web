@@ -2,10 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "dva";
 import { Tabs } from "antd";
-import {
-  dispatchDomainType,
-  dispatchDomainTypeEffect
-} from "~/services/project";
+import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
 import SessionChatDetail from "./SessionChatDetail";
 import styles from "./SessionDetails.less";
 
@@ -17,24 +14,15 @@ export default class View extends Component {
   };
 
   onChange = activeKey => {
-    dispatchDomainType(
-      this.context,
-      this.props,
-      "myHandling/activateOpenedSession",
-      parseInt(activeKey)
-    );
+    dispatchDomainType(this.context, this.props, "myHandling/activateOpenedSession", parseInt(activeKey));
   };
 
   // edit actions
   add = targetKey => {};
 
   remove = targetKey => {
-    dispatchDomainType(
-      this.context,
-      this.props,
-      "myHandling/closeOpenedSession",
-      parseInt(targetKey)
-    );
+    const sessionID = parseInt(targetKey);
+    dispatchDomainType(this.context, this.props, "myHandling/closeOpenedSession", sessionID);
   };
 
   onEdit = (targetKey, action) => {
