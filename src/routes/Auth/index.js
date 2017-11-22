@@ -49,7 +49,7 @@ export default class Auth extends React.Component {
     this.props.form.validateFields();
 
     const { dispatch, location } = this.props;
-    const query = qs.parse(location.search);
+    const query = qs.parse(location.search.replace(/^(\?|\ )+/, ''));
     const jwt = query.jwt;
     if (jwt) {
       // 提供了jwt, 则尝试登录
