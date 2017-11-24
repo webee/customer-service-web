@@ -63,39 +63,43 @@ export default {
       // response
       // check 401 unauthorized
       // redirect to /auth
-      const check_401 = request.interceptors.response.use(
+      const checkResponse = request.interceptors.response.use(
         response => {
           return response;
         },
-        error => {
-          console.debug("error: ", error);
-          if (error.response) {
-            const response = error.response;
+        err => {
+          console.error(err);
+          if (err.response) {
+            const response = err.response;
             console.debug("response: ", response);
-            console.debug("response data: ", response.data);
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
-            done(new Error(response.data.message));
-            if (response.status == 401) {
+            if (response.status === 401) {
               do_logout();
+            } else if (response.status === 409) {
+              // 业务错误
+              const { data } = response;
+              done(new Error(`${data.code}(${data.message}: ${data.description}, ${data.details})`));
+            } else {
+              done(new Error(response.data.message));
             }
-          } else if (error.request) {
+          } else if (err.request) {
             // The request was made but no response was received
             // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
             // http.ClientRequest in node.js
-            console.debug("request failed: ", error.request);
-            done(error);
+            console.debug("request failed: ", err.request);
+            done(err);
           } else {
             // Something happened in setting up the request that triggered an Error
-            done(error);
+            done(err);
           }
-          throw error;
+          throw err;
         }
       );
 
       return () => {
         request.interceptors.request.eject(attach_auth_header);
-        request.interceptors.response.eject(check_401);
+        request.interceptors.response.eject(checkResponse);
       };
     }
   }
