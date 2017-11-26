@@ -11,8 +11,7 @@
   "env": {
     "development": {
       "extraBabelPlugins": [
-        "dva-hmr",
-        "transform-runtime"
+        "dva-hmr"
       ]
     },
     "production": {

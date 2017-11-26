@@ -90,10 +90,6 @@ class Main extends React.Component {
     showSettingModal: false
   };
 
-  onLogoClick = () => {
-    this.props.dispatch({ type: "app/fetch" });
-  };
-
   toggleBreadcrumb = checked => {
     const { dispatch } = this.props;
     dispatch({
@@ -125,10 +121,22 @@ class Main extends React.Component {
   };
 
   componentDidMount() {
-    console.log("props: ", this.props);
-    // fetch data
-    this.props.dispatch({ type: "app/fetch" });
+    const { dispatch } = this.props;
+    // load ui settings
+    dispatch({ type: "app/loadUISettings" });
+    // fetch app info
+    dispatch({ type: "app/fetchAppInfo" });
+    // open xchat
+    dispatch({ type: "app/openXChat" });
   }
+
+  componentWillUnmount() {
+    dispatch({ type: "app/closeXChat" });
+  }
+
+  onLogoClick = () => {
+    this.props.dispatch({ type: "app/fetchAppInfo" });
+  };
 
   getHeaderMenu() {
     const { staff, location } = this.props;

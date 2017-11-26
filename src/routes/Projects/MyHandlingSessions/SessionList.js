@@ -6,6 +6,7 @@ import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
 import SessionItem from "./SessionItem";
+import EmptyContent from "./EmptyContent";
 import { Input, Checkbox } from "antd";
 import Moment from "react-moment";
 import styles from "./SessionList.less";
@@ -19,36 +20,35 @@ export default class View extends Component {
     projectType: PropTypes.string
   };
 
-  getRowRenderer() {
+  rowRenderer = ({index, key, style}) => {
     const { data } = this.props;
     const { sessions, listSessions, currentOpenedSession } = data;
-    return ({ index, key, style }) => {
-      const session = sessions[listSessions[index]];
-      const item = {
-        id: session.id,
-        name: session.owner.name,
-        description: `${session.msg.type}:${session.msg.content}`,
-        online: session.is_online,
-        ts: session.msg.ts,
-        unread: session.msg_id - session.sync_msg_id
-      };
-      return (
-        <div key={key} className={styles.item} style={style}>
-          <SessionItem
-            selected={item.id === currentOpenedSession}
-            onClick={() => this.onClick(session.id)}
-            name={item.name}
-            description={item.description}
-            ts={item.ts}
-            unread={item.unread}
-            online={item.online}
-          />
-        </div>
-      );
+    const session = sessions[listSessions[index]];
+    const item = {
+      id: session.id,
+      name: session.owner.name,
+      description: `${session.msg.type}:${session.msg.content}`,
+      online: session.is_online,
+      ts: session.msg.ts,
+      unread: session.msg_id - session.sync_msg_id
     };
-  }
+    return (
+      <div key={key} className={styles.item} style={style}>
+        <SessionItem
+          selected={item.id === currentOpenedSession}
+          onClick={() => this.onClick(session.id)}
+          name={item.name}
+          description={item.description}
+          ts={item.ts}
+          unread={item.unread}
+          online={item.online}
+        />
+      </div>
+    );
 
-  noRowsRenderer = () => <p>没有会话</p>;
+  };
+
+  noRowsRenderer = () => <EmptyContent />;
 
   onClick = id => {
     // 加入到打开的会话中
@@ -58,7 +58,7 @@ export default class View extends Component {
   render() {
     const { projectDomain, projectType } = this.context;
     const { data } = this.props;
-    const { sessions, listSessions } = data;
+    const { sessions, listSessions, currentOpenedSession } = data;
     return (
       <div className={styles.main}>
         <div className={styles.header}>
@@ -75,8 +75,9 @@ export default class View extends Component {
                 height={height}
                 rowCount={listSessions.length}
                 rowHeight={60}
-                rowRenderer={this.getRowRenderer()}
+                rowRenderer={this.rowRenderer}
                 noRowsRenderer={this.noRowsRenderer}
+                data={data}
               />
             )}
           </AutoSizer>

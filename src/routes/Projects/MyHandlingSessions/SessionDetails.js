@@ -4,6 +4,7 @@ import { connect } from "dva";
 import { Tabs } from "antd";
 import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
 import SessionChatDetail from "./SessionChatDetail";
+import EmptyContent from "./EmptyContent";
 import styles from "./SessionDetails.less";
 
 @connect()
@@ -32,7 +33,7 @@ export default class View extends Component {
   render() {
     const { sessions, openedSessions, currentOpenedSession } = this.props.data;
     if (openedSessions.length === 0) {
-      return <p>请选择会话进行接待</p>;
+      return <EmptyContent fontSize={96} />;
     }
 
     return (

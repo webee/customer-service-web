@@ -271,10 +271,11 @@ export default class View extends Component {
           <Checkbox>在线</Checkbox>
           <Checkbox>待回</Checkbox>
         </div>
-        <div className={styles.list}>
+        <div className={styles.body}>
         <AutoSizer>
           {({ width, height }) => (
             <List
+              className={styles.list}
               width={width}
               height={height}
               rowCount={data.length}
