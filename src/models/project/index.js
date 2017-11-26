@@ -1,14 +1,19 @@
 import { reducer as myHandlingReducer, effectFunc as myHandlingEffectFunc } from "./myHandling";
+import { reducer as _Reducer, effectFunc as _EffectFunc } from "./_";
 
 function domainTypeReducer(state = {}, action) {
   return {
-    myHandling: myHandlingReducer(state.myHandling, action)
+    _: _Reducer(state._, action),
+    myHandling: myHandlingReducer(state.myHandling, action),
   };
 }
 
 function* domainTypeEffectFunc(action, effects) {
   const { all, call } = effects;
-  yield all([call(myHandlingEffectFunc, action, effects)]);
+  yield all([
+    call(_EffectFunc, action, effects),
+    call(myHandlingEffectFunc, action, effects),
+  ]);
 }
 
 export default {

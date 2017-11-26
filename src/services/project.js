@@ -17,10 +17,6 @@ export function createDomainTypeAction(projectDomain, projectType, type, payload
   return createDomainTypeWrapperAction(projectDomain, projectType, "dispatchDomainType", { type, payload });
 }
 
-export function dispatchDomainType({ projectDomain, projectType }, { dispatch }, type, payload) {
-  dispatch(createProjectDomainTypeAction(projectDomain, projectType, type, payload));
-}
-
 export function createProjectDomainTypeEffectAction(projectDomain, projectType, type, payload) {
   return createDomainTypeWrapperAction(
     projectDomain,
@@ -47,13 +43,43 @@ export function createDomainTypeEffectAction(projectDomain, projectType, type, p
   );
 }
 
+export function dispatchDomainType({ projectDomain, projectType }, { dispatch }, type, payload) {
+  dispatch(createProjectDomainTypeAction(projectDomain, projectType, type, payload));
+}
+
 export function dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, type, payload) {
   dispatch(createProjectDomainTypeEffectAction(projectDomain, projectType, type, payload));
+}
+
+
+// handle notify
+export function handleNotify(dispatch, type, details) {
+  switch (type) {
+    case "session":
+      // 刷新会话列表
+      break;
+    case "session.msg":
+      const { id } = details;
+      // 拉取最新消息
+      break;
+  }
 }
 
 // apis
 export async function fetchMyHandlingSessions(projectDomain, projectType) {
   const resp = await request.get(`/projects/${projectDomain}/${projectType}/my_handling_sessions`);
+  return resp.data;
+}
+
+export async function fetchProjectMsgs(projectID, { lid, rid, limit, desc }) {
+  const resp = await request.get(`/sessions/${projectID}/msgs`, {
+    params: {
+      lid,
+      rid,
+      limit,
+      desc: getQsArgBool(desc, { t: "t", f: "" })
+    }
+  });
   return resp.data;
 }
 
@@ -71,18 +97,6 @@ export async function syncSessionMsgID(projectID, sessionID, msg_id) {
   });
 }
 
-function getQsArgBool(b, {t=true, f=false}) {
-  return b === undefined ? b : (b ? t : f);
-}
-
-export async function fetchSessionMsgs(projectID, sessionID, { lid, rid, limit, desc }) {
-  const resp = await request.get(`/sessions/${projectID}/${sessionID}/msgs`, {
-    params: {
-      lid,
-      rid,
-      limit,
-      desc: getQsArgBool(desc, {t: 't', f: ''}),
-    }
-  });
-  return resp.data;
+function getQsArgBool(b, { t = true, f = false }) {
+  return b === undefined ? b : b ? t : f;
 }

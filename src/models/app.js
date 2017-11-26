@@ -1,6 +1,7 @@
 import { notification } from "antd";
 import { XChatClient, wampDebug, XCHAT_STATUS } from "xchat-client";
 import * as appService from "../services/app";
+import * as projectService from "../services/project";
 import { createProjectDomainTypeAction } from "../services/project";
 
 // xchat client
@@ -76,11 +77,18 @@ export default {
         console.debug("xchat msg: ", kind, msg);
       };
       xchatClient.subMsg((kind, msg) => {
-        // TODO: 处理后台通知
-        notification.open({
-          message: kind,
-          description: JSON.stringify(msg)
-        });
+        // dispatch notify
+        const { domain } = msg;
+        if (!domain || domain === "cs") {
+          try {
+            const { ns, type, details } = JSON.parse(msg.msg);
+            if (ns === "project") {
+              projectService.handleNotify(dispatch, type, details);
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        }
       }, "user_notify");
     },
     // TODO: xxx

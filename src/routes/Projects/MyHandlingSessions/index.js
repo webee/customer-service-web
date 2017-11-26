@@ -10,7 +10,6 @@ import styles from "./index.less";
 import SessionList from "./SessionList";
 import SessionDetails from "./SessionDetails";
 
-@connect()
 export default class View extends Component {
   static contextTypes = {
     projectDomain: PropTypes.string,
@@ -30,7 +29,7 @@ export default class View extends Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { dispatch, data, myHandlingData } = this.props;
     return (
       <SplitPane
         className={styles.splitPane}
@@ -40,8 +39,8 @@ export default class View extends Component {
         maxSize={300}
         paneClassName={styles.main}
       >
-        <SessionList data={data} />
-        <SessionDetails data={data} />
+        <SessionList dispatch={dispatch} data={data} myHandlingData={myHandlingData} />
+        <SessionDetails dispatch={dispatch} data={data} myHandlingData={myHandlingData}/>
       </SplitPane>
     );
   }

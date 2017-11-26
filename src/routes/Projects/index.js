@@ -41,10 +41,11 @@ export default class View extends Component {
   };
 
   getPureTabContent(key) {
+    const { dispatch } = this.props;
     const { projectDomain, projectType, data } = this.props;
     switch (key) {
       case "my_handling_sessions":
-        return <MyHandlingSessionsView data={data.myHandling} />;
+        return <MyHandlingSessionsView dispatch={dispatch} data={data._} myHandlingData={data.myHandling} />;
       case "other_handling_sessions":
         return (
           <h1>

@@ -7,7 +7,6 @@ import SessionChatDetail from "./SessionChatDetail";
 import EmptyContent from "./EmptyContent";
 import styles from "./SessionDetails.less";
 
-@connect()
 export default class View extends Component {
   static contextTypes = {
     projectDomain: PropTypes.string,
@@ -30,8 +29,19 @@ export default class View extends Component {
     this[action](targetKey);
   };
 
+  renderSessionChatDetail(id) {
+    const { dispatch, data, myHandlingData } = this.props;
+    const { sessions } = myHandlingData;
+    const { projectMsgs } = data;
+    const session = sessions[id];
+    const projMsgs = projectMsgs[session.proj_id] || {};
+    return <SessionChatDetail dispatch={dispatch} session={session} projMsgs={projMsgs} />;
+  }
+
   render() {
-    const { sessions, openedSessions, currentOpenedSession } = this.props.data;
+    const { dispatch, data, myHandlingData } = this.props;
+    const { sessions, openedSessions, currentOpenedSession } = myHandlingData;
+    const { projectMsgs } = data;
     if (openedSessions.length === 0) {
       return <EmptyContent fontSize={96} />;
     }
@@ -48,7 +58,7 @@ export default class View extends Component {
         {openedSessions.map(id => {
           return (
             <Tabs.TabPane key={id} tab={`会话#${id}`}>
-              <SessionChatDetail session={sessions[id]} />
+              {this.renderSessionChatDetail(id)}
             </Tabs.TabPane>
           );
         })}

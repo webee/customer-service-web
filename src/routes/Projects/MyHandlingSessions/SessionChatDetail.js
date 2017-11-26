@@ -6,9 +6,9 @@ import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project
 import SplitPane from "react-split-pane";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
+import MessageList from './MessageList';
 import styles from "./SessionChatDetail.less";
 
-@connect()
 export default class View extends Component {
   static contextTypes = {
     projectDomain: PropTypes.string,
@@ -17,33 +17,19 @@ export default class View extends Component {
 
   componentDidMount() {
     const { session } = this.props;
-    dispatchDomainTypeEffect(this.context, this.props, "myHandling/fetchSessionNewMsgs", {
+    dispatchDomainTypeEffect(this.context, this.props, "_/fetchProjectNewMsgs", {
       projectID: session.proj_id,
-      sessionID: session.id,
       limit: 100
     });
   }
   componentWillUnmount() {
     const { session } = this.props;
-    dispatchDomainType(this.context, this.props, "myHandling/clearSessionMsgs", session.id);
+    dispatchDomainType(this.context, this.props, "myHandling/clearProjectMsgs", session.proj_id);
   }
-
-  getRowRenderer() {
-    const { session } = this.props;
-    return ({ index, key, style }) => {
-      return (
-        <div key={key} className={styles.item} style={style}>
-          <p>消息#{index}</p>
-        </div>
-      );
-    };
-  }
-
-  noRowsRenderer = () => <p>没有对话消息</p>;
 
   render() {
     const { projectDomain, projectType } = this.context;
-    const { session } = this.props;
+    const { dispatch, session, projMsgs } = this.props;
     return (
       <div className={styles.splitter}>
         <div className={styles.splitHeader}>Header#{session.id}</div>
@@ -63,24 +49,10 @@ export default class View extends Component {
               split="horizontal"
               defaultSize={150}
               minSize={100}
-              maxSize={400}
+              maxSize={300}
               paneClassName={styles.main}
             >
-              <div style={{ flex: "auto" }}>
-                <AutoSizer>
-                  {({ width, height }) => (
-                    <List
-                      className={styles.msgList}
-                      width={width}
-                      height={height}
-                      rowCount={100}
-                      rowHeight={20}
-                      rowRenderer={this.getRowRenderer()}
-                      noRowsRenderer={this.noRowsRenderer}
-                    />
-                  )}
-                </AutoSizer>;
-              </div>
+              <MessageList projMsgs={projMsgs} />
               <div>消息发送区域</div>
             </SplitPane>
             <div>会话信息区域</div>

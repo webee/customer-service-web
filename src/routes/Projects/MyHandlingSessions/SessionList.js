@@ -13,7 +13,6 @@ import styles from "./SessionList.less";
 
 const Search = Input.Search;
 
-@connect()
 export default class View extends Component {
   static contextTypes = {
     projectDomain: PropTypes.string,
@@ -21,8 +20,8 @@ export default class View extends Component {
   };
 
   rowRenderer = ({index, key, style}) => {
-    const { data } = this.props;
-    const { sessions, listSessions, currentOpenedSession } = data;
+    const { myHandlingData } = this.props;
+    const { sessions, listSessions, currentOpenedSession } = myHandlingData;
     const session = sessions[listSessions[index]];
     const item = {
       id: session.id,
@@ -57,8 +56,8 @@ export default class View extends Component {
 
   render() {
     const { projectDomain, projectType } = this.context;
-    const { data } = this.props;
-    const { sessions, listSessions, currentOpenedSession } = data;
+    const { myHandlingData } = this.props;
+    const { listSessions } = myHandlingData;
     return (
       <div className={styles.main}>
         <div className={styles.header}>
@@ -77,7 +76,7 @@ export default class View extends Component {
                 rowHeight={60}
                 rowRenderer={this.rowRenderer}
                 noRowsRenderer={this.noRowsRenderer}
-                data={data}
+                myHandlingData={myHandlingData}
               />
             )}
           </AutoSizer>
