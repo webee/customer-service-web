@@ -30,8 +30,8 @@ export default {
       yield put({ type: "RESET", payload: "*" });
     },
     *logout({ payload: state }, { call, put }) {
-      yield put({ type: "resetState" });
       yield put(routerRedux.push({ pathname: authPath, state }));
+      yield put({ type: "resetState" });
     }
   },
   subscriptions: {

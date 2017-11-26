@@ -2,12 +2,6 @@ import request from '../utils/request';
 // FIXME: replace localStorage by localforage.
 
 
-export async function fetchStaffAppTree() {
-  const resp = await request.get('/staff_app_tree');
-  return resp.data;
-}
-
-
 export function saveUISettings(settings) {
   localStorage.setItem('ui_settings', JSON.stringify(settings));
 }
@@ -23,4 +17,16 @@ export function loadUISettings() {
     console.debug(e);
     return {};
   }
+}
+
+
+// apis
+export async function fetchStaffAppInfo() {
+  const resp = await request.get('/staff_app_info');
+  return resp.data;
+}
+
+export async function getXChatInfo() {
+  const resp = await request.get('/xchat');
+  return resp.data;
 }
