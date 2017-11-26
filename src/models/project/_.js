@@ -74,5 +74,12 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       desc: false
     });
     yield put(createAction(`${ns}/appendProjectMsgs`, { id: projectID, msgs: msgs }));
-  }
+  },
+  *syncSessionMsgID({ key, payload: { projectID, sessionID}}, { select, call, put }) {
+    const projMsgs = yield select(state => state.project[key]._.projectMsgs[projectID]);
+    if (projMsgs && projMsgs.rid) {
+      const { rid } = projMsgs;
+      yield call(projectService.syncSessionMsgID, projectID, sessionID, rid);
+    }
+  },
 });

@@ -7,6 +7,7 @@ import SplitPane from "react-split-pane";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
 import MessageList from './MessageList';
+import MessageSender from './MessageSender';
 import styles from "./SessionChatDetail.less";
 
 export default class View extends Component {
@@ -22,9 +23,17 @@ export default class View extends Component {
       limit: 100
     });
   }
+  componentDidUpdate(prevProps, prevState) {
+    const { session } = this.props;
+    // FIXME: 完善未读数的更新
+    dispatchDomainTypeEffect(this.context, this.props, "_/syncSessionMsgID", {
+      projectID: session.proj_id,
+      sessionID: session.id,
+    });
+  }
   componentWillUnmount() {
     const { session } = this.props;
-    dispatchDomainType(this.context, this.props, "myHandling/clearProjectMsgs", session.proj_id);
+    dispatchDomainType(this.context, this.props, "_/clearProjectMsgs", session.proj_id);
   }
 
   render() {
@@ -52,8 +61,8 @@ export default class View extends Component {
               maxSize={300}
               paneClassName={styles.main}
             >
-              <MessageList projMsgs={projMsgs} />
-              <div>消息发送区域</div>
+              <MessageList dispatch={dispatch} projMsgs={projMsgs} />
+              <MessageSender dispatch={dispatch} session={session}/>
             </SplitPane>
             <div>会话信息区域</div>
           </SplitPane>

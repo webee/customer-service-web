@@ -1,4 +1,4 @@
-import request from "../utils/request";
+import request, { getQsArgBool } from "../utils/request";
 
 export function createDomainTypeWrapperAction(projectDomain, projectType, type, action, extras = {}) {
   return { type, payload: { projectDomain, projectType, ...action, ...extras } };
@@ -83,7 +83,7 @@ export async function fetchProjectMsgs(projectID, { lid, rid, limit, desc }) {
   return resp.data;
 }
 
-export async function sessionSendMsg(projectID, sessionID, { domain = "", type = "", content }) {
+export async function sendSessionMsg(projectID, sessionID, { domain = "", type = "", content }) {
   return await request.post(`/sessions/${projectID}/${sessionID}/send_msg`, {
     domain,
     type,
@@ -95,8 +95,4 @@ export async function syncSessionMsgID(projectID, sessionID, msg_id) {
   return await request.post(`/sessions/${projectID}/${sessionID}/sync_msg_id`, {
     msg_id
   });
-}
-
-function getQsArgBool(b, { t = true, f = false }) {
-  return b === undefined ? b : b ? t : f;
 }

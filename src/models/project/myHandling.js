@@ -13,7 +13,7 @@ export const reducer = createNSSubReducer(
     // 打开的接待中的会话id
     openedSessions: [],
     // 当前正在处理的打开的接待中的会话
-    currentOpenedSession: null,
+    currentOpenedSession: null
   },
   {
     saveSessions(state, { payload: session_list }) {
@@ -54,7 +54,7 @@ export const reducer = createNSSubReducer(
       }
 
       return { ...state, openedSessions, currentOpenedSession };
-    },
+    }
   }
 );
 
@@ -63,5 +63,8 @@ export const effectFunc = createNSSubEffectFunc(ns, {
   *fetchSessions({ projectDomain, projectType, createAction, payload }, { call, put }) {
     const sessions = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
     yield put(createAction(`${ns}/saveSessions`, sessions));
+  },
+  *sendSessionMsg({ payload: { projectID, sessionID, domain, type, content } }, { call, put }) {
+    yield call(projectService.sendSessionMsg, projectID, sessionID, {domain, type, content});
   },
 });
