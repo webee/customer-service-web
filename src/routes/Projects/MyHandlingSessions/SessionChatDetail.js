@@ -6,8 +6,10 @@ import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project
 import SplitPane from "react-split-pane";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
-import MessageList from './MessageList';
-import MessageSender from './MessageSender';
+import SessionChatHeader from "./SessionChatHeader";
+import SessionChatInfo from "./SessionChatInfo";
+import MessageList from "./MessageList";
+import MessageSender from "./MessageSender";
 import styles from "./SessionChatDetail.less";
 
 export default class View extends Component {
@@ -28,7 +30,7 @@ export default class View extends Component {
     // FIXME: 完善未读数的更新
     dispatchDomainTypeEffect(this.context, this.props, "_/syncSessionMsgID", {
       projectID: session.project_id,
-      sessionID: session.id,
+      sessionID: session.id
     });
   }
   componentWillUnmount() {
@@ -38,11 +40,19 @@ export default class View extends Component {
 
   render() {
     const { projectDomain, projectType } = this.context;
-    const { dispatch, appData, session, projMsgs } = this.props;
-    const { staffs, customers } = appData;
+    const { dispatch, appData, session, project, projMsgs } = this.props;
+    const { staffs, customers, domains } = appData;
     return (
       <div className={styles.splitter}>
-        <div className={styles.splitHeader}>Header#{session.id}</div>
+        <div className={styles.splitHeader}>
+          <SessionChatHeader
+            projectDomain={projectDomain}
+            projectType={projectType}
+            domains={domains}
+            project={project}
+            customers={customers}
+          />
+        </div>
         <div className={styles.splitContent}>
           <SplitPane
             className={styles.splitPane}
@@ -63,9 +73,9 @@ export default class View extends Component {
               paneClassName={styles.main}
             >
               <MessageList dispatch={dispatch} staffs={staffs} customers={customers} projMsgs={projMsgs} />
-              <MessageSender dispatch={dispatch} session={session}/>
+              <MessageSender dispatch={dispatch} session={session} />
             </SplitPane>
-            <div>会话信息区域</div>
+            <SessionChatInfo />
           </SplitPane>
         </div>
       </div>

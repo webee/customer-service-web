@@ -9,21 +9,21 @@ import { env } from "../config";
 import MainLayout from "../components/layouts/MainLayout";
 import MainLayoutStyles from "../components/layouts/MainLayout.less";
 
-// function getProjectDomainNavData(projectDomains, domains, types) {
+// function getProjectDomainNavData(projectDomains) {
 //   return projectDomains.map(d => ({
 //     icon: 'message', title: d.title, pathname: d.name, open: true, noLink: true,
 //     items: d.types.map(t => ({title: t.title, pathname: t.name, fixed: true, noHeader: true, noBreadcrumb: true, noFooter: true}))
 //   }));
 // }
 //
-// function getNavData(projectDomains, domains, types) {
+// function getNavData(projectDomains) {
 //   return [
 // 		{icon: 'home', title: '首页', pathname: '', component: require('../routes/Home')},
 // 		{icon: 'message', title: '项目', pathname: 'projects', noLink: true,
 //       instance: {
 //         pathname: ':projectDomain/:projectType',
 //         component: require('../routes/Projects'),
-//         items: getProjectDomainNavData(projectDomains, domains, types),
+//         items: getProjectDomainNavData(projectDomains),
 //       }
 //     },
 // 		{icon: 'setting', title: '设置', pathname: 'setting', component: require('../routes/Setting')},
@@ -36,21 +36,19 @@ const asProjectDomainType = (projectDomain, projectType) => {
   );
 };
 
-function getProjectDomainNavData(projectDomains, domains, types) {
+function getProjectDomainNavData(projectDomains) {
   return projectDomains.map(d => {
-    const domain = domains[d];
     return {
       icon: "message",
-      title: domain.title,
-      pathname: `projects/${d}`,
+      title: d.title,
+      pathname: `projects/${d.name}`,
       open: true,
       noLink: true,
-      items: domain.types.map(t => {
-        const type = types[t];
+      items: d.types.map(t => {
         return {
-          title: type.title,
-          pathname: t,
-          component: asProjectDomainType(d, t)(require("../routes/Projects")),
+          title: t.title,
+          pathname: t.name,
+          component: asProjectDomainType(d.name, t.name)(require("../routes/Projects")),
           fixed: true,
           noHeader: true,
           noBreadcrumb: true,
@@ -61,7 +59,7 @@ function getProjectDomainNavData(projectDomains, domains, types) {
   });
 }
 
-function getNavData(projectDomains, domains, types) {
+function getNavData(projectDomains) {
   return [
     {
       icon: "home",
@@ -69,7 +67,7 @@ function getNavData(projectDomains, domains, types) {
       pathname: "",
       component: require("../routes/Home")
     },
-    ...getProjectDomainNavData(projectDomains, domains, types),
+    ...getProjectDomainNavData(projectDomains),
     {
       icon: "setting",
       title: "设置",
@@ -214,13 +212,13 @@ class Main extends React.Component {
   render() {
     const { match, location } = this.props;
     const root_path = getRootPath(match.path);
-    const { staff, app, projectDomains, domains, types, ui_settings } = this.props;
+    const { staff, app, projectDomains, ui_settings } = this.props;
     const loaded = staff && app && projectDomains;
     if (!loaded) {
       return <Loader loaded={false} />;
     }
 
-    const navData = getNavData(projectDomains, domains, types);
+    const navData = getNavData(projectDomains);
 
     return (
       <MainLayout
@@ -243,8 +241,6 @@ function mapStateToProps(state) {
     staff: appData.staff,
     app: appData.app,
     projectDomains: appData.projectDomains,
-    domains: appData.domains,
-    types: appData.types,
   };
 }
 

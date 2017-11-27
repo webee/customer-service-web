@@ -18,8 +18,6 @@ export default {
     projectDomains: null,
     // 所有domains by name
     domains: {},
-    // 所有types by name
-    types: {},
 
     // 以下不影响main entry
     // 所有staff by uid
@@ -36,15 +34,15 @@ export default {
     },
     saveAppInfo(state, { payload: { app, staff, project_domain_tree } }) {
       const domains = {};
-      const types = {};
-      const projectDomains = project_domain_tree.map(pd => pd.name);
+      const projectDomains = project_domain_tree;
       project_domain_tree.forEach(pd => {
-        domains[pd.name] = { ...pd, types: pd.types.map(t => t.name) };
+        const types = {};
         pd.types.forEach(pt => {
           types[pt.name] = pt;
         });
+        domains[pd.name] = { ...pd, types };
       });
-      return { ...state, app, staff, projectDomains: projectDomains, domains, types };
+      return { ...state, app, staff, projectDomains, domains };
     },
     updateStaffs(state, { payload: staffs }) {
       return { ...state, staffs: { ...state.staffs, ...staffs } };
