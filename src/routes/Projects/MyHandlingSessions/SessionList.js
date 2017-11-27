@@ -20,14 +20,16 @@ export default class View extends Component {
   };
 
   rowRenderer = ({index, key, style}) => {
-    const { myHandlingData } = this.props;
-    const { sessions, listSessions, currentOpenedSession } = myHandlingData;
+    const { data, myHandlingData } = this.props;
+    const { sessions, projects } = data;
+    const { listSessions, currentOpenedSession } = myHandlingData;
     const session = sessions[listSessions[index]];
+    const project = projects[session.project_id];
     const item = {
       id: session.id,
-      name: session.owner.name,
+      name: project.owner.name,
       description: `${session.msg.type}:${session.msg.content}`,
-      online: session.is_online,
+      online: project.is_online,
       ts: session.msg.ts,
       unread: session.msg_id - session.sync_msg_id
     };
@@ -64,6 +66,7 @@ export default class View extends Component {
           <Search placeholder="uid/name" style={{ width: "100%" }} onSearch={value => console.log(value)} />
           <Checkbox>在线</Checkbox>
           <Checkbox>待回</Checkbox>
+          <Checkbox>最久未回</Checkbox>
         </div>
         <div className={styles.body}>
           <AutoSizer>

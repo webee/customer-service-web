@@ -14,7 +14,12 @@ export default {
     ui_settings: {},
     staff: null,
     app: null,
-    project_domains: null,
+    // project domain type tree
+    projectDomains: null,
+    // 所有domains by name
+    domains: {},
+    // 所有types by name
+    types: {},
     xchatInfo: null,
     xchatStatusInfo: null
   },
@@ -22,8 +27,17 @@ export default {
     saveUISettings(state, { payload }) {
       return { ...state, ui_settings: { ...state.ui_settings, ...payload } };
     },
-    saveAppInfo(state, { payload: { app, staff, project_domains } }) {
-      return { ...state, app, staff, project_domains };
+    saveAppInfo(state, { payload: { app, staff, project_domain_tree } }) {
+      const domains = {};
+      const types = {};
+      const projectDomains = project_domain_tree.map(pd => pd.name);
+      project_domain_tree.forEach(pd => {
+        domains[pd.name] = { ...pd, types: pd.types.map(t => t.name) };
+        pd.types.forEach(pt => {
+          types[pt.name] = pt;
+        });
+      });
+      return { ...state, app, staff, projectDomains: projectDomains, domains, types };
     },
     saveXChatInfo(state, { payload: xchatInfo }) {
       return { ...state, xchatInfo };
@@ -42,15 +56,18 @@ export default {
       const ui_settings = yield call(appService.loadUISettings);
       yield put({ type: "saveUISettings", payload: ui_settings });
     },
-    *fetchAppInfo({ payload }, { call, put }) {
+    *fetchAppInfo({ payload }, { all, call, put }) {
       const staffAppInfo = yield call(appService.fetchStaffAppInfo);
       // init project state
-      for (let d of staffAppInfo.project_domains) {
-        for (let t of d.types) {
+      const projectDomainTypeActions = [];
+      staffAppInfo.project_domain_tree.forEach(d => {
+        d.types.forEach(t => {
           // NOTE: initialize project domain/type states.
-          yield put(createProjectDomainTypeAction(d.name, t.name));
-        }
-      }
+          projectDomainTypeActions.push(put(createProjectDomainTypeAction(d.name, t.name)));
+        });
+      });
+      yield all(projectDomainTypeActions);
+
       yield put({ type: "saveAppInfo", payload: staffAppInfo });
     },
     *openXChat(action, { call, put }) {

@@ -2,36 +2,28 @@ import React, { Component } from "react";
 import Loader from "react-loader";
 import { connect } from "dva";
 import { withRouter, Route, Link, Switch, Redirect } from "dva/router";
-import {
-  Menu,
-  Icon,
-  Switch as SwitchComp,
-  Modal,
-  Form,
-  Avatar,
-  Dropdown
-} from "antd";
+import { Menu, Icon, Switch as SwitchComp, Modal, Form, Avatar, Dropdown } from "antd";
 import { getRootPath } from "../commons/router";
 const { SubMenu, ItemGroup } = Menu;
 import { env } from "../config";
 import MainLayout from "../components/layouts/MainLayout";
 import MainLayoutStyles from "../components/layouts/MainLayout.less";
 
-// function getProjectDomainNavData(project_domains) {
-//   return project_domains.map(d => ({
+// function getProjectDomainNavData(projectDomains, domains, types) {
+//   return projectDomains.map(d => ({
 //     icon: 'message', title: d.title, pathname: d.name, open: true, noLink: true,
 //     items: d.types.map(t => ({title: t.title, pathname: t.name, fixed: true, noHeader: true, noBreadcrumb: true, noFooter: true}))
 //   }));
 // }
 //
-// function getNavData(project_domains) {
+// function getNavData(projectDomains, domains, types) {
 //   return [
 // 		{icon: 'home', title: '首页', pathname: '', component: require('../routes/Home')},
 // 		{icon: 'message', title: '项目', pathname: 'projects', noLink: true,
 //       instance: {
 //         pathname: ':projectDomain/:projectType',
 //         component: require('../routes/Projects'),
-//         items: getProjectDomainNavData(project_domains),
+//         items: getProjectDomainNavData(projectDomains, domains, types),
 //       }
 //     },
 // 		{icon: 'setting', title: '设置', pathname: 'setting', component: require('../routes/Setting')},
@@ -40,34 +32,36 @@ import MainLayoutStyles from "../components/layouts/MainLayout.less";
 
 const asProjectDomainType = (projectDomain, projectType) => {
   return WrappedComponent => props => (
-    <WrappedComponent
-      projectDomain={projectDomain}
-      projectType={projectType}
-      {...props}
-    />
+    <WrappedComponent projectDomain={projectDomain} projectType={projectType} {...props} />
   );
 };
 
-function getProjectDomainNavData(project_domains) {
-  return project_domains.map(d => ({
-    icon: "message",
-    title: d.title,
-    pathname: `projects/${d.name}`,
-    open: true,
-    noLink: true,
-    items: d.types.map(t => ({
-      title: t.title,
-      pathname: t.name,
-      component: asProjectDomainType(d.name, t.name)(require('../routes/Projects')),
-      fixed: true,
-      noHeader: true,
-      noBreadcrumb: true,
-      noFooter: true
-    }))
-  }));
+function getProjectDomainNavData(projectDomains, domains, types) {
+  return projectDomains.map(d => {
+    const domain = domains[d];
+    return {
+      icon: "message",
+      title: domain.title,
+      pathname: `projects/${d}`,
+      open: true,
+      noLink: true,
+      items: domain.types.map(t => {
+        const type = types[t];
+        return {
+          title: type.title,
+          pathname: t,
+          component: asProjectDomainType(d, t)(require("../routes/Projects")),
+          fixed: true,
+          noHeader: true,
+          noBreadcrumb: true,
+          noFooter: true
+        };
+      })
+    };
+  });
 }
 
-function getNavData(project_domains) {
+function getNavData(projectDomains, domains, types) {
   return [
     {
       icon: "home",
@@ -75,7 +69,7 @@ function getNavData(project_domains) {
       pathname: "",
       component: require("../routes/Home")
     },
-    ...getProjectDomainNavData(project_domains),
+    ...getProjectDomainNavData(projectDomains, domains, types),
     {
       icon: "setting",
       title: "设置",
@@ -142,11 +136,7 @@ class Main extends React.Component {
     const { staff, location } = this.props;
     console.log("location:", location);
     const menu = (
-      <Menu
-        className={MainLayoutStyles.menu}
-        selectedKeys={[]}
-        onClick={this.onMenuClick}
-      >
+      <Menu className={MainLayoutStyles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
         <Menu.Item disabled>
           <Icon type="user/home" />个人中心
         </Menu.Item>
@@ -174,21 +164,12 @@ class Main extends React.Component {
         <Link to="/_" className={MainLayoutStyles.action}>
           <Icon type="code" />Test
         </Link>
-        <span
-          className={MainLayoutStyles.action}
-          onClick={this.handleSettingUI}
-        >
+        <span className={MainLayoutStyles.action} onClick={this.handleSettingUI}>
           <Icon type="setting" />界面设置
         </span>
         <Dropdown overlay={menu}>
-          <span
-            className={`${MainLayoutStyles.action} ${MainLayoutStyles.account}`}
-          >
-            <Avatar
-              size="small"
-              className={MainLayoutStyles.avatar}
-              icon="user"
-            />
+          <span className={`${MainLayoutStyles.action} ${MainLayoutStyles.account}`}>
+            <Avatar size="small" className={MainLayoutStyles.avatar} icon="user" />
             {staff.name}
           </span>
         </Dropdown>
@@ -233,13 +214,13 @@ class Main extends React.Component {
   render() {
     const { match, location } = this.props;
     const root_path = getRootPath(match.path);
-    const { staff, app, project_domains, ui_settings } = this.props;
-    const loaded = staff && app && project_domains;
+    const { staff, app, projectDomains, domains, types, ui_settings } = this.props;
+    const loaded = staff && app && projectDomains;
     if (!loaded) {
       return <Loader loaded={false} />;
     }
 
-    const navData = getNavData(project_domains);
+    const navData = getNavData(projectDomains, domains, types);
 
     return (
       <MainLayout

@@ -31,10 +31,10 @@ export default class View extends Component {
 
   renderSessionChatDetail(id) {
     const { dispatch, data, myHandlingData } = this.props;
-    const { sessions } = myHandlingData;
+    const { sessions } = data;
     const { projectMsgs } = data;
     const session = sessions[id];
-    const projMsgs = projectMsgs[session.proj_id] || {};
+    const projMsgs = projectMsgs[session.project_id] || {};
     return <SessionChatDetail dispatch={dispatch} session={session} projMsgs={projMsgs} />;
   }
 

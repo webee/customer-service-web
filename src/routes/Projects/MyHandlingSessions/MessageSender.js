@@ -35,7 +35,7 @@ export default class extends React.Component {
         e.preventDefault();
         // send msg
         dispatchDomainTypeEffect(this.context, this.props, "myHandling/sendSessionMsg", {
-          projectID: session.proj_id,
+          projectID: session.project_id,
           sessionID: session.id,
           domain: "",
           type: "text",
@@ -44,7 +44,7 @@ export default class extends React.Component {
         this.setState({ value: "" });
         setTimeout(
           () => dispatchDomainTypeEffect(this.context, this.props, "_/fetchProjectNewMsgs", {
-            projectID: session.proj_id,
+            projectID: session.project_id,
           }),
           100
         )

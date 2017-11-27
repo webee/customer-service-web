@@ -1,17 +1,49 @@
 import { createNSSubEffectFunc, createNSSubReducer } from "../utils";
 import * as projectService from "../../services/project";
 
-const ns = '_';
+const ns = "_";
 // reducers
 export const reducer = createNSSubReducer(
   ns,
   {
+    // 所有会话by id
+    sessions: {},
+    // 所有项目by id
+    projects: {},
+    // 所有staff by uid
+    staffs: {},
+    // 所有customers by uid
+    customers: {},
     // 项目消息by project id: {lid, rid, [msgs], noMore}
     projectMsgs: {}
   },
   {
+    saveSessions(state, { payload: sessionList }) {
+      const sessions = { ...state.sessions };
+      sessionList.forEach(s => sessions[s.id] = s);
+
+      return { ...state, sessions };
+    },
+    saveProjects(state, { payload: projectList }) {
+      const projects = { ...state.projects };
+      const staffs = { ...state.staffs };
+      const customers = { ...state.customers };
+      projectList.forEach(p => {
+        projects[p.id] = p;
+
+        // staffs
+        staffs[p.staffs.leader.uid] = p.staffs.leader
+        p.staffs.assistants.forEach(u => staffs[u.uid] = u);
+        p.staffs.participants.forEach(u => staffs[u.uid] = u);
+        // customers
+        customers[p.owner.uid] = p.owner;
+        p.customers.parties.forEach(u => customers[u.uid] = u);
+      });
+
+      return { ...state, projects, staffs, customers };
+    },
     clearProjectMsgs(state, { payload: id }) {
-      const projectMsgs = {...state.projectMsgs};
+      const projectMsgs = { ...state.projectMsgs };
       delete projectMsgs[id];
       return { ...state, projectMsgs };
     },
@@ -48,7 +80,7 @@ export const reducer = createNSSubReducer(
       });
       projectMsgs[id] = { lid, rid, msg: newMsgs, noMore };
       return { ...state, projectMsgs };
-    },
+    }
   }
 );
 
@@ -75,11 +107,11 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     });
     yield put(createAction(`${ns}/appendProjectMsgs`, { id: projectID, msgs: msgs }));
   },
-  *syncSessionMsgID({ key, payload: { projectID, sessionID}}, { select, call, put }) {
+  *syncSessionMsgID({ key, payload: { projectID, sessionID } }, { select, call, put }) {
     const projMsgs = yield select(state => state.project[key]._.projectMsgs[projectID]);
     if (projMsgs && projMsgs.rid) {
       const { rid } = projMsgs;
       yield call(projectService.syncSessionMsgID, projectID, sessionID, rid);
     }
-  },
+  }
 });

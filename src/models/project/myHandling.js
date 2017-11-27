@@ -6,8 +6,6 @@ const ns = "myHandling";
 export const reducer = createNSSubReducer(
   ns,
   {
-    // 所有会话by id
-    sessions: {},
     // 接待中的会话
     listSessions: [],
     // 打开的接待中的会话id
@@ -16,20 +14,14 @@ export const reducer = createNSSubReducer(
     currentOpenedSession: null
   },
   {
-    saveSessions(state, { payload: session_list }) {
-      const sessions = {};
-      const listSessions = [];
-      for (let s of session_list) {
-        sessions[s.id] = s;
-        listSessions.push(s.id);
-      }
-
-      return { ...state, sessions, listSessions };
+    saveListSessions(state, { payload: listSessions }) {
+      return { ...state, listSessions };
     },
     openSession(state, { payload: id }) {
-      if (!state.sessions.hasOwnProperty(id)) {
+      if (state.listSessions.indexOf(id) < 0) {
         return state;
       }
+
       const currentOpenedSession = id;
       const openedSessions = [...state.openedSessions];
       if (openedSessions.indexOf(id) === -1) {
@@ -61,10 +53,14 @@ export const reducer = createNSSubReducer(
 // effects
 export const effectFunc = createNSSubEffectFunc(ns, {
   *fetchSessions({ projectDomain, projectType, createAction, payload }, { call, put }) {
-    const sessions = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
-    yield put(createAction(`${ns}/saveSessions`, sessions));
+    const sessionList = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
+    yield put(
+      createAction(`_/saveSessions`, sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined })))
+    );
+    yield put(createAction(`_/saveProjects`, sessionList.map(s => s.project)));
+    yield put(createAction(`${ns}/saveListSessions`, sessionList.map(s => s.id)));
   },
   *sendSessionMsg({ payload: { projectID, sessionID, domain, type, content } }, { call, put }) {
-    yield call(projectService.sendSessionMsg, projectID, sessionID, {domain, type, content});
-  },
+    yield call(projectService.sendSessionMsg, projectID, sessionID, { domain, type, content });
+  }
 });

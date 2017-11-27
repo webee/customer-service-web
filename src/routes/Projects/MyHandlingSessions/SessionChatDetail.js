@@ -19,7 +19,7 @@ export default class View extends Component {
   componentDidMount() {
     const { session } = this.props;
     dispatchDomainTypeEffect(this.context, this.props, "_/fetchProjectNewMsgs", {
-      projectID: session.proj_id,
+      projectID: session.project_id,
       limit: 100
     });
   }
@@ -27,13 +27,13 @@ export default class View extends Component {
     const { session } = this.props;
     // FIXME: 完善未读数的更新
     dispatchDomainTypeEffect(this.context, this.props, "_/syncSessionMsgID", {
-      projectID: session.proj_id,
+      projectID: session.project_id,
       sessionID: session.id,
     });
   }
   componentWillUnmount() {
     const { session } = this.props;
-    dispatchDomainType(this.context, this.props, "_/clearProjectMsgs", session.proj_id);
+    dispatchDomainType(this.context, this.props, "_/clearProjectMsgs", session.project_id);
   }
 
   render() {

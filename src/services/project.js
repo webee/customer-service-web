@@ -72,7 +72,7 @@ export async function fetchMyHandlingSessions(projectDomain, projectType) {
 }
 
 export async function fetchProjectMsgs(projectID, { lid, rid, limit, desc }) {
-  const resp = await request.get(`/sessions/${projectID}/msgs`, {
+  const resp = await request.get(`/projects/${projectID}/msgs`, {
     params: {
       lid,
       rid,
