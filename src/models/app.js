@@ -20,6 +20,13 @@ export default {
     domains: {},
     // 所有types by name
     types: {},
+
+    // 以下不影响main entry
+    // 所有staff by uid
+    staffs: {},
+    // 所有customer by uid
+    customers: {},
+    // xchat info
     xchatInfo: null,
     xchatStatusInfo: null
   },
@@ -38,6 +45,12 @@ export default {
         });
       });
       return { ...state, app, staff, projectDomains: projectDomains, domains, types };
+    },
+    updateStaffs(state, { payload: staffs }) {
+      return { ...state, staffs: { ...state.staffs, ...staffs } };
+    },
+    updateCustomers(state, { payload: customers }) {
+      return { ...state, customers: { ...state.customers, ...customers } };
     },
     saveXChatInfo(state, { payload: xchatInfo }) {
       return { ...state, xchatInfo };

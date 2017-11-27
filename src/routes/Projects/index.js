@@ -8,9 +8,10 @@ import TopRightButton from "../../components/TopRightButton";
 import MyHandlingSessionsView from "./MyHandlingSessions";
 
 @connect((state, ownProps) => {
-  const {projectDomain, projectType} = ownProps;
+  const { projectDomain, projectType } = ownProps;
   const data = state.project[[projectDomain, projectType]];
-  return {data};
+  const appData = state.app;
+  return { data, appData };
 })
 export default class View extends Component {
   constructor(props) {
@@ -24,7 +25,7 @@ export default class View extends Component {
 
   static childContextTypes = {
     projectDomain: PropTypes.string,
-    projectType: PropTypes.string,
+    projectType: PropTypes.string
   };
 
   getChildContext() {
@@ -42,10 +43,10 @@ export default class View extends Component {
 
   getPureTabContent(key) {
     const { dispatch } = this.props;
-    const { projectDomain, projectType, data } = this.props;
+    const { projectDomain, projectType, data, appData } = this.props;
     switch (key) {
       case "my_handling_sessions":
-        return <MyHandlingSessionsView dispatch={dispatch} data={data._} myHandlingData={data.myHandling} />;
+        return <MyHandlingSessionsView dispatch={dispatch} appData={appData} data={data._} myHandlingData={data.myHandling} />;
       case "other_handling_sessions":
         return (
           <h1>

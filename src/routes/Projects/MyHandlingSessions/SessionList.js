@@ -20,7 +20,7 @@ export default class View extends Component {
   };
 
   rowRenderer = ({index, key, style}) => {
-    const { data, myHandlingData } = this.props;
+    const { appData, data, myHandlingData } = this.props;
     const { sessions, projects } = data;
     const { listSessions, currentOpenedSession } = myHandlingData;
     const session = sessions[listSessions[index]];

@@ -55,9 +55,28 @@ export const effectFunc = createNSSubEffectFunc(ns, {
   *fetchSessions({ projectDomain, projectType, createAction, payload }, { call, put }) {
     const sessionList = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
     yield put(
-      createAction(`_/saveSessions`, sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined })))
+      createAction('_/updateSessions', sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined })))
     );
-    yield put(createAction(`_/saveProjects`, sessionList.map(s => s.project)));
+    const projectList = sessionList.map(s => s.project);
+
+    const projects = {};
+    const staffs = {};
+    const customers = {};
+    projectList.forEach(p => {
+      // TODO: 修改staffs和customers, 使用id引用
+      projects[p.id] = p;
+      // staffs
+      staffs[p.staffs.leader.uid] = p.staffs.leader
+      p.staffs.assistants.forEach(u => staffs[u.uid] = u);
+      p.staffs.participants.forEach(u => staffs[u.uid] = u);
+      // customers
+      customers[p.owner.uid] = p.owner;
+      p.customers.parties.forEach(u => customers[u.uid] = u);
+    });
+    yield put(createAction('_/updateProjects', projects));
+    yield put({type: 'app/updateStaffs', payload: staffs});
+    yield put({type: 'app/updateCustomers', payload: customers});
+
     yield put(createAction(`${ns}/saveListSessions`, sessionList.map(s => s.id)));
   },
   *sendSessionMsg({ payload: { projectID, sessionID, domain, type, content } }, { call, put }) {

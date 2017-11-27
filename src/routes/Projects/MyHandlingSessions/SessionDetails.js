@@ -30,18 +30,16 @@ export default class View extends Component {
   };
 
   renderSessionChatDetail(id) {
-    const { dispatch, data, myHandlingData } = this.props;
-    const { sessions } = data;
-    const { projectMsgs } = data;
+    const { dispatch, appData, data, myHandlingData } = this.props;
+    const { sessions, projectMsgs } = data;
     const session = sessions[id];
     const projMsgs = projectMsgs[session.project_id] || {};
-    return <SessionChatDetail dispatch={dispatch} session={session} projMsgs={projMsgs} />;
+    return <SessionChatDetail dispatch={dispatch} appData={appData} session={session} projMsgs={projMsgs} />;
   }
 
   render() {
-    const { dispatch, data, myHandlingData } = this.props;
-    const { sessions, openedSessions, currentOpenedSession } = myHandlingData;
-    const { projectMsgs } = data;
+    const { myHandlingData } = this.props;
+    const { openedSessions, currentOpenedSession } = myHandlingData;
     if (openedSessions.length === 0) {
       return <EmptyContent fontSize={96} />;
     }

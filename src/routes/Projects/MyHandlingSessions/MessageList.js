@@ -12,7 +12,7 @@ const cache = new CellMeasurerCache({
   // TODO: 使用msg_id
   keyMapper: (rowIndex, columnIndex) => {
     return rowIndex;
-  },
+  }
 });
 
 export default class extends React.Component {
@@ -21,17 +21,31 @@ export default class extends React.Component {
   };
 
   rowRenderer = ({ index, key, parent, style }) => {
-    const { projMsgs } = this.props;
+    const { staffs, customers, projMsgs } = this.props;
     const { msgs } = projMsgs;
     const msg = msgs[index];
     const { type, content, user_type, user_id } = msg;
+    let userName = user_id;
+    switch (user_type) {
+      case "staff":
+        const staff = staffs[user_id];
+        userName = staff ? staff.name : userName;
+        break;
+      case "customer":
+        const customer = customers[user_id];
+        userName = customer ? customer.name : userName;
+        break;
+    }
     // TODO: 基于type来渲染
-    const itemClassNames = cs(styles.item, { [styles.left]: user_type === 'customer', [styles.right]: user_type === 'staff'});
+    const itemClassNames = cs(styles.item, {
+      [styles.left]: user_type === "customer",
+      [styles.right]: user_type === "staff"
+    });
     return (
       <CellMeasurer cache={cache} columnIndex={0} key={key} parent={parent} rowIndex={index}>
         <div style={style}>
           <div className={itemClassNames}>
-            <div className={styles.head}>{user_id}</div>
+            <div className={styles.head}>{userName}</div>
             <div className={styles.body}>{content}</div>
           </div>
         </div>

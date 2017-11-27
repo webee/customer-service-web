@@ -38,7 +38,8 @@ export default class View extends Component {
 
   render() {
     const { projectDomain, projectType } = this.context;
-    const { dispatch, session, projMsgs } = this.props;
+    const { dispatch, appData, session, projMsgs } = this.props;
+    const { staffs, customers } = appData;
     return (
       <div className={styles.splitter}>
         <div className={styles.splitHeader}>Header#{session.id}</div>
@@ -61,7 +62,7 @@ export default class View extends Component {
               maxSize={300}
               paneClassName={styles.main}
             >
-              <MessageList dispatch={dispatch} projMsgs={projMsgs} />
+              <MessageList dispatch={dispatch} staffs={staffs} customers={customers} projMsgs={projMsgs} />
               <MessageSender dispatch={dispatch} session={session}/>
             </SplitPane>
             <div>会话信息区域</div>

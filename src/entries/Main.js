@@ -237,7 +237,15 @@ class Main extends React.Component {
 }
 
 function mapStateToProps(state) {
-  return { ...state.app };
+  const appData = state.app;
+  return {
+    ui_settings: appData.ui_settings,
+    staff: appData.staff,
+    app: appData.app,
+    projectDomains: appData.projectDomains,
+    domains: appData.domains,
+    types: appData.types,
+  };
 }
 
 export default connect(mapStateToProps)(Main);

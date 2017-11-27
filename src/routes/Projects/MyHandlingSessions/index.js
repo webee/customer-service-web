@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
@@ -10,7 +10,7 @@ import styles from "./index.less";
 import SessionList from "./SessionList";
 import SessionDetails from "./SessionDetails";
 
-export default class View extends Component {
+export default class View extends React.Component {
   static contextTypes = {
     projectDomain: PropTypes.string,
     projectType: PropTypes.string
@@ -18,18 +18,18 @@ export default class View extends Component {
 
   componentDidMount() {
     dispatchDomainTypeEffect(this.context, this.props, "myHandling/fetchSessions");
-    this.fetchSessionsInterval = setInterval(
-      () => dispatchDomainTypeEffect(this.context, this.props, "myHandling/fetchSessions"),
-      6000
-    );
+    // this.fetchSessionsInterval = setInterval(
+    //   () => dispatchDomainTypeEffect(this.context, this.props, "myHandling/fetchSessions"),
+    //   6000
+    // );
   }
 
   componentWillUnmount() {
-    clearInterval(this.fetchSessionsInterval);
+    // clearInterval(this.fetchSessionsInterval);
   }
 
   render() {
-    const { dispatch, data, myHandlingData } = this.props;
+    const { dispatch, appData, data, myHandlingData } = this.props;
     return (
       <SplitPane
         className={styles.splitPane}
@@ -39,8 +39,8 @@ export default class View extends Component {
         maxSize={300}
         paneClassName={styles.main}
       >
-        <SessionList dispatch={dispatch} data={data} myHandlingData={myHandlingData} />
-        <SessionDetails dispatch={dispatch} data={data} myHandlingData={myHandlingData}/>
+        <SessionList dispatch={dispatch} appData={appData} data={data} myHandlingData={myHandlingData} />
+        <SessionDetails dispatch={dispatch} appData={appData} data={data} myHandlingData={myHandlingData}/>
       </SplitPane>
     );
   }

@@ -10,37 +10,18 @@ export const reducer = createNSSubReducer(
     sessions: {},
     // 所有项目by id
     projects: {},
-    // 所有staff by uid
-    staffs: {},
-    // 所有customers by uid
-    customers: {},
     // 项目消息by project id: {lid, rid, [msgs], noMore}
     projectMsgs: {}
   },
   {
-    saveSessions(state, { payload: sessionList }) {
+    updateSessions(state, { payload: sessionList }) {
       const sessions = { ...state.sessions };
       sessionList.forEach(s => sessions[s.id] = s);
 
       return { ...state, sessions };
     },
-    saveProjects(state, { payload: projectList }) {
-      const projects = { ...state.projects };
-      const staffs = { ...state.staffs };
-      const customers = { ...state.customers };
-      projectList.forEach(p => {
-        projects[p.id] = p;
-
-        // staffs
-        staffs[p.staffs.leader.uid] = p.staffs.leader
-        p.staffs.assistants.forEach(u => staffs[u.uid] = u);
-        p.staffs.participants.forEach(u => staffs[u.uid] = u);
-        // customers
-        customers[p.owner.uid] = p.owner;
-        p.customers.parties.forEach(u => customers[u.uid] = u);
-      });
-
-      return { ...state, projects, staffs, customers };
+    updateProjects(state, { payload: projects }) {
+      return { ...state, projects: {...state.projects, ...projects} };
     },
     clearProjectMsgs(state, { payload: id }) {
       const projectMsgs = { ...state.projectMsgs };
