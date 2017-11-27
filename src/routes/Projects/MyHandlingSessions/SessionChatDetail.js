@@ -4,7 +4,6 @@ import { reduxRouter } from "dva/router";
 import { connect } from "dva";
 import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
 import SplitPane from "react-split-pane";
-import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
 import SessionChatHeader from "./SessionChatHeader";
 import SessionChatInfo from "./SessionChatInfo";
@@ -58,9 +57,9 @@ export default class View extends Component {
             className={styles.splitPane}
             primary="second"
             split="vertical"
-            defaultSize={280}
-            minSize={280}
-            maxSize={320}
+            defaultSize={320}
+            minSize={320}
+            maxSize={360}
             paneClassName={styles.main}
           >
             <SplitPane

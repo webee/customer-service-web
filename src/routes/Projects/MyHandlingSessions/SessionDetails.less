@@ -1,26 +1,23 @@
 .main {
   min-width: 820px;
-  // flex: 1 0 auto;
   flex: auto;
 
   display: flex;
   flex-direction: column;
 
-  :global {
-    .ant-tabs-bar {
-      margin-bottom: 4px;
-    }
-    .ant-tabs-content {
-      flex: 1 0 auto;
+  :global(>.ant-tabs-bar) {
+    margin-bottom: 4px;
+  }
+  :global(>.ant-tabs-content) {
+    flex: auto;
+
+    display: flex;
+    flex-direction: column;
+    :global(>.ant-tabs-tabpane.ant-tabs-tabpane-active) {
+      flex: auto;
 
       display: flex;
-      flex-direction: column;
-      .ant-tabs-tabpane.ant-tabs-tabpane-active {
-        flex: 1 0 auto;
-
-        display: flex;
-        overflow: auto;
-      }
+      overflow: auto;
     }
   }
 }
