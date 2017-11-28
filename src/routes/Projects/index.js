@@ -41,61 +41,12 @@ export default class View extends Component {
     this.setState({ expanded: !this.state.expanded });
   };
 
-  getPureTabContent(key) {
-    const { dispatch } = this.props;
-    const { projectDomain, projectType, data, appData } = this.props;
-    switch (key) {
-      case "my_handling_sessions":
-        return <MyHandlingSessionsView dispatch={dispatch} appData={appData} data={data._} myHandlingData={data.myHandling} />;
-      case "other_handling_sessions":
-        return (
-          <h1>
-            {projectDomain}/{projectType}: 接待中的会话
-          </h1>
-        );
-      case "handled_sessions":
-        return (
-          <div style={{ flex: "1 0 auto" }}>
-            <h1>
-              {projectDomain}/{projectType}:
-              最近接待的会话叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-              最近接待的会话<br/>
-            </h1>
-          </div>
-        );
-    }
-  }
-
   getTabContent(key) {
     const { expanded } = this.state;
-    const icon = expanded ? "shrink" : "arrows-alt";
     return (
-      <TopRightButton
-        icon={icon}
-        style={{ flex: "auto" }}
-        contentStyle={{ height: "100%", display: "flex" }}
-        onClick={this.onToggleExpand}
-      >
-        {this.getPureTabContent(key)}
-      </TopRightButton>
+      <TabContentView expanded={expanded} onToggleExpand={this.onToggleExpand}>
+        <PureTabContentView name={key} {...this.props} />
+      </TabContentView>
     );
   }
 
@@ -125,3 +76,63 @@ export default class View extends Component {
     );
   }
 }
+
+const PureTabContentView = props => {
+  const { dispatch, name } = props;
+  const { projectDomain, projectType, data, appData } = props;
+  switch (name) {
+    case "my_handling_sessions":
+      return (
+        <MyHandlingSessionsView dispatch={dispatch} appData={appData} data={data._} myHandlingData={data.myHandling} />
+      );
+    case "other_handling_sessions":
+      return (
+        <h1>
+          {projectDomain}/{projectType}: 接待中的会话
+        </h1>
+      );
+    case "handled_sessions":
+      return (
+        <div style={{ flex: "1 0 auto" }}>
+          <h1>
+            {projectDomain}/{projectType}:
+            最近接待的会话叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉<br
+            />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+            最近接待的会话<br />
+          </h1>
+        </div>
+      );
+  }
+};
+
+const TabContentView = ({ expanded, onToggleExpand, children }) => {
+  const icon = expanded ? "shrink" : "arrows-alt";
+  return (
+    <TopRightButton
+      icon={icon}
+      style={{ flex: "auto" }}
+      contentStyle={{ height: "100%", display: "flex" }}
+      onClick={onToggleExpand}
+    >
+      {children}
+    </TopRightButton>
+  );
+};

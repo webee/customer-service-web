@@ -6,19 +6,20 @@ import CellMeasurer, { CellMeasurerCache } from "react-virtualized/dist/commonjs
 import EmptyContent from "./EmptyContent";
 import styles from "./MessageList.less";
 
-const cache = new CellMeasurerCache({
-  defaultHeight: 50,
-  fixedWidth: true,
-  // TODO: 使用msg_id
-  keyMapper: (rowIndex, columnIndex) => {
-    return rowIndex;
-  }
-});
-
 export default class extends React.Component {
   state = {
     width: undefined
   };
+  cache = new CellMeasurerCache({
+    defaultHeight: 50,
+    fixedWidth: true,
+    keyMapper: (rowIndex, columnIndex) => {
+      const { projMsgs } = this.props;
+      const { msgs } = projMsgs;
+      const msg = msgs[rowIndex];
+      return msg.msg_id;
+    }
+  });
 
   rowRenderer = ({ index, key, parent, style }) => {
     const { staffs, customers, projMsgs } = this.props;
@@ -42,7 +43,7 @@ export default class extends React.Component {
       [styles.right]: user_type === "staff"
     });
     return (
-      <CellMeasurer cache={cache} columnIndex={0} key={key} parent={parent} rowIndex={index}>
+      <CellMeasurer cache={this.cache} columnIndex={0} key={key} parent={parent} rowIndex={index}>
         <div style={style}>
           <div className={itemClassNames}>
             <div className={styles.head}>{userName}</div>
@@ -57,7 +58,7 @@ export default class extends React.Component {
 
   onResize = ({ width }) => {
     if (this.state.width !== width) {
-      cache.clearAll();
+      this.cache.clearAll();
       this.setState({ width });
     }
   };
@@ -70,12 +71,12 @@ export default class extends React.Component {
         {({ width, height }) => (
           <List
             className={styles.list}
-            deferredMeasurementCache={cache}
+            deferredMeasurementCache={this.cache}
             width={width}
             height={height}
             rowCount={msgs.length}
             scrollToIndex={msgs.length - 1}
-            rowHeight={cache.rowHeight}
+            rowHeight={this.cache.rowHeight}
             rowRenderer={this.rowRenderer}
             noRowsRenderer={this.noRowsRenderer}
           />
