@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
 import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
+import * as projectNotify from "../../../services/projectNotify";
 import SplitPane from "react-split-pane";
 import List from "react-virtualized/dist/commonjs/List";
 import SessionChatHeader from "./SessionChatHeader";
@@ -19,22 +20,17 @@ export default class View extends Component {
 
   componentDidMount() {
     const { session } = this.props;
-    dispatchDomainTypeEffect(this.context, this.props, "_/fetchProjectNewMsgs", {
-      projectID: session.project_id,
-      limit: 100
-    });
+    projectNotify.fetchProjectMsgs(this.context, this.props, session.project_id);
   }
   componentDidUpdate(prevProps, prevState) {
-    const { session } = this.props;
-    // FIXME: 完善未读数的更新
-    dispatchDomainTypeEffect(this.context, this.props, "_/syncSessionMsgID", {
-      projectID: session.project_id,
-      sessionID: session.id
-    });
+    // const { session } = this.props;
+    // // FIXME: 完善未读数的更新
+    // dispatchDomainTypeEffect(this.context, this.props, "_/syncSessionMsgID", {
+    //   projectID: session.project_id,
+    //   sessionID: session.id
+    // });
   }
   componentWillUnmount() {
-    const { session } = this.props;
-    dispatchDomainType(this.context, this.props, "_/clearProjectMsgs", session.project_id);
   }
 
   render() {

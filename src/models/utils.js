@@ -1,5 +1,5 @@
 export function parseNSSubType(ns, type) {
-  return (type && type.startsWith(ns)) ? type.substr(ns.length + 1) : type;
+  return type && type.startsWith(ns) ? type.substr(ns.length + 1) : type;
 }
 
 export function createNSSubReducer(ns, defaultState, reducers) {
@@ -22,4 +22,13 @@ export function createNSSubEffectFunc(ns, effectFuncs) {
       yield call(effectFunc, action, effects);
     }
   };
+}
+
+export function listToDict(list, byKey) {
+  if (Array.isArray(list)) {
+    const r = {};
+    list.forEach(d => (r[byKey(d)] = d));
+    return r;
+  }
+  return list;
 }

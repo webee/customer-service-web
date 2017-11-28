@@ -1,5 +1,6 @@
 import { createNSSubEffectFunc, createNSSubReducer } from "../utils";
 import * as projectService from "../../services/project";
+import { updateSessionList } from './_';
 
 const ns = "myHandling";
 // reducers
@@ -52,31 +53,9 @@ export const reducer = createNSSubReducer(
 
 // effects
 export const effectFunc = createNSSubEffectFunc(ns, {
-  *fetchSessions({ projectDomain, projectType, createAction, payload }, { call, put }) {
+  *fetchSessions({ projectDomain, projectType, createAction, createEffectAction, payload }, { call, put }) {
     const sessionList = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
-    yield put(
-      createAction('_/updateSessions', sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined })))
-    );
-    const projectList = sessionList.map(s => s.project);
-
-    const projects = {};
-    const staffs = {};
-    const customers = {};
-    projectList.forEach(p => {
-      // TODO: 修改staffs和customers, 使用id引用
-      projects[p.id] = p;
-      // staffs
-      staffs[p.staffs.leader.uid] = p.staffs.leader
-      p.staffs.assistants.forEach(u => staffs[u.uid] = u);
-      p.staffs.participants.forEach(u => staffs[u.uid] = u);
-      // customers
-      customers[p.owner.uid] = p.owner;
-      p.customers.parties.forEach(u => customers[u.uid] = u);
-    });
-    yield put(createAction('_/updateProjects', projects));
-    yield put({type: 'app/updateStaffs', payload: staffs});
-    yield put({type: 'app/updateCustomers', payload: customers});
-
+    yield* updateSessionList({ createAction, payload: sessionList}, { call, put });
     yield put(createAction(`${ns}/saveListSessions`, sessionList.map(s => s.id)));
   },
   *sendSessionMsg({ payload: { projectID, sessionID, domain, type, content } }, { call, put }) {

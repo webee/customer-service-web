@@ -1,7 +1,8 @@
 import { notification } from "antd";
 import { XChatClient, wampDebug, XCHAT_STATUS } from "xchat-client";
+import { listToDict } from "./utils";
 import * as appService from "../services/app";
-import * as projectService from "../services/project";
+import * as projectNotify from "../services/projectNotify";
 import { createProjectDomainTypeAction } from "../services/project";
 
 // xchat client
@@ -44,10 +45,12 @@ export default {
       });
       return { ...state, app, staff, projectDomains, domains };
     },
-    updateStaffs(state, { payload: staffs }) {
+    updateStaffs(state, { payload: staffList }) {
+      const staffs = listToDict(staffList, u => u.uid);
       return { ...state, staffs: { ...state.staffs, ...staffs } };
     },
-    updateCustomers(state, { payload: customers }) {
+    updateCustomers(state, { payload: customerList }) {
+      const customers = listToDict(customerList, u => u.uid)
       return { ...state, customers: { ...state.customers, ...customers } };
     },
     saveXChatInfo(state, { payload: xchatInfo }) {
@@ -111,7 +114,7 @@ export default {
           try {
             const { ns, type, details } = JSON.parse(msg.msg);
             if (ns === "project") {
-              projectService.handleNotify(dispatch, type, details);
+              projectNotify.handle(dispatch, type, details);
             }
           } catch (err) {
             console.error(err);

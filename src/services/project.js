@@ -51,23 +51,14 @@ export function dispatchDomainTypeEffect({ projectDomain, projectType }, { dispa
   dispatch(createProjectDomainTypeEffectAction(projectDomain, projectType, type, payload));
 }
 
-
-// handle notify
-export function handleNotify(dispatch, type, details) {
-  switch (type) {
-    case "session":
-      // 刷新会话列表
-      break;
-    case "session.msg":
-      const { id } = details;
-      // 拉取最新消息
-      break;
-  }
-}
-
 // apis
 export async function fetchMyHandlingSessions(projectDomain, projectType) {
   const resp = await request.get(`/projects/${projectDomain}/${projectType}/my_handling_sessions`);
+  return resp.data;
+}
+
+export async function fetchSessionItem(projectDomain, projectType, sessionID) {
+  const resp = await request.get(`/projects/${projectDomain}/${projectType}/${sessionID}`);
   return resp.data;
 }
 

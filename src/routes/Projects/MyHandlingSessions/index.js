@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
 import { dispatchDomainTypeEffect } from "../../../services/project";
+import * as projectNotify from "../../../services/projectNotify";
 import { List, Avatar, Badge, Tag } from "antd";
 import SplitPane from "react-split-pane";
 import styles from "./index.less";
@@ -17,15 +18,7 @@ export default class View extends React.Component {
   };
 
   componentDidMount() {
-    dispatchDomainTypeEffect(this.context, this.props, "myHandling/fetchSessions");
-    // this.fetchSessionsInterval = setInterval(
-    //   () => dispatchDomainTypeEffect(this.context, this.props, "myHandling/fetchSessions"),
-    //   6000
-    // );
-  }
-
-  componentWillUnmount() {
-    // clearInterval(this.fetchSessionsInterval);
+    projectNotify.fetchMyHandlingSessions(this.context, this.props);
   }
 
   render() {

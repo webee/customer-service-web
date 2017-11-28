@@ -57,7 +57,6 @@ export default class View extends Component {
   };
 
   render() {
-    const { projectDomain, projectType } = this.context;
     const { myHandlingData } = this.props;
     const { listSessions } = myHandlingData;
     return (

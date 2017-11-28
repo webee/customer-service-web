@@ -1,4 +1,4 @@
-import { createNSSubEffectFunc, createNSSubReducer } from "../utils";
+import { createNSSubEffectFunc, createNSSubReducer, listToDict } from "../utils";
 import * as projectService from "../../services/project";
 
 const ns = "_";
@@ -15,12 +15,11 @@ export const reducer = createNSSubReducer(
   },
   {
     updateSessions(state, { payload: sessionList }) {
-      const sessions = { ...state.sessions };
-      sessionList.forEach(s => sessions[s.id] = s);
-
-      return { ...state, sessions };
+      const sessions = listToDict(sessionList, o => o.id);
+      return { ...state, sessions: {...state.sessions, ...sessions} };
     },
-    updateProjects(state, { payload: projects }) {
+    updateProjects(state, { payload: projectList }) {
+      const projects = listToDict(projectList, o => o.id);
       return { ...state, projects: {...state.projects, ...projects} };
     },
     clearProjectMsgs(state, { payload: id }) {
@@ -94,5 +93,33 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       const { rid } = projMsgs;
       yield call(projectService.syncSessionMsgID, projectID, sessionID, rid);
     }
-  }
+  },
+  *fetchSessionItem({ projectDomain, projectType, createAction, payload: sessionID }, { call, put }) {
+    const s = yield call(projectService.fetchSessionItem, projectDomain, projectType, sessionID);
+
+    yield* updateSessionList({ createAction, payload: [s]}, { call, put });
+  },
 });
+
+export function* updateSessionList({ createAction, payload: sessionList }, { call, put }) {
+    yield put(
+      createAction('_/updateSessions', sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined })))
+    );
+    // TODO: 修改staffs和customers, 使用id引用
+    const projectList = sessionList.map(s => s.project);
+    yield put(createAction('_/updateProjects', projectList));
+
+    const staffs = [];
+    const customers = [];
+    projectList.forEach(p => {
+      // staffs
+      staffs.push(p.staffs.leader);
+      staffs.push(...p.staffs.assistants);
+      staffs.push(...p.staffs.participants);
+      // customers
+      customers.push(p.owner);
+      customers.push(p.customers.parties);
+    });
+    yield put({type: 'app/updateStaffs', payload: staffs});
+    yield put({type: 'app/updateCustomers', payload: customers});
+}
