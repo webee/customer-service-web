@@ -52,8 +52,11 @@ export default class View extends Component {
   noRowsRenderer = () => <EmptyContent />;
 
   onClick = id => {
-    // 加入到打开的会话中
-    dispatchDomainType(this.context, this.props, "myHandling/openSession", id);
+    const { myHandlingData: { currentOpenedSession } } = this.props;
+    if (id !== currentOpenedSession) {
+      // 加入到打开的会话中
+      dispatchDomainType(this.context, this.props, "myHandling/openSession", id);
+    }
   };
 
   render() {

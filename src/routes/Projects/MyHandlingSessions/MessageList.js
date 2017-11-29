@@ -8,18 +8,19 @@ import styles from "./MessageList.less";
 
 export default class extends React.Component {
   state = {
-    width: undefined
+    width: 0,
   };
   cache = new CellMeasurerCache({
     defaultHeight: 50,
     fixedWidth: true,
     keyMapper: (rowIndex, columnIndex) => {
-      const { projMsgs } = this.props;
-      const { msgs } = projMsgs;
+      const { projMsgs: { msgs } } = this.props;
       const msg = msgs[rowIndex];
       return msg.msg_id;
     }
   });
+  // list ref
+  list = undefined;
 
   rowRenderer = ({ index, key, parent, style }) => {
     const { staffs, customers, projMsgs } = this.props;
@@ -64,18 +65,17 @@ export default class extends React.Component {
   };
 
   render() {
-    const { projMsgs } = this.props;
-    const msgs = projMsgs.msgs || [];
+    const msgs = this.props.projMsgs.msgs || [];
     return (
       <AutoSizer onResize={this.onResize}>
         {({ width, height }) => (
           <List
+            ref={i => (this.list = i)}
             className={styles.list}
             deferredMeasurementCache={this.cache}
             width={width}
             height={height}
             rowCount={msgs.length}
-            scrollToIndex={msgs.length - 1}
             rowHeight={this.cache.rowHeight}
             rowRenderer={this.rowRenderer}
             noRowsRenderer={this.noRowsRenderer}
@@ -83,5 +83,21 @@ export default class extends React.Component {
         )}
       </AutoSizer>
     );
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    this._scrollToBottom();
+    // FIXME: 解决List的scrollToIndex参数的bug
+    setTimeout(() => this._scrollToBottom(), 50);
+  }
+
+  componentDidMount() {
+    this._scrollToBottom();
+  }
+
+  _scrollToBottom() {
+    const msgs = this.props.projMsgs.msgs || [];
+    const lastRowIndex = msgs.length - 1;
+    this.list.scrollToRow(lastRowIndex);
   }
 }

@@ -42,12 +42,6 @@ export default class extends React.Component {
           content: JSON.stringify({ text: this.state.value })
         });
         this.setState({ value: "" });
-        setTimeout(
-          () => dispatchDomainTypeEffect(this.context, this.props, "_/fetchProjectNewMsgs", {
-            projectID: session.project_id,
-          }),
-          100
-        )
       }
     }
   };
