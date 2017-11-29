@@ -1,14 +1,22 @@
 import { createNSSubEffectFunc, createNSSubReducer } from "../utils";
 import * as projectService from "../../services/project";
-import { updateSessionList } from './_';
+import { updateSessionList } from "./_";
 
 const ns = "myHandling";
 // reducers
 export const reducer = createNSSubReducer(
   ns,
   {
+    // 使用version来控制列表及列表内容的修改
+    version: 0,
     // 接待中的会话
     listSessions: [],
+    listFilters: {
+      isOnline: false,
+      hasUnread: false
+    },
+    // latest_msg_ts|oldest_msg_ts
+    listSortBy: "latest_msg_ts",
     // 打开的接待中的会话id
     openedSessions: [],
     // 当前正在处理的打开的接待中的会话
@@ -17,6 +25,13 @@ export const reducer = createNSSubReducer(
   {
     saveListSessions(state, { payload: listSessions }) {
       return { ...state, listSessions };
+    },
+    changeListSortBy(state, { payload: listSortBy }) {
+      return { ...state, listSortBy };
+    },
+    updateListFilters(state, { payload }) {
+      const listFilters = { ...state.listFilters, ...payload };
+      return { ...state, listFilters };
     },
     openSession(state, { payload: id }) {
       if (state.listSessions.indexOf(id) < 0) {
@@ -55,7 +70,7 @@ export const reducer = createNSSubReducer(
 export const effectFunc = createNSSubEffectFunc(ns, {
   *fetchSessions({ projectDomain, projectType, createAction, createEffectAction, payload }, { call, put }) {
     const sessionList = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
-    yield* updateSessionList({ createAction, payload: sessionList}, { call, put });
+    yield* updateSessionList({ createAction, payload: sessionList }, { call, put });
     yield put(createAction(`${ns}/saveListSessions`, sessionList.map(s => s.id)));
   },
   *sendSessionMsg({ payload: { projectID, sessionID, domain, type, content } }, { call, put }) {

@@ -7,7 +7,7 @@ import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
 import SessionItem from "./SessionItem";
 import EmptyContent from "./EmptyContent";
-import { Input, Checkbox } from "antd";
+import { Input, Checkbox, Button, Icon, Switch, Dropdown, Menu } from "antd";
 import Moment from "react-moment";
 import styles from "./SessionList.less";
 
@@ -19,7 +19,7 @@ export default class View extends Component {
     projectType: PropTypes.string
   };
 
-  rowRenderer = ({index, key, style}) => {
+  rowRenderer = ({ index, key, style, parent }) => {
     const { appData, data, myHandlingData } = this.props;
     const { sessions, projects } = data;
     const { listSessions, currentOpenedSession } = myHandlingData;
@@ -46,7 +46,6 @@ export default class View extends Component {
         />
       </div>
     );
-
   };
 
   noRowsRenderer = () => <EmptyContent />;
@@ -59,16 +58,87 @@ export default class View extends Component {
     }
   };
 
+  getSessionList() {
+    const { appData, data, myHandlingData } = this.props;
+    const { sessions, projects } = data;
+    const { listSessions, listFilters, currentOpenedSession } = myHandlingData;
+    const sessionList = [];
+    for (let id of listSessions) {
+      const session = sessions[id];
+      const project = projects[session.project_id];
+      // filters
+      //// is_online
+      if (listFilters.isOnline) {
+        if (!project.is_online) {
+          continue;
+        }
+      }
+      //// has_unread
+      if (listFilters.hasUnread) {
+        if (session.sync_msg_id <= session.msg_id) {
+          continue;
+        }
+      }
+
+      sessionList.push({ ...session, project });
+    }
+  }
+
+  onFilterChange = (filter, checked) => {
+    dispatchDomainType(this.context, this.props, "myHandling/updateListFilters", {[filter]: checked});
+  };
+
+  getFilterSwitchOnChange = (filter) => {
+    return checked => this.onFilterChange(filter, checked);
+  }
+
+  onSortByChange = (sortBy, checked) => {
+    if (!checked) {
+      // 默认的排序方式
+      sortBy = "latest_msg_ts";
+    }
+    dispatchDomainType(this.context, this.props, "myHandling/changeListSortBy", sortBy);
+  };
+
+  getSortByCheckboxOnChange = sortBy => {
+    return e => this.onSortByChange(sortBy, e.target.checked);
+  };
+
+  renderSortByMenu() {
+    const { myHandlingData } = this.props;
+    const { listSortBy } = myHandlingData;
+    return (
+      <Menu>
+        <Menu.Item>
+          <Checkbox checked={listSortBy === "latest_msg_ts"} onChange={this.getSortByCheckboxOnChange("latest_msg_ts")}>
+            最近消息
+          </Checkbox>
+        </Menu.Item>
+        <Menu.Item>
+          <Checkbox checked={listSortBy === "oldest_msg_ts"} onChange={this.getSortByCheckboxOnChange("oldest_msg_ts")}>
+            最久消息
+          </Checkbox>
+        </Menu.Item>
+      </Menu>
+    );
+  }
+
   render() {
     const { myHandlingData } = this.props;
-    const { listSessions } = myHandlingData;
+    const { listSessions, listFilters } = myHandlingData;
     return (
       <div className={styles.main}>
         <div className={styles.header}>
           <Search placeholder="uid/name" style={{ width: "100%" }} onSearch={value => console.log(value)} />
-          <Checkbox>在线</Checkbox>
-          <Checkbox>待回</Checkbox>
-          <Checkbox>最久未回</Checkbox>
+          <div className={styles.options}>
+            <Switch size="small" checked={listFilters.isOnline} checkedChildren="在线" unCheckedChildren="在线" onChange={this.getFilterSwitchOnChange('isOnline')}/>
+            <Switch size="small" checked={listFilters.hasUnread} checkedChildren="待回" unCheckedChildren="待回" onChange={this.getFilterSwitchOnChange('hasUnread')}/>
+            <Dropdown overlay={this.renderSortByMenu()}>
+              <Button size="small" style={{ marginLeft: 8 }}>
+                排序 <Icon type="down" />
+              </Button>
+            </Dropdown>
+          </div>
         </div>
         <div className={styles.body}>
           <AutoSizer>
