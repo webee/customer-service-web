@@ -20,23 +20,22 @@ export default class View extends Component {
   };
 
   rowRenderer = ({ index, key, style, parent }) => {
-    const { appData, data, myHandlingData } = this.props;
-    const { sessions, projects } = data;
-    const { listSessions, currentOpenedSession } = myHandlingData;
-    const session = sessions[listSessions[index]];
-    const project = projects[session.project_id];
+    const { sessionList } = parent.props;
+    const session = sessionList[index];
+    const project = session.project;
     const item = {
       id: session.id,
       name: project.owner.name,
       description: `${session.msg.type}:${session.msg.content}`,
       online: project.is_online,
       ts: session.msg.ts,
-      unread: session.msg_id - session.sync_msg_id
+      unread: session.msg_id - session.sync_msg_id,
+      selected: session.isCurrentOpened,
     };
     return (
       <div key={key} className={styles.item} style={style}>
         <SessionItem
-          selected={item.id === currentOpenedSession}
+          selected={item.selected}
           onClick={() => this.onClick(session.id)}
           name={item.name}
           description={item.description}
@@ -58,39 +57,13 @@ export default class View extends Component {
     }
   };
 
-  getSessionList() {
-    const { appData, data, myHandlingData } = this.props;
-    const { sessions, projects } = data;
-    const { listSessions, listFilters, currentOpenedSession } = myHandlingData;
-    const sessionList = [];
-    for (let id of listSessions) {
-      const session = sessions[id];
-      const project = projects[session.project_id];
-      // filters
-      //// is_online
-      if (listFilters.isOnline) {
-        if (!project.is_online) {
-          continue;
-        }
-      }
-      //// has_unread
-      if (listFilters.hasUnread) {
-        if (session.sync_msg_id <= session.msg_id) {
-          continue;
-        }
-      }
-
-      sessionList.push({ ...session, project });
-    }
-  }
-
   onFilterChange = (filter, checked) => {
-    dispatchDomainType(this.context, this.props, "myHandling/updateListFilters", {[filter]: checked});
+    dispatchDomainType(this.context, this.props, "myHandling/updateListFilters", { [filter]: checked });
   };
 
-  getFilterSwitchOnChange = (filter) => {
+  getFilterSwitchOnChange = filter => {
     return checked => this.onFilterChange(filter, checked);
-  }
+  };
 
   onSortByChange = (sortBy, checked) => {
     if (!checked) {
@@ -123,23 +96,78 @@ export default class View extends Component {
     );
   }
 
-  render() {
+  renderHeader() {
     const { myHandlingData } = this.props;
     const { listSessions, listFilters } = myHandlingData;
     return (
-      <div className={styles.main}>
-        <div className={styles.header}>
-          <Search placeholder="uid/name" style={{ width: "100%" }} onSearch={value => console.log(value)} />
-          <div className={styles.options}>
-            <Switch size="small" checked={listFilters.isOnline} checkedChildren="在线" unCheckedChildren="在线" onChange={this.getFilterSwitchOnChange('isOnline')}/>
-            <Switch size="small" checked={listFilters.hasUnread} checkedChildren="待回" unCheckedChildren="待回" onChange={this.getFilterSwitchOnChange('hasUnread')}/>
-            <Dropdown overlay={this.renderSortByMenu()}>
-              <Button size="small" style={{ marginLeft: 8 }}>
-                排序 <Icon type="down" />
-              </Button>
-            </Dropdown>
-          </div>
+      <div className={styles.header}>
+        <Search placeholder="uid/name" style={{ width: "100%" }} onSearch={value => console.log(value)} />
+        <div className={styles.options}>
+          <Switch
+            size="small"
+            checked={listFilters.isOnline}
+            checkedChildren="在线"
+            unCheckedChildren="在线"
+            onChange={this.getFilterSwitchOnChange("isOnline")}
+          />
+          <Switch
+            size="small"
+            checked={listFilters.hasUnread}
+            checkedChildren="待回"
+            unCheckedChildren="待回"
+            onChange={this.getFilterSwitchOnChange("hasUnread")}
+          />
+          <Dropdown overlay={this.renderSortByMenu()}>
+            <Button size="small" style={{ marginLeft: 8 }}>
+              排序 <Icon type="down" />
+            </Button>
+          </Dropdown>
         </div>
+      </div>
+    );
+  }
+
+  getSessionList() {
+    const { appData, data, myHandlingData } = this.props;
+    const { sessions, projects } = data;
+    const { listSessions, listFilters, listSortBy, currentOpenedSession } = myHandlingData;
+    const sessionList = [];
+    for (let id of listSessions) {
+      const session = sessions[id];
+      const project = projects[session.project_id];
+      // filters
+      //// is_online
+      if (listFilters.isOnline) {
+        if (!project.is_online) {
+          continue;
+        }
+      }
+      //// has_unread
+      if (listFilters.hasUnread) {
+        if (session.sync_msg_id >= session.msg_id) {
+          continue;
+        }
+      }
+      // 包含进project
+      sessionList.push({ ...session, project, isCurrentOpened: currentOpenedSession === session.id });
+    }
+    // sort
+    switch (listSortBy) {
+      case "latest_msg_ts":
+        sessionList.sort((s1, s2) => -(s1.msg_ts - s2.msg_ts));
+        break;
+      case "oldest_msg_ts":
+        sessionList.sort((s1, s2) => +(s1.msg_ts - s2.msg_ts));
+        break;
+    }
+    return sessionList;
+  }
+
+  render() {
+    const sessionList = this.getSessionList();
+    return (
+      <div className={styles.main}>
+        {this.renderHeader()}
         <div className={styles.body}>
           <AutoSizer>
             {({ width, height }) => (
@@ -147,11 +175,11 @@ export default class View extends Component {
                 className={styles.list}
                 width={width}
                 height={height}
-                rowCount={listSessions.length}
+                rowCount={sessionList.length}
                 rowHeight={60}
                 rowRenderer={this.rowRenderer}
                 noRowsRenderer={this.noRowsRenderer}
-                myHandlingData={myHandlingData}
+                sessionList={sessionList}
               />
             )}
           </AutoSizer>
