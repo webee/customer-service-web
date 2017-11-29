@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
-import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
+import { dispatchDomainType } from "~/services/project";
 import * as projectNotify from "../../../services/projectNotify";
 import SplitPane from "react-split-pane";
 import List from "react-virtualized/dist/commonjs/List";
@@ -21,16 +21,6 @@ export default class View extends Component {
   componentDidMount() {
     const { session } = this.props;
     projectNotify.fetchProjectMsgs(this.context, this.props, session.project_id);
-  }
-  componentDidUpdate(prevProps, prevState) {
-    // const { session } = this.props;
-    // // FIXME: 完善未读数的更新
-    // dispatchDomainTypeEffect(this.context, this.props, "_/syncSessionMsgID", {
-    //   projectID: session.project_id,
-    //   sessionID: session.id
-    // });
-  }
-  componentWillUnmount() {
   }
 
   render() {
@@ -67,7 +57,13 @@ export default class View extends Component {
               maxSize={300}
               paneClassName={styles.main}
             >
-              <MessageList dispatch={dispatch} staffs={staffs} customers={customers} projMsgs={projMsgs} />
+              <MessageList
+                dispatch={dispatch}
+                session={session}
+                staffs={staffs}
+                customers={customers}
+                projMsgs={projMsgs}
+              />
               <MessageSender dispatch={dispatch} session={session} />
             </SplitPane>
             <SessionChatInfo />

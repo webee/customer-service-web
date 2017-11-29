@@ -1,19 +1,17 @@
+import { toPromiseEffects } from '../utils';
 import { reducer as myHandlingReducer, effectFunc as myHandlingEffectFunc } from "./myHandling";
 import { reducer as _Reducer, effectFunc as _EffectFunc } from "./_";
 
 function domainTypeReducer(state = {}, action) {
   return {
     _: _Reducer(state._, action),
-    myHandling: myHandlingReducer(state.myHandling, action),
+    myHandling: myHandlingReducer(state.myHandling, action)
   };
 }
 
 function* domainTypeEffectFunc(action, effects) {
   const { all, call } = effects;
-  yield all([
-    call(_EffectFunc, action, effects),
-    call(myHandlingEffectFunc, action, effects),
-  ]);
+  yield all([call(_EffectFunc, action, effects), call(myHandlingEffectFunc, action, effects)]);
 }
 
 export default {
@@ -27,12 +25,11 @@ export default {
       return { ...state, [key]: domainTypeReducer(state[key], { ...payload, key }) };
     }
   },
-  effects: {
+  effects: toPromiseEffects({
     *dispatchDomainTypeEffect({ payload }, effects) {
       const { projectDomain, projectType } = payload;
       const key = [projectDomain, projectType];
-      const { call } = effects;
-      yield call(domainTypeEffectFunc, { ...payload, key }, effects);
+      yield* domainTypeEffectFunc({ ...payload, key }, effects);
     }
-  }
+  })
 };

@@ -14,13 +14,21 @@ export const reducer = createNSSubReducer(
     projectMsgs: {}
   },
   {
+    updateSessionSyncMsgID(state, { payload: { id, sync_msg_id } }) {
+      const curSession = state.sessions[id];
+      if (!curSession) {
+        return state;
+      }
+      const sessions = { [id]: { ...curSession, sync_msg_id } };
+      return { ...state, sessions: { ...state.sessions, ...sessions } };
+    },
     updateSessions(state, { payload: sessionList }) {
       const sessions = listToDict(sessionList, o => o.id);
-      return { ...state, sessions: {...state.sessions, ...sessions} };
+      return { ...state, sessions: { ...state.sessions, ...sessions } };
     },
     updateProjects(state, { payload: projectList }) {
       const projects = listToDict(projectList, o => o.id);
-      return { ...state, projects: {...state.projects, ...projects} };
+      return { ...state, projects: { ...state.projects, ...projects } };
     },
     clearProjectMsgs(state, { payload: id }) {
       const projectMsgs = { ...state.projectMsgs };
@@ -87,39 +95,35 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     });
     yield put(createAction(`${ns}/appendProjectMsgs`, { id: projectID, msgs: msgs }));
   },
-  *syncSessionMsgID({ key, payload: { projectID, sessionID } }, { select, call, put }) {
-    const projMsgs = yield select(state => state.project[key]._.projectMsgs[projectID]);
-    if (projMsgs && projMsgs.rid) {
-      const { rid } = projMsgs;
-      yield call(projectService.syncSessionMsgID, projectID, sessionID, rid);
-    }
+  *syncSessionMsgID({ key, createAction, payload: { projectID, sessionID, sync_msg_id } }, { select, call, put }) {
+    yield call(projectService.syncSessionMsgID, projectID, sessionID, sync_msg_id);
   },
   *fetchSessionItem({ projectDomain, projectType, createAction, payload: sessionID }, { call, put }) {
     const s = yield call(projectService.fetchSessionItem, projectDomain, projectType, sessionID);
 
-    yield* updateSessionList({ createAction, payload: [s]}, { call, put });
-  },
+    yield* updateSessionList({ createAction, payload: [s] }, { call, put });
+  }
 });
 
 export function* updateSessionList({ createAction, payload: sessionList }, { call, put }) {
-    yield put(
-      createAction('_/updateSessions', sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined })))
-    );
-    // TODO: 修改staffs和customers, 使用id引用
-    const projectList = sessionList.map(s => s.project);
-    yield put(createAction('_/updateProjects', projectList));
+  yield put(
+    createAction("_/updateSessions", sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined })))
+  );
+  // TODO: 修改staffs和customers, 使用id引用
+  const projectList = sessionList.map(s => s.project);
+  yield put(createAction("_/updateProjects", projectList));
 
-    const staffs = [];
-    const customers = [];
-    projectList.forEach(p => {
-      // staffs
-      staffs.push(p.staffs.leader);
-      staffs.push(...p.staffs.assistants);
-      staffs.push(...p.staffs.participants);
-      // customers
-      customers.push(p.owner);
-      customers.push(p.customers.parties);
-    });
-    yield put({type: 'app/updateStaffs', payload: staffs});
-    yield put({type: 'app/updateCustomers', payload: customers});
+  const staffs = [];
+  const customers = [];
+  projectList.forEach(p => {
+    // staffs
+    staffs.push(p.staffs.leader);
+    staffs.push(...p.staffs.assistants);
+    staffs.push(...p.staffs.participants);
+    // customers
+    customers.push(p.owner);
+    customers.push(p.customers.parties);
+  });
+  yield put({ type: "app/updateStaffs", payload: staffs });
+  yield put({ type: "app/updateCustomers", payload: customers });
 }

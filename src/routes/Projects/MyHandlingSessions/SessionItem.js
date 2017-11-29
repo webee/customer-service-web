@@ -10,7 +10,7 @@ export default ({ name, description, ts, unread, online, style, selected, onClic
   return (
     <div className={className} style={style} onClick={onClick}>
       <div className={styles.avatar}>
-        <Badge count={unread || 0} overflowCount={9}>
+        <Badge count={unread || 0} overflowCount={99}>
           <Avatar className={avatarClassName} shape="square" size="large" icon="user" />
         </Badge>
       </div>

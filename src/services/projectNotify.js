@@ -1,4 +1,5 @@
 import { SingletonWorker } from "../utils/notify";
+import { delay } from "../utils/commons";
 import { dispatchDomainTypeEffect } from "./project";
 
 const domainTypeWorkers = {};
@@ -9,7 +10,11 @@ export function handle(dispatch, type, details) {
     case "my_handling.sessions":
       // 更新会话信息
       const { sessionID } = details;
-      fetchMyHandlingSessions(details, { dispatch }, sessionID)
+      if (sessionID) {
+        fetchSessionItem(details, { dispatch }, sessionID);
+      } else {
+        fetchMyHandlingSessions(details, { dispatch });
+      }
       break;
     case "msgs":
       fetchProjectMsgs(details, { dispatch }, details.projectID);
@@ -17,29 +22,38 @@ export function handle(dispatch, type, details) {
   }
 }
 
-function getWorker(key, f, ...args) {
+function getWorker(name, key, f, ...args) {
   let worker = domainTypeWorkers[key];
   if (!worker) {
-    worker = new SingletonWorker(f, ...args);
+    worker = new SingletonWorker(name, f, ...args);
     domainTypeWorkers[key] = worker;
   }
   return worker;
 }
 
-export function fetchMyHandlingSessions({ projectDomain, projectType }, { dispatch }, sessionID) {
-  const worker = getWorker([projectDomain, projectType, fetchMyHandlingSessions], () => {
-    if (sessionID) {
-      dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "_/fetchSessionItem", sessionID);
-    } else {
-      dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "myHandling/fetchSessions");
-    }
+export function fetchMyHandlingSessions({ projectDomain, projectType }, { dispatch }) {
+  const taskName = fetchMyHandlingSessions.name;
+  const worker = getWorker(taskName, [projectDomain, projectType, fetchMyHandlingSessions], async () => {
+    await delay(100);
+    await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "myHandling/fetchSessions");
+  });
+  worker.start();
+}
+
+export function fetchSessionItem({ projectDomain, projectType }, { dispatch }, sessionID) {
+  const taskName = fetchSessionItem.name;
+  const worker = getWorker(taskName, [projectDomain, projectType, fetchSessionItem, sessionID], async () => {
+    await delay(100);
+    await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "_/fetchSessionItem", sessionID);
   });
   worker.start();
 }
 
 export function fetchProjectMsgs({ projectDomain, projectType }, { dispatch }, projectID) {
-  const worker = getWorker([projectDomain, projectType, fetchProjectMsgs, projectID], () => {
-    dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "_/fetchProjectNewMsgs", {
+  const taskName = fetchProjectMsgs.name;
+  const worker = getWorker(taskName, [projectDomain, projectType, fetchProjectMsgs, projectID], async () => {
+    await delay(100);
+    await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "_/fetchProjectNewMsgs", {
       projectID
     });
   });

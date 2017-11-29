@@ -3,7 +3,8 @@ const RUNNING = Symbol('RUNNING');
 const RUNNING_WITH_PENDING = Symbol('RUNNING_WITH_PENDING');
 
 export class SingletonWorker {
-  constructor(f, data = undefined, init = true) {
+  constructor(name, f, init = true) {
+    this.name = name;
     // 是否已经初始化完成
     this._init = init;
     this._pending = false;
@@ -11,16 +12,14 @@ export class SingletonWorker {
     this.status = INIT;
     // 任务函数
     this.f = f;
-    // 数据参数
-    this.data = data;
   }
 
   // 设置初始化完成
-  init(...args) {
+  init() {
     this._init = true;
     if (this._pending) {
       this._pending = false;
-      this.start(...args);
+      this.start();
     }
   }
 
@@ -42,7 +41,7 @@ export class SingletonWorker {
       if (this.__cmpAndSetStatus(INIT, RUNNING)) {
         return true;
       }
-      this.cmpAndSetStatus(RUNNING, RUNNING_WITH_PENDING);
+      this.__cmpAndSetStatus(RUNNING, RUNNING_WITH_PENDING);
     } else {
       this._pending = true;
     }
@@ -54,21 +53,18 @@ export class SingletonWorker {
     return this.__cmpAndSetStatus(RUNNING, INIT);
   }
 
-  async start(...args) {
+  async start() {
     if (this._try_start()) {
       do {
-        let r = this.f(this.data, ...args);
+        const r = this.f();
         if (r instanceof Promise) {
           try {
-            r = await r;
+            console.log('start await: ', this.name, r);
+            await r;
+            console.log('done await: ', this.name);
           } catch (err) {
-            r = undefined;
             console.error("SingletonWorker", err);
           }
-        }
-        if (r !== undefined) {
-          // 更新数据参数
-          this.data = r;
         }
       } while (!this._done());
     }

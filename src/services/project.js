@@ -1,3 +1,4 @@
+import { promiseDispatch } from '../models/utils';
 import request, { getQsArgBool } from "../utils/request";
 
 export function createDomainTypeWrapperAction(projectDomain, projectType, type, action, extras = {}) {
@@ -44,11 +45,11 @@ export function createDomainTypeEffectAction(projectDomain, projectType, type, p
 }
 
 export function dispatchDomainType({ projectDomain, projectType }, { dispatch }, type, payload) {
-  dispatch(createProjectDomainTypeAction(projectDomain, projectType, type, payload));
+  return dispatch(createProjectDomainTypeAction(projectDomain, projectType, type, payload));
 }
 
 export function dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, type, payload) {
-  dispatch(createProjectDomainTypeEffectAction(projectDomain, projectType, type, payload));
+  return promiseDispatch(dispatch, createProjectDomainTypeEffectAction(projectDomain, projectType, type, payload));
 }
 
 // apis

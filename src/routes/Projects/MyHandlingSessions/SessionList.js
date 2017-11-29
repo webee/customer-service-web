@@ -19,44 +19,6 @@ export default class View extends Component {
     projectType: PropTypes.string
   };
 
-  rowRenderer = ({ index, key, style, parent }) => {
-    const { sessionList } = parent.props;
-    const session = sessionList[index];
-    const project = session.project;
-    const item = {
-      id: session.id,
-      name: project.owner.name,
-      description: `${session.msg.type}:${session.msg.content}`,
-      online: project.is_online,
-      ts: session.msg.ts,
-      unread: session.msg_id - session.sync_msg_id,
-      selected: session.isCurrentOpened,
-    };
-    return (
-      <div key={key} className={styles.item} style={style}>
-        <SessionItem
-          selected={item.selected}
-          onClick={() => this.onClick(session.id)}
-          name={item.name}
-          description={item.description}
-          ts={item.ts}
-          unread={item.unread}
-          online={item.online}
-        />
-      </div>
-    );
-  };
-
-  noRowsRenderer = () => <EmptyContent />;
-
-  onClick = id => {
-    const { myHandlingData: { currentOpenedSession } } = this.props;
-    if (id !== currentOpenedSession) {
-      // 加入到打开的会话中
-      dispatchDomainType(this.context, this.props, "myHandling/openSession", id);
-    }
-  };
-
   onFilterChange = (filter, checked) => {
     dispatchDomainType(this.context, this.props, "myHandling/updateListFilters", { [filter]: checked });
   };
@@ -187,4 +149,42 @@ export default class View extends Component {
       </div>
     );
   }
+
+  rowRenderer = ({ index, key, style, parent }) => {
+    const { sessionList } = parent.props;
+    const session = sessionList[index];
+    const project = session.project;
+    const item = {
+      id: session.id,
+      name: project.owner.name,
+      description: `${session.msg.type}:${session.msg.content}`,
+      online: project.is_online,
+      ts: session.msg.ts,
+      unread: session.msg_id - session.sync_msg_id,
+      selected: session.isCurrentOpened,
+    };
+    return (
+      <div key={key} className={styles.item} style={style}>
+        <SessionItem
+          selected={item.selected}
+          onClick={() => this.onClick(session.id)}
+          name={item.name}
+          description={item.description}
+          ts={item.ts}
+          unread={item.unread}
+          online={item.online}
+        />
+      </div>
+    );
+  };
+
+  noRowsRenderer = () => <EmptyContent />;
+
+  onClick = id => {
+    const { myHandlingData: { currentOpenedSession } } = this.props;
+    if (id !== currentOpenedSession) {
+      // 加入到打开的会话中
+      dispatchDomainType(this.context, this.props, "myHandling/openSession", id);
+    }
+  };
 }

@@ -1,5 +1,8 @@
 import React from "react";
+import PropTypes from "prop-types";
 import cs from "classnames";
+import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
+import { Icon, Button, Badge } from "antd";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
 import CellMeasurer, { CellMeasurerCache } from "react-virtualized/dist/commonjs/CellMeasurer";
@@ -7,8 +10,15 @@ import EmptyContent from "./EmptyContent";
 import styles from "./MessageList.less";
 
 export default class extends React.Component {
+  static contextTypes = {
+    projectDomain: PropTypes.string,
+    projectType: PropTypes.string
+  };
+
   state = {
     width: 0,
+    isInRead: false,
+    stopIndex: undefined
   };
   cache = new CellMeasurerCache({
     defaultHeight: 50,
@@ -45,12 +55,14 @@ export default class extends React.Component {
     });
     return (
       <CellMeasurer cache={this.cache} columnIndex={0} key={key} parent={parent} rowIndex={index}>
-        <div style={style}>
-          <div className={itemClassNames}>
-            <div className={styles.head}>{userName}</div>
-            <div className={styles.body}>{content}</div>
+        {({ measure }) => (
+          <div style={style}>
+            <div className={itemClassNames}>
+              <div className={styles.head}>{userName}</div>
+              <div className={styles.body}>{content}</div>
+            </div>
           </div>
-        </div>
+        )}
       </CellMeasurer>
     );
   };
@@ -64,35 +76,68 @@ export default class extends React.Component {
     }
   };
 
-  render() {
+  onScroll = ({ clientHeight, scrollHeight, scrollTop }) => {
+    // console.log('scroll: ', clientHeight, scrollHeight, scrollTop);
+  };
+
+  onRowsRendered = ({ overscanStartIndex, overscanStopIndex, startIndex, stopIndex }) => {
+    const { session } = this.props;
     const msgs = this.props.projMsgs.msgs || [];
+    const msg = msgs[stopIndex];
+    const lastRowIndex = msgs.length - 1;
+    const isInRead = stopIndex && lastRowIndex - stopIndex >= 1;
+    this.setState({ isInRead, stopIndex });
+    if (msg.msg_id > session.sync_msg_id) {
+      dispatchDomainType(this.context, this.props, "_/updateSessionSyncMsgID", {
+        id: session.id,
+        sync_msg_id: msg.msg_id
+      });
+      dispatchDomainTypeEffect(this.context, this.props, "_/syncSessionMsgID", {
+        projectID: session.project_id,
+        sessionID: session.id,
+        sync_msg_id: msg.msg_id
+      });
+    }
+  };
+
+  onDownClicked = () => {
+    this._scrollToBottom();
+  };
+
+  render() {
+    const { session, projMsgs } = this.props;
+    const { isInRead } = this.state;
+    const msgs = projMsgs.msgs || [];
+    const lastRowIndex = msgs.length - 1;
+    const scrollToIndex = isInRead ? undefined : lastRowIndex;
     return (
       <AutoSizer onResize={this.onResize}>
         {({ width, height }) => (
-          <List
-            ref={i => (this.list = i)}
-            className={styles.list}
-            deferredMeasurementCache={this.cache}
-            width={width}
-            height={height}
-            rowCount={msgs.length}
-            rowHeight={this.cache.rowHeight}
-            rowRenderer={this.rowRenderer}
-            noRowsRenderer={this.noRowsRenderer}
-          />
+          <div className={styles.main} style={{ width, height }}>
+            <List
+              ref={i => (this.list = i)}
+              className={styles.list}
+              deferredMeasurementCache={this.cache}
+              width={width}
+              height={height}
+              rowCount={msgs.length}
+              scrollToIndex={scrollToIndex}
+              onScroll={this.onScroll}
+              onRowsRendered={this.onRowsRendered}
+              rowHeight={this.cache.rowHeight}
+              rowRenderer={this.rowRenderer}
+              noRowsRenderer={this.noRowsRenderer}
+            />
+            {height >= 64 &&
+              isInRead && (
+                <Badge className={styles.down} count={session.msg_id - session.sync_msg_id}>
+                  <Button ghost type="primary" shape="circle" icon="down" onClick={this.onDownClicked} />
+                </Badge>
+              )}
+          </div>
         )}
       </AutoSizer>
     );
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    this._scrollToBottom();
-    // FIXME: 解决List的scrollToIndex参数的bug
-    setTimeout(() => this._scrollToBottom(), 50);
-  }
-
-  componentDidMount() {
-    this._scrollToBottom();
   }
 
   _scrollToBottom() {
