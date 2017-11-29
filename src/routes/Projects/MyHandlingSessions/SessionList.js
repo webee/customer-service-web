@@ -97,21 +97,24 @@ export default class View extends Component {
     for (let id of listSessions) {
       const session = sessions[id];
       const project = projects[session.project_id];
-      // filters
-      //// is_online
-      if (listFilters.isOnline) {
-        if (!project.is_online) {
-          continue;
+      const isCurrentOpened = currentOpenedSession === session.id;
+      if (!isCurrentOpened) {
+        // filters
+        //// is_online
+        if (listFilters.isOnline) {
+          if (!project.is_online) {
+            continue;
+          }
         }
-      }
-      //// has_unread
-      if (listFilters.hasUnread) {
-        if (session.sync_msg_id >= session.msg_id) {
-          continue;
+        //// has_unread
+        if (listFilters.hasUnread) {
+          if (session.sync_msg_id >= session.msg_id) {
+            continue;
+          }
         }
       }
       // 包含进project
-      sessionList.push({ ...session, project, isCurrentOpened: currentOpenedSession === session.id });
+      sessionList.push({ ...session, project, isCurrentOpened: isCurrentOpened });
     }
     // sort
     switch (listSortBy) {
@@ -161,7 +164,7 @@ export default class View extends Component {
       online: project.is_online,
       ts: session.msg.ts,
       unread: session.msg_id - session.sync_msg_id,
-      selected: session.isCurrentOpened,
+      selected: session.isCurrentOpened
     };
     return (
       <div key={key} className={styles.item} style={style}>

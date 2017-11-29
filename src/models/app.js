@@ -1,4 +1,5 @@
 import { notification } from "antd";
+import { toPromiseEffects } from './utils';
 import { XChatClient, wampDebug, XCHAT_STATUS } from "xchat-client";
 import { listToDict } from "./utils";
 import * as appService from "../services/app";
@@ -60,7 +61,7 @@ export default {
       return { ...state, xchatStatusInfo };
     }
   },
-  effects: {
+  effects: toPromiseEffects({
     *setUISettings({ payload }, { call, select, put }) {
       yield put({ type: "saveUISettings", payload });
       const ui_settings = yield select(state => state.app.ui_settings);
@@ -95,7 +96,7 @@ export default {
     *closeXChat(action, { call, put }) {
       xchatClient.close();
     }
-  },
+  }),
   subscriptions: {
     xchat({ dispatch, history }) {
       xchatClient.onconnected = () => {

@@ -1,4 +1,5 @@
 import { routerRedux } from "dva/router";
+import { toPromiseEffects } from './utils';
 import request from "~/utils/request";
 import envConfig from "~/config";
 import { STAFF_JWT_HEADER } from "~/constants";
@@ -9,7 +10,7 @@ export default {
   namespace: "auth",
   state: {},
   reducers: {},
-  effects: {
+  effects: toPromiseEffects({
     *refreshJWT({ payload: jwt }, { call }) {
       jwt = yield call(authService.refreshJWT, jwt);
       yield call(authService.saveJWT, jwt);
@@ -33,7 +34,7 @@ export default {
       yield put(routerRedux.push({ pathname: authPath, state }));
       yield put({ type: "resetState" });
     }
-  },
+  }),
   subscriptions: {
     init({ dispatch, history }, done) {
       const do_logout = () => {

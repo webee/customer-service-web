@@ -59,9 +59,7 @@ export class SingletonWorker {
         const r = this.f();
         if (r instanceof Promise) {
           try {
-            console.log('start await: ', this.name, r);
             await r;
-            console.log('done await: ', this.name);
           } catch (err) {
             console.error("SingletonWorker", err);
           }

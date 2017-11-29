@@ -24,6 +24,14 @@ export const reducer = createNSSubReducer(
     },
     updateSessions(state, { payload: sessionList }) {
       const sessions = listToDict(sessionList, o => o.id);
+      for (let id in sessions) {
+        // 保持本地更新的sync_msg_id
+        const s = sessions[id];
+        const sCur = state.sessions[s.id];
+        if (sCur && sCur.sync_msg_id > s.sync_msg_id) {
+          s.sync_msg_id = sCur.sync_msg_id;
+        }
+      }
       return { ...state, sessions: { ...state.sessions, ...sessions } };
     },
     updateProjects(state, { payload: projectList }) {
