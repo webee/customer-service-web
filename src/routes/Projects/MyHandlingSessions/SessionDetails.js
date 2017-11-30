@@ -32,6 +32,7 @@ export default class View extends Component {
   renderSessionChatDetail(id) {
     const { dispatch, appData, data, myHandlingData } = this.props;
     const { sessions, projects, projectMsgs } = data;
+    const { currentOpenedSession } = myHandlingData;
     const session = sessions[id];
     const project = projects[session.project_id];
     const projMsgs = projectMsgs[session.project_id] || {};
@@ -40,10 +41,20 @@ export default class View extends Component {
         dispatch={dispatch}
         appData={appData}
         session={session}
+        isCurrentOpened={currentOpenedSession === session.id}
         project={project}
         projMsgs={projMsgs}
       />
     );
+  }
+
+  getSessionName(id) {
+    const { data } = this.props;
+    const { sessions, projects } = data;
+    const session = sessions[id];
+    const project = projects[session.project_id];
+    const { owner } = project;
+    return owner.name;
   }
 
   render() {
@@ -64,7 +75,7 @@ export default class View extends Component {
       >
         {openedSessions.map(id => {
           return (
-            <Tabs.TabPane key={id} tab={`会话#${id}`}>
+            <Tabs.TabPane key={id} tab={this.getSessionName(id)}>
               {this.renderSessionChatDetail(id)}
             </Tabs.TabPane>
           );

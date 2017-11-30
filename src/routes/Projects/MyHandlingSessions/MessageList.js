@@ -18,7 +18,8 @@ export default class extends React.Component {
   state = {
     width: 0,
     isInRead: false,
-    stopIndex: undefined
+    scrollTop: 0,
+    scrollDirection: 0
   };
   cache = new CellMeasurerCache({
     defaultHeight: 50,
@@ -77,16 +78,28 @@ export default class extends React.Component {
   };
 
   onScroll = ({ clientHeight, scrollHeight, scrollTop }) => {
-    // console.log('scroll: ', clientHeight, scrollHeight, scrollTop);
+    const { scrollTop: prevScrollTop } = this.state;
+    this.setState({ scrollTop, scrollDirection: scrollTop - prevScrollTop });
   };
 
   onRowsRendered = ({ overscanStartIndex, overscanStopIndex, startIndex, stopIndex }) => {
-    const { session } = this.props;
+    const { session, isCurrentOpened } = this.props;
+    if (!isCurrentOpened) {
+      return;
+    }
+
+    const { scrollDirection, isInRead: prevIsInRead } = this.state;
     const msgs = this.props.projMsgs.msgs || [];
     const msg = msgs[stopIndex];
     const lastRowIndex = msgs.length - 1;
-    const isInRead = stopIndex && lastRowIndex - stopIndex >= 1;
-    this.setState({ isInRead, stopIndex });
+    let isInRead = stopIndex && lastRowIndex - stopIndex >= 1;
+    if (!prevIsInRead) {
+      isInRead = scrollDirection <= 0 && isInRead;
+    }
+    this.setState({ isInRead });
+    dispatchDomainType(this.context, this.props, "myHandling/updateCurrentOpenedSessionState", { isInRead });
+
+    // 同步已读消息id
     if (msg.msg_id > session.sync_msg_id) {
       dispatchDomainType(this.context, this.props, "_/updateSessionSyncMsgID", {
         id: session.id,
@@ -105,10 +118,11 @@ export default class extends React.Component {
   };
 
   render() {
-    const { session, projMsgs } = this.props;
+    const { session, projMsgs, isCurrentOpened } = this.props;
     const { isInRead } = this.state;
     const msgs = projMsgs.msgs || [];
     const lastRowIndex = msgs.length - 1;
+    // 解决向上滑动的bug
     const scrollToIndex = isInRead ? undefined : lastRowIndex;
     return (
       <AutoSizer onResize={this.onResize}>
@@ -127,6 +141,7 @@ export default class extends React.Component {
               rowHeight={this.cache.rowHeight}
               rowRenderer={this.rowRenderer}
               noRowsRenderer={this.noRowsRenderer}
+              isCurrentOpened={isCurrentOpened}
             />
             {height >= 64 &&
               isInRead && (

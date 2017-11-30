@@ -7,7 +7,7 @@ const ns = "myHandling";
 export const reducer = createNSSubReducer(
   ns,
   {
-    // 使用version来控制列表及列表内容的修改
+    // TODO: 使用version来控制列表及列表内容的修改 
     version: 0,
     // 接待中的会话
     listSessions: [],
@@ -20,7 +20,10 @@ export const reducer = createNSSubReducer(
     // 打开的接待中的会话id
     openedSessions: [],
     // 当前正在处理的打开的接待中的会话
-    currentOpenedSession: null
+    currentOpenedSession: null,
+    currentOpenedSessionState: {
+      isInRead: false
+    }
   },
   {
     saveListSessions(state, { payload: listSessions }) {
@@ -37,19 +40,29 @@ export const reducer = createNSSubReducer(
       if (state.listSessions.indexOf(id) < 0) {
         return state;
       }
+      if (state.currentOpenedSession === id) {
+        return state;
+      }
 
       const currentOpenedSession = id;
       const openedSessions = [...state.openedSessions];
       if (openedSessions.indexOf(id) === -1) {
         openedSessions.push(id);
       }
-      return { ...state, openedSessions, currentOpenedSession };
+      return { ...state, openedSessions, currentOpenedSession, currentOpenedSessionState: { isInRead: false } };
+    },
+    updateCurrentOpenedSessionState(state, { payload: sessionState }) {
+      const currentOpenedSessionState = { ...state.currentOpenedSessionState, ...sessionState };
+      return { ...state, currentOpenedSessionState };
     },
     activateOpenedSession(state, { payload: id }) {
-      if (!state.openedSessions.indexOf(id) === -1) {
+      if (!state.openedSessions.indexOf(id) < 0) {
         return state;
       }
-      return { ...state, currentOpenedSession: id };
+      if (state.currentOpenedSession === id) {
+        return state;
+      }
+      return { ...state, currentOpenedSession: id, currentOpenedSessionState: { isInRead: false } };
     },
     closeOpenedSession(state, { payload: id }) {
       if (!state.openedSessions.indexOf(id) === -1) {
@@ -59,9 +72,9 @@ export const reducer = createNSSubReducer(
       let currentOpenedSession = state.currentOpenedSession;
       if (currentOpenedSession === id) {
         currentOpenedSession = openedSessions[0];
+        return { ...state, openedSessions, currentOpenedSession, currentOpenedSessionState: { isInRead: false } };
       }
-
-      return { ...state, openedSessions, currentOpenedSession };
+      return { ...state, openedSessions };
     }
   }
 );

@@ -100,6 +100,7 @@ export default class View extends Component {
       const isCurrentOpened = currentOpenedSession === session.id;
       if (!isCurrentOpened) {
         // filters
+        //// TODO: search text
         //// is_online
         if (listFilters.isOnline) {
           if (!project.is_online) {
@@ -129,6 +130,8 @@ export default class View extends Component {
   }
 
   render() {
+    const { myHandlingData } = this.props;
+    const { currentOpenedSessionState } = myHandlingData;
     const sessionList = this.getSessionList();
     return (
       <div className={styles.main}>
@@ -145,6 +148,7 @@ export default class View extends Component {
                 rowRenderer={this.rowRenderer}
                 noRowsRenderer={this.noRowsRenderer}
                 sessionList={sessionList}
+                currentOpenedSessionState={currentOpenedSessionState}
               />
             )}
           </AutoSizer>
@@ -154,16 +158,18 @@ export default class View extends Component {
   }
 
   rowRenderer = ({ index, key, style, parent }) => {
-    const { sessionList } = parent.props;
+    const { sessionList, currentOpenedSessionState } = parent.props;
     const session = sessionList[index];
     const project = session.project;
+    // 当前打开并且不处在阅读状态则未读不显示
+    const unread = session.isCurrentOpened && !currentOpenedSessionState.isInRead ? 0 : session.msg_id - session.sync_msg_id;
     const item = {
       id: session.id,
       name: project.owner.name,
       description: `${session.msg.type}:${session.msg.content}`,
       online: project.is_online,
       ts: session.msg.ts,
-      unread: session.msg_id - session.sync_msg_id,
+      unread: unread,
       selected: session.isCurrentOpened
     };
     return (
