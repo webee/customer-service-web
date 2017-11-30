@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import Rx from "rxjs/Rx";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
 import { dispatchDomainType } from "~/services/project";
@@ -17,6 +18,8 @@ export default class View extends Component {
     projectDomain: PropTypes.string,
     projectType: PropTypes.string
   };
+  // onSend observable
+  onSendObservable = new Rx.Subject();
 
   componentDidMount() {
     const { session } = this.props;
@@ -63,8 +66,9 @@ export default class View extends Component {
                 staffs={staffs}
                 customers={customers}
                 projMsgs={projMsgs}
+                onSendObservable={this.onSendObservable}
               />
-              <MessageSender dispatch={dispatch} session={session} />
+              <MessageSender dispatch={dispatch} session={session} onSend={() => this.onSendObservable.next()} />
             </SplitPane>
             <SessionChatInfo />
           </SplitPane>

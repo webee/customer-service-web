@@ -42,7 +42,7 @@ export function asPromiseEffect(effectGen) {
   return function*({ resolve, reject, ...action }, effects) {
     if (resolve && reject) {
       try {
-        resolve(yield* effectGen(action, effects));
+        resolve(yield effectGen(action, effects));
       } catch (err) {
         reject(err);
       }

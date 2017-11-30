@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import cs from "classnames";
-import { Icon, Input } from "antd";
+import { Button, Icon, Input } from "antd";
 import { dispatchDomainTypeEffect } from "../../../services/project";
 import styles from "./MessageSender.less";
 
@@ -14,51 +14,66 @@ export default class extends React.Component {
   };
 
   state = {
-    value: ""
+    text: ""
   };
 
   onChange = e => {
-    this.setState({ value: e.target.value });
+    this.setState({ text: e.target.value });
   };
 
   onKeyPress = e => {
-    const { session } = this.props;
-    console.log("key: ", e.key);
-    console.log("keyCode: ", e.nativeEvent.keyCode);
-    console.log("shiftKey: ", e.nativeEvent.shiftKey);
-    console.log("ctrlKey: ", e.nativeEvent.ctrlKey);
-    const { value } = this.state;
-    if (e.key === "Enter") {
-      if (!value) {
+    if (e.charCode === 13) {
+      // enter
+      if (e.shiftKey || e.ctrlKey) {
+        // (shift|ctrl)-enter: send
+        this.send();
         e.preventDefault();
       } else {
-        e.preventDefault();
-        // send msg
-        dispatchDomainTypeEffect(this.context, this.props, "myHandling/sendSessionMsg", {
-          projectID: session.project_id,
-          sessionID: session.id,
-          domain: "",
-          type: "text",
-          content: JSON.stringify({ text: this.state.value })
-        });
-        this.setState({ value: "" });
+        const { text } = this.state;
+        if (!text) {
+          e.preventDefault();
+        }
       }
     }
+  };
+
+  send = () => {
+    const { session, onSend } = this.props;
+    const { text } = this.state;
+    if (!text) {
+      // 不能发送空值
+      return;
+    }
+
+    // send msg
+    dispatchDomainTypeEffect(this.context, this.props, "myHandling/sendSessionMsg", {
+      projectID: session.project_id,
+      sessionID: session.id,
+      domain: "",
+      type: "text",
+      content: JSON.stringify({ text })
+    });
+    onSend();
+    this.setState({text: ""});
   };
 
   render() {
     return (
       <div className={styles.main}>
         <div className={styles.toolbar}>
-          <Icon type="picture" />
-          <Icon type="folder" />
+          <div className={styles.left}>
+            <Icon type="picture" />
+            <Icon type="folder" />
+          </div>
+          <div className={styles.right}>
+            <Button type="primary" onClick={this.send}>发送</Button>
+          </div>
         </div>
         <div className={styles.input}>
           <TextArea
-            value={this.state.value}
+            value={this.state.text}
             onChange={this.onChange}
             onKeyPress={this.onKeyPress}
-            onKeyUp={this.onKeyUp}
           />
         </div>
       </div>

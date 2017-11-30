@@ -29,7 +29,7 @@ export default {
     *dispatchDomainTypeEffect({ payload }, effects) {
       const { projectDomain, projectType } = payload;
       const key = [projectDomain, projectType];
-      yield* domainTypeEffectFunc({ ...payload, key }, effects);
+      yield domainTypeEffectFunc({ ...payload, key }, effects);
     }
   })
 };

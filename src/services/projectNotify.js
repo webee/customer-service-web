@@ -23,11 +23,13 @@ export function handle(dispatch, type, details) {
 }
 
 function getWorker(name, key, f, ...args) {
-  let worker = domainTypeWorkers[key];
+  // TODO: 记录使用时间，为以后可能的清理缓存作准备
+  let { worker } = domainTypeWorkers[key] || {};
   if (!worker) {
     worker = new SingletonWorker(name, f, ...args);
-    domainTypeWorkers[key] = worker;
+    domainTypeWorkers[key] = { worker };
   }
+  domainTypeWorkers[key].ts = new Date();
   return worker;
 }
 

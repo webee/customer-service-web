@@ -24,7 +24,6 @@ const navData = [
     {icon: 'layout', title: '数据展示', pathname: 'dataDisplay', def: 'etc',
       items: [
         {icon: 'gift', title: '杂项', pathname: 'etc', fixed: true, noFooter: true, component: require('../routes/_Test/DataDisplay')},
-        {icon: 'gift', title: '聊天', pathname: 'chat', fixed: true, noFooter: true, component: require('../routes/_Test/DataDisplay/ChatEtc')},
       ]
     },
     {icon: 'heart', title: '列表', pathname: 'list', component: require('../routes/_Test/List')},

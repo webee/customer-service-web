@@ -41,12 +41,11 @@
     "numeral": "^2.0.6",
     "prop-types": "^15.5.10",
     "qs": "^6.5.0",
-    "react": "^15.6.2",
+    "react": "^16.2.0",
     "react-blocks": "^1.1.4",
-    "react-chat-elements": "^0.7.0",
     "react-container-query": "^0.9.1",
     "react-document-title": "^2.0.3",
-    "react-dom": "^15.6.2",
+    "react-dom": "^16.2.0",
     "react-fittext": "^1.0.0",
     "react-icons": "^2.2.7",
     "react-loader": "^2.4.2",
@@ -56,6 +55,7 @@
     "react-split-pane": "^0.1.71",
     "react-virtualized": "^9.13.0",
     "reflexbox": "^3.0.0-0",
+    "rxjs": "^5.5.2",
     "xchat-client": "git+ssh://git@gitlab.corp.qinqinxiaobao.com:js/xchat-client.git#master"
   },
   "devDependencies": {

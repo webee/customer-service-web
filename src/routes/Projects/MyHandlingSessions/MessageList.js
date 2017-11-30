@@ -140,6 +140,17 @@ export default class extends React.Component {
     );
   }
 
+  componentDidMount() {
+    const { onSendObservable } = this.props;
+    this.onSend = onSendObservable.subscribe(() => {
+      this._scrollToBottom();
+    });
+  }
+
+  componentWillUnmount() {
+    this.onSend.unsubscribe();
+  }
+
   _scrollToBottom() {
     const msgs = this.props.projMsgs.msgs || [];
     const lastRowIndex = msgs.length - 1;
