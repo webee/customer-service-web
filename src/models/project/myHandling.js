@@ -1,13 +1,12 @@
 import { createNSSubEffectFunc, createNSSubReducer } from "../utils";
 import * as projectService from "../../services/project";
-import { updateSessionList } from "./_";
 
 const ns = "myHandling";
 // reducers
 export const reducer = createNSSubReducer(
   ns,
   {
-    // TODO: 使用version来控制列表及列表内容的修改 
+    // TODO: 使用version来控制列表及列表内容的修改
     version: 0,
     // 接待中的会话
     listSessions: [],
@@ -26,6 +25,20 @@ export const reducer = createNSSubReducer(
     }
   },
   {
+    addToListSessions(state, { payload: id }) {
+      if (state.listSessions.indexOf(id) >= 0) {
+        return state;
+      }
+      const listSessions = [ ...state.listSessions, id ];
+      return { ...state, listSessions };
+    },
+    removeFromListSessions(state, { payload: id }) {
+      if (state.listSessions.indexOf(id) < 0) {
+        return state;
+      }
+      const listSessions = state.listSessions.filter(i => i != id);
+      return { ...state, listSessions };
+    },
     saveListSessions(state, { payload: listSessions }) {
       return { ...state, listSessions };
     },
@@ -46,7 +59,7 @@ export const reducer = createNSSubReducer(
 
       const currentOpenedSession = id;
       const openedSessions = [...state.openedSessions];
-      if (openedSessions.indexOf(id) === -1) {
+      if (openedSessions.indexOf(id) < 0) {
         openedSessions.push(id);
       }
       return { ...state, openedSessions, currentOpenedSession, currentOpenedSessionState: { isInRead: false } };
@@ -56,7 +69,7 @@ export const reducer = createNSSubReducer(
       return { ...state, currentOpenedSessionState };
     },
     activateOpenedSession(state, { payload: id }) {
-      if (!state.openedSessions.indexOf(id) < 0) {
+      if (state.openedSessions.indexOf(id) < 0) {
         return state;
       }
       if (state.currentOpenedSession === id) {
@@ -65,7 +78,7 @@ export const reducer = createNSSubReducer(
       return { ...state, currentOpenedSession: id, currentOpenedSessionState: { isInRead: false } };
     },
     closeOpenedSession(state, { payload: id }) {
-      if (!state.openedSessions.indexOf(id) === -1) {
+      if (state.openedSessions.indexOf(id) < 0) {
         return state;
       }
       const openedSessions = state.openedSessions.filter(i => i != id);
@@ -83,10 +96,48 @@ export const reducer = createNSSubReducer(
 export const effectFunc = createNSSubEffectFunc(ns, {
   *fetchSessions({ projectDomain, projectType, createAction, createEffectAction, payload }, { call, put }) {
     const sessionList = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
-    yield* updateSessionList({ createAction, payload: sessionList }, { call, put });
+    yield updateSessionList({ createAction, payload: sessionList }, { call, put });
     yield put(createAction(`${ns}/saveListSessions`, sessionList.map(s => s.id)));
   },
+  *fetchSessionItem({ projectDomain, projectType, createAction, payload: sessionID }, { call, put }) {
+    const s = yield call(projectService.fetchSessionItem, projectDomain, projectType, sessionID);
+
+    yield updateSessionList({ createAction, payload: [s] }, { call, put });
+    yield put(createAction(`${ns}/addToListSessions`, s.id));
+  },
   *sendSessionMsg({ payload: { projectID, sessionID, domain, type, content } }, { call, put }) {
-    yield call(projectService.sendSessionMsg, projectID, sessionID, { domain, type, content });
+    const { rx_key, ts } = yield call(projectService.sendSessionMsg, projectID, sessionID, { domain, type, content });
+  },
+  *finishHandlingSession({ createEffectAction, payload: { projectID, sessionID } }, { call, put }) {
+    yield call(projectService.finishHandlingSession, projectID, sessionID);
+    yield put(createEffectAction(`${ns}/removeHandlingSession`, { sessionID }));
+  },
+  *removeHandlingSession({ createAction, payload: { sessionID } }, { call, put }) {
+    yield put(createAction(`${ns}/closeOpenedSession`, sessionID));
+    yield put(createAction(`${ns}/removeFromListSessions`, sessionID));
+    yield put(createAction(`_/removeSession`, sessionID));
   }
 });
+
+function* updateSessionList({ createAction, payload: sessionList }, { call, put }) {
+  yield put(
+    createAction("_/updateSessions", sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined })))
+  );
+  // TODO: 修改staffs和customers, 使用id引用
+  const projectList = sessionList.map(s => s.project);
+  yield put(createAction("_/updateProjects", projectList));
+
+  const staffs = [];
+  const customers = [];
+  projectList.forEach(p => {
+    // staffs
+    staffs.push(p.staffs.leader);
+    staffs.push(...p.staffs.assistants);
+    staffs.push(...p.staffs.participants);
+    // customers
+    customers.push(p.owner);
+    customers.push(p.customers.parties);
+  });
+  yield put({ type: "app/updateStaffs", payload: staffs });
+  yield put({ type: "app/updateCustomers", payload: customers });
+}

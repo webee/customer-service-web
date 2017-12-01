@@ -1,4 +1,4 @@
-import { promiseDispatch } from '../models/utils';
+import { promiseDispatch } from "../models/utils";
 import request, { getQsArgBool } from "../utils/request";
 
 export function createDomainTypeWrapperAction(projectDomain, projectType, type, action, extras = {}) {
@@ -76,15 +76,20 @@ export async function fetchProjectMsgs(projectID, { lid, rid, limit, desc }) {
 }
 
 export async function sendSessionMsg(projectID, sessionID, { domain = "", type = "", content }) {
-  return await request.post(`/sessions/${projectID}/${sessionID}/send_msg`, {
+  const resp = await request.post(`/sessions/${projectID}/${sessionID}/send_msg`, {
     domain,
     type,
     content
   });
+  return resp.data;
 }
 
 export async function syncSessionMsgID(projectID, sessionID, msg_id) {
   return await request.post(`/sessions/${projectID}/${sessionID}/sync_msg_id`, {
     msg_id
   });
+}
+
+export async function finishHandlingSession(projectID, sessionID) {
+  return await request.post(`/sessions/${projectID}/${sessionID}/finish_handling`);
 }

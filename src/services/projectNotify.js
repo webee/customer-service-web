@@ -9,12 +9,16 @@ export function handle(dispatch, type, details) {
   switch (type) {
     case "my_handling.sessions":
       // 更新会话信息
-      const { sessionID } = details;
-      if (sessionID) {
-        fetchSessionItem(details, { dispatch }, sessionID);
+      if (details.sessionID) {
+        fetchSessionItem(details, { dispatch }, details.sessionID);
       } else {
         fetchMyHandlingSessions(details, { dispatch });
       }
+      break;
+    case "my_handling.session.finished":
+      dispatchDomainTypeEffect(details, { dispatch }, "myHandling/removeHandlingSession", {
+        sessionID: details.sessionID
+      });
       break;
     case "msgs":
       fetchProjectMsgs(details, { dispatch }, details.projectID);
@@ -46,7 +50,12 @@ export function fetchSessionItem({ projectDomain, projectType }, { dispatch }, s
   const taskName = fetchSessionItem.name;
   const worker = getWorker(taskName, [projectDomain, projectType, fetchSessionItem, sessionID], async () => {
     await delay(100);
-    await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "_/fetchSessionItem", sessionID);
+    await dispatchDomainTypeEffect(
+      { projectDomain, projectType },
+      { dispatch },
+      "myHandling/fetchSessionItem",
+      sessionID
+    );
   });
   worker.start();
 }

@@ -34,6 +34,11 @@ export const reducer = createNSSubReducer(
       }
       return { ...state, sessions: { ...state.sessions, ...sessions } };
     },
+    removeSession(state, { payload: id }) {
+      const sessions = { ...state.sessions };
+      delete sessions[id];
+      return { ...state, sessions };
+    },
     updateProjects(state, { payload: projectList }) {
       const projects = listToDict(projectList, o => o.id);
       return { ...state, projects: { ...state.projects, ...projects } };
@@ -62,7 +67,8 @@ export const reducer = createNSSubReducer(
     },
     insertProjectMsgs(state, { payload: { id, msgs, noMore } }) {
       const projectMsgs = { ...state.projectMsgs };
-      let { lid, rid, msgs: _msgs } = projectMsgs[id] || { msgs: [] };
+      let { lid, rid, msgs: _msgs, noMore: _noMore } = projectMsgs[id] || { msgs: [] };
+      const newNoMore = noMore === undefined ? _noMore : noMore;
       let newMsgs = [..._msgs];
       msgs.forEach(msg => {
         if (!lid || msg.msg_id < lid) {
@@ -74,7 +80,7 @@ export const reducer = createNSSubReducer(
           rid = msg.msg_id;
         }
       });
-      projectMsgs[id] = { lid, rid, msg: newMsgs, noMore };
+      projectMsgs[id] = { lid, rid, msgs: newMsgs, noMore: newNoMore };
       return { ...state, projectMsgs };
     }
   }
@@ -96,42 +102,17 @@ export const effectFunc = createNSSubEffectFunc(ns, {
   *fetchProjectNewMsgs({ key, createAction, payload: { projectID, limit } }, { select, call, put }) {
     const projectMsgs = yield select(state => state.project[key]._.projectMsgs);
     const { rid } = projectMsgs[projectID] || {};
-    const { msgs, has_more } = yield call(projectService.fetchProjectMsgs, projectID, {
+    const { msgs } = yield call(projectService.fetchProjectMsgs, projectID, {
       lid: rid,
-      limit,
-      desc: false
+      limit
     });
-    yield put(createAction(`${ns}/appendProjectMsgs`, { id: projectID, msgs: msgs }));
+    if (!rid) {
+      yield put(createAction(`${ns}/insertProjectMsgs`, { id: projectID, msgs }));
+    } else {
+      yield put(createAction(`${ns}/appendProjectMsgs`, { id: projectID, msgs }));
+    }
   },
   *syncSessionMsgID({ key, createAction, payload: { projectID, sessionID, sync_msg_id } }, { select, call, put }) {
     yield call(projectService.syncSessionMsgID, projectID, sessionID, sync_msg_id);
-  },
-  *fetchSessionItem({ projectDomain, projectType, createAction, payload: sessionID }, { call, put }) {
-    const s = yield call(projectService.fetchSessionItem, projectDomain, projectType, sessionID);
-
-    yield* updateSessionList({ createAction, payload: [s] }, { call, put });
   }
 });
-
-export function* updateSessionList({ createAction, payload: sessionList }, { call, put }) {
-  yield put(
-    createAction("_/updateSessions", sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined })))
-  );
-  // TODO: 修改staffs和customers, 使用id引用
-  const projectList = sessionList.map(s => s.project);
-  yield put(createAction("_/updateProjects", projectList));
-
-  const staffs = [];
-  const customers = [];
-  projectList.forEach(p => {
-    // staffs
-    staffs.push(p.staffs.leader);
-    staffs.push(...p.staffs.assistants);
-    staffs.push(...p.staffs.participants);
-    // customers
-    customers.push(p.owner);
-    customers.push(p.customers.parties);
-  });
-  yield put({ type: "app/updateStaffs", payload: staffs });
-  yield put({ type: "app/updateCustomers", payload: customers });
-}

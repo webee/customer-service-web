@@ -34,11 +34,13 @@ export default class View extends Component {
       <div className={styles.splitter}>
         <div className={styles.splitHeader}>
           <SessionChatHeader
+            dispatch={dispatch}
             projectDomain={projectDomain}
             projectType={projectType}
             domains={domains}
             project={project}
             customers={customers}
+            session={session}
           />
         </div>
         <div className={styles.splitContent}>
