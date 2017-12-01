@@ -1,10 +1,10 @@
-import React from 'react';
-import { routerRedux, Route, Switch } from 'dva/router';
-import _Test from './entries/_Test';
-import Auth from './entries/Auth';
-import Main from './entries/Main';
-import { authRequired } from './entries/auth_utils';
-import { authPath } from './config';
+import React from "react";
+import { routerRedux, Route, Switch } from "dva/router";
+import _Test from "./entries/_Test";
+import Auth from "./entries/Auth";
+import Main from "./entries/Main";
+import { authRequired } from "./entries/auth_utils";
+import { authPath } from "./config";
 
 const { ConnectedRouter } = routerRedux;
 

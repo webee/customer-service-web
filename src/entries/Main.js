@@ -123,11 +123,13 @@ class Main extends React.Component {
   }
 
   componentWillUnmount() {
+    const { dispatch } = this.props;
     dispatch({ type: "app/closeXChat" });
   }
 
   onLogoClick = () => {
-    this.props.dispatch({ type: "app/fetchAppInfo" });
+    const { dispatch } = this.props;
+    dispatch({ type: "app/fetchAppInfo" });
   };
 
   getHeaderMenu() {

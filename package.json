@@ -70,7 +70,6 @@
     "babel-plugin-transform-runtime": "^6.9.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
-    "babel-preset-react-native-stage-0": "^1.0.1",
     "cross-port-killer": "^1.0.1",
     "enzyme": "^3.1.0",
     "enzyme-adapter-react-16": "^1.0.2",
@@ -88,6 +87,7 @@
     "lint-staged": "^4.3.0",
     "mockjs": "^1.0.1-beta3",
     "pro-download": "^1.0.0",
+    "react-hot-loader": "^3.1.3",
     "react-test-renderer": "^16.0.0",
     "redbox-react": "^1.3.2",
     "roadhog": "^1.3.1",
@@ -95,9 +95,7 @@
     "stylelint": "^8.1.0",
     "stylelint-config-standard": "^17.0.0"
   },
-  "optionalDependencies": {
-    "nightmare": "^2.10.0"
-  },
+  "optionalDependencies": {},
   "babel": {
     "presets": [
       "env",
