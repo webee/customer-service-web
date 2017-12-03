@@ -1,10 +1,10 @@
-import { createNSSubEffectFunc, createNSSubReducer, listToDict } from "../utils";
+import { collectTypeReducers, createNSSubEffectFunc, createNSSubReducer, listToDict } from "../utils";
 import * as projectService from "../../services/project";
 
 const ns = "_";
+
 // reducers
-export const reducer = createNSSubReducer(
-  ns,
+export const reducer = collectTypeReducers(
   {
     // 所有会话by id
     sessions: {},
@@ -88,8 +88,8 @@ export const reducer = createNSSubReducer(
 
 // effects
 export const effectFunc = createNSSubEffectFunc(ns, {
-  *loadProjectHistoryMsgs({ key, createAction, payload: { projectID, limit } }, { select, call, put }) {
-    const projectMsgs = yield select(state => state.project[key]._.projectMsgs);
+  *loadProjectHistoryMsgs({ projectDomain, projectType, createAction, payload: { projectID, limit } }, { select, call, put }) {
+    const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
     const { lid } = projectMsgs[projectID] || {};
     const { msgs } = yield call(projectService.fetchProjectMsgs, projectID, {
       rid: lid,
@@ -97,22 +97,22 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       desc: true
     });
     const noMore = limit > 0 && msgs.length == 0;
-    yield put(createAction(`${ns}/insertProjectMsgs`, { id: projectID, msgs, noMore }));
+    yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs, noMore }));
   },
-  *fetchProjectNewMsgs({ key, createAction, payload: { projectID, limit } }, { select, call, put }) {
-    const projectMsgs = yield select(state => state.project[key]._.projectMsgs);
+  *fetchProjectNewMsgs({ projectDomain, projectType, createAction, payload: { projectID, limit } }, { select, call, put }) {
+    const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
     const { rid } = projectMsgs[projectID] || {};
     const { msgs } = yield call(projectService.fetchProjectMsgs, projectID, {
       lid: rid,
       limit
     });
     if (!rid) {
-      yield put(createAction(`${ns}/insertProjectMsgs`, { id: projectID, msgs }));
+      yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs }));
     } else {
-      yield put(createAction(`${ns}/appendProjectMsgs`, { id: projectID, msgs }));
+      yield put(createAction(`_/appendProjectMsgs`, { id: projectID, msgs }));
     }
   },
-  *syncSessionMsgID({ key, createAction, payload: { projectID, sessionID, sync_msg_id } }, { select, call, put }) {
+  *syncSessionMsgID({ payload: { projectID, sessionID, sync_msg_id } }, { select, call, put }) {
     yield call(projectService.syncSessionMsgID, projectID, sessionID, sync_msg_id);
   }
 });

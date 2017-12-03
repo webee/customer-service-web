@@ -1,35 +1,30 @@
-import { toPromiseEffects } from '../utils';
+import config from "~/config";
+import { combineNSReducers, asNestedReducer, toPromiseEffects } from "../utils";
 import { reducer as myHandlingReducer, effectFunc as myHandlingEffectFunc } from "./myHandling";
 import { reducer as _Reducer, effectFunc as _EffectFunc } from "./_";
-
-function domainTypeReducer(state = {}, action) {
-  return {
-    _: _Reducer(state._, action),
-    myHandling: myHandlingReducer(state.myHandling, action)
-  };
-}
 
 function* domainTypeEffectFunc(action, effects) {
   const { all, call } = effects;
   yield all([call(_EffectFunc, action, effects), call(myHandlingEffectFunc, action, effects)]);
 }
 
-export default {
-  namespace: "project",
+const ns = "project";
 
+export const reducer = asNestedReducer(
+  combineNSReducers({
+    _: _Reducer,
+    myHandling: myHandlingReducer
+  }),
+  ["projectDomain", "projectType"]
+);
+
+export default {
+  namespace: ns,
   state: {},
-  reducers: {
-    dispatchDomainType(state, { payload }) {
-      const { projectDomain, projectType } = payload;
-      const key = [projectDomain, projectType];
-      return { ...state, [key]: domainTypeReducer(state[key], { ...payload, key }) };
-    }
-  },
+  reducers: {},
   effects: toPromiseEffects({
     *dispatchDomainTypeEffect({ payload }, effects) {
-      const { projectDomain, projectType } = payload;
-      const key = [projectDomain, projectType];
-      yield domainTypeEffectFunc({ ...payload, key }, effects);
+      yield domainTypeEffectFunc(payload, effects);
     }
   })
 };

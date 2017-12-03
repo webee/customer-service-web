@@ -10,6 +10,8 @@ import envConfig from "./config";
 import "./polyfill";
 import "./g2";
 import "./index.less";
+import { collectReducers } from "./models/utils";
+import modelReducer from "./models/reducer";
 
 // debug
 console.debug("env config: ", envConfig);
@@ -22,24 +24,7 @@ const app = dva({
     message.error(e.message, ERROR_MSG_DURATION);
   },
   onReducer(reducer) {
-    return (state, action) => {
-      let newState = state;
-      const { type, payload } = action;
-      if (type === "RESET") {
-        if (payload === "*") {
-          // 清空所有
-          newState = {};
-        } else {
-          // 清空指定的分支
-          newState = { ...state };
-          payload.forEach(ns => {
-            newState[ns] = undefined;
-          });
-        }
-      }
-
-      return reducer(newState, action);
-    };
+    return collectReducers(modelReducer, reducer);
   }
 });
 
@@ -49,6 +34,6 @@ app.use(createLoading());
 // 3. Register models
 app.model(require("./models/auth"));
 app.model(require("./models/app"));
-app.model(require("./models/project"));
+app.model(require("./models/project").default);
 
 export default app;

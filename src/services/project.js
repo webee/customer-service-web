@@ -5,17 +5,11 @@ export function createDomainTypeWrapperAction(projectDomain, projectType, type, 
   return { type, payload: { projectDomain, projectType, ...action, ...extras } };
 }
 
-// model外部使用
-export function createProjectDomainTypeAction(projectDomain, projectType, type, payload) {
-  return createDomainTypeWrapperAction(projectDomain, projectType, "project/dispatchDomainType", {
-    type,
+export function createProjectDomainTypeAction(projectDomain, projectType, type="", payload=undefined) {
+  return {
+    type: `/project/${projectDomain}/${projectType}/${type}`,
     payload
-  });
-}
-
-// model内部使用
-export function createDomainTypeAction(projectDomain, projectType, type, payload) {
-  return createDomainTypeWrapperAction(projectDomain, projectType, "dispatchDomainType", { type, payload });
+  };
 }
 
 export function createProjectDomainTypeEffectAction(projectDomain, projectType, type, payload) {
@@ -25,7 +19,7 @@ export function createProjectDomainTypeEffectAction(projectDomain, projectType, 
     "project/dispatchDomainTypeEffect",
     { type, payload },
     {
-      createAction: (type, payload) => createDomainTypeAction(projectDomain, projectType, type, payload),
+      createAction: (type, payload) => createProjectDomainTypeAction(projectDomain, projectType, type, payload),
       createEffectAction: (type, payload) => createDomainTypeEffectAction(projectDomain, projectType, type, payload)
     }
   );
@@ -38,7 +32,7 @@ export function createDomainTypeEffectAction(projectDomain, projectType, type, p
     "dispatchDomainTypeEffect",
     { type, payload },
     {
-      createAction: (type, payload) => createDomainTypeAction(projectDomain, projectType, type, payload),
+      createAction: (type, payload) => createProjectDomainTypeAction(projectDomain, projectType, type, payload),
       createEffectAction: (type, payload) => createDomainTypeEffectAction(projectDomain, projectType, type, payload)
     }
   );

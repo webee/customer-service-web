@@ -9,7 +9,7 @@ import MyHandlingSessionsView from "./MyHandlingSessions";
 
 @connect((state, ownProps) => {
   const { projectDomain, projectType } = ownProps;
-  const data = state.project[[projectDomain, projectType]];
+  const data = state.project[projectDomain][projectType];
   const appData = state.app;
   return { data, appData };
 })

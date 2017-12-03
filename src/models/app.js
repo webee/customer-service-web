@@ -78,7 +78,7 @@ export default {
       staffAppInfo.project_domain_tree.forEach(d => {
         d.types.forEach(t => {
           // NOTE: initialize project domain/type states.
-          projectDomainTypeActions.push(put(createProjectDomainTypeAction(d.name, t.name)));
+          projectDomainTypeActions.push(put(createProjectDomainTypeAction(d.name, t.name, "@@INIT")));
         });
       });
       yield all(projectDomainTypeActions);

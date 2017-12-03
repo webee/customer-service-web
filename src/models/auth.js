@@ -28,7 +28,7 @@ export default {
     },
     *resetState(action, { call, put }) {
       yield call(authService.clearJWT);
-      yield put({ type: "RESET", payload: "*" });
+      yield put({ type: "/RESET", payload: "*" });
     },
     *logout({ payload: state }, { call, put }) {
       yield put(routerRedux.push({ pathname: authPath, state }));

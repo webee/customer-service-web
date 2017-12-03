@@ -1,10 +1,9 @@
-import { createNSSubEffectFunc, createNSSubReducer } from "../utils";
+import { collectTypeReducers, createNSSubEffectFunc, createNSSubReducer } from "../utils";
 import * as projectService from "../../services/project";
 
 const ns = "myHandling";
 // reducers
-export const reducer = createNSSubReducer(
-  ns,
+export const reducer = collectTypeReducers(
   {
     // TODO: 使用version来控制列表及列表内容的修改
     version: 0,
@@ -121,11 +120,11 @@ export const effectFunc = createNSSubEffectFunc(ns, {
 
 function* updateSessionList({ createAction, payload: sessionList }, { call, put }) {
   yield put(
-    createAction("_/updateSessions", sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined })))
+    createAction(`_/updateSessions`, sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined })))
   );
   // TODO: 修改staffs和customers, 使用id引用
   const projectList = sessionList.map(s => s.project);
-  yield put(createAction("_/updateProjects", projectList));
+  yield put(createAction(`_/updateProjects`, projectList));
 
   const staffs = [];
   const customers = [];
@@ -136,7 +135,7 @@ function* updateSessionList({ createAction, payload: sessionList }, { call, put 
     staffs.push(...p.staffs.participants);
     // customers
     customers.push(p.owner);
-    customers.push(p.customers.parties);
+    customers.push(...p.customers.parties);
   });
   yield put({ type: "app/updateStaffs", payload: staffs });
   yield put({ type: "app/updateCustomers", payload: customers });
