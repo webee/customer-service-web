@@ -96,8 +96,10 @@ export default class extends React.Component {
     if (!prevIsInRead) {
       isInRead = scrollDirection <= 0 && isInRead;
     }
-    this.setState({ isInRead });
-    dispatchDomainType(this.context, this.props, "myHandling/updateCurrentOpenedSessionState", { isInRead });
+    if (prevIsInRead !== isInRead) {
+      this.setState({ isInRead });
+      dispatchDomainType(this.context, this.props, "myHandling/updateCurrentOpenedSessionState", { isInRead });
+    }
 
     // 同步已读消息id
     if (msg.msg_id > session.sync_msg_id) {
