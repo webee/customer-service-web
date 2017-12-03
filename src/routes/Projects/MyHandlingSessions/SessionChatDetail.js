@@ -28,7 +28,7 @@ export default class View extends Component {
 
   render() {
     const { projectDomain, projectType } = this.context;
-    const { dispatch, appData, session, project, projMsgs, projTxMsgs, txMsgs, isCurrentOpened } = this.props;
+    const { dispatch, appData, session, project, projMsgs, projTxMsgIDs, txMsgs, isCurrentOpened } = this.props;
     const { staffs, customers, domains } = appData;
     return (
       <div className={styles.splitter}>
@@ -68,7 +68,7 @@ export default class View extends Component {
                 staffs={staffs}
                 customers={customers}
                 projMsgs={projMsgs}
-                projTxMsgs={projTxMsgs}
+                projTxMsgIDs={projTxMsgIDs}
                 txMsgs={txMsgs}
                 isCurrentOpened={isCurrentOpened}
                 onSendObservable={this.onSendObservable}

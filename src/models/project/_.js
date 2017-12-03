@@ -1,5 +1,7 @@
 import { collectTypeReducers, createNSSubEffectFunc, listToDict } from "../utils";
 import * as projectService from "../../services/project";
+import { newSingletonContext } from "../../utils/notify";
+import { asYieldFunc } from "../../utils/commons";
 
 const ns = "_";
 
@@ -16,8 +18,10 @@ export const reducer = collectTypeReducers(
     tx_id: 0,
     // 项目发送中的消息by tx_id
     txMsgs: {},
-    // 项目发送消息列表by project id: [tx_id...]
-    projectTxMsgs: {}
+    // 发送id的id列表
+    txMsgIDs: [],
+    // 项目发送消息id列表by project id: [tx_id...]
+    projectTxMsgIDs: {}
   },
   {
     updateSessionSyncMsgID(state, { payload: { id, sync_msg_id } }) {
@@ -91,18 +95,56 @@ export const reducer = collectTypeReducers(
     },
     addTxMsg(
       state,
-      { payload: { projectID, sessionID: session_id, user_type, user_id, domain, type, content, msgType } }
+      { payload: { projectID: project_id, sessionID: session_id, user_type, user_id, domain, type, content, msgType } }
     ) {
+      if (!(msgType === "ripe" || msgType === "raw")) {
+        return state;
+      }
+
       let tx_id = state.tx_id + 1;
       const status = msgType === "ripe" ? "ready" : "pending";
       const ts = Math.round(new Date().getTime() / 1000);
-      const txMsg = { session_id, status, user_type, user_id, domain, type, content, ts };
+      const txMsg = { project_id, session_id, status, user_type, user_id, msgType, domain, type, content, ts };
 
       const txMsgs = { ...state.txMsgs, [tx_id]: txMsg };
-      const projTxMsgs = [...(state.projectTxMsgs[projectID] || []), tx_id];
-      const projectTxMsgs = { ...state.projectTxMsgs, [projectID]: projTxMsgs };
+      const txMsgIDs = [...state.txMsgIDs, tx_id];
+      const projTxMsgIDs = [...(state.projectTxMsgIDs[project_id] || []), tx_id];
+      const projectTxMsgIDs = { ...state.projectTxMsgIDs, [project_id]: projTxMsgIDs };
 
-      return { ...state, tx_id, txMsgs, projectTxMsgs };
+      return { ...state, tx_id, txMsgs, txMsgIDs, projectTxMsgIDs };
+    },
+    updateSendedTxMsg(state, { payload: { tx_id, rx_key, ts } }) {
+      const txMsgIDs = state.txMsgIDs.filter(id => id !== tx_id);
+      const txMsgs = { ...state.txMsgs };
+      txMsgs[tx_id] = { ...txMsgs[tx_id], rx_key, ts };
+
+      return { ...state, txMsgIDs, txMsgs };
+    },
+    checkProjectTxMsgsRxKey(state, { payload: { projectID, tx_id, rid = 0 } }) {
+      const projMsgs = state.projectMsgs[projectID];
+      if (projMsgs.rid && projMsgs.rid <= rid) {
+        return state;
+      }
+
+      const msgs = projMsgs.msgs || [];
+      const txMsgs = state.txMsgs;
+      const toCheckTsMsgIDs = (state.projectTxMsgIDs[projectID] || []).filter(id => (tx_id ? tx_id === id : true));
+      const rxTxMsgsIDs = [];
+      for (let i = msgs.length - 1; i >= 0; i--) {
+        const msg = msgs[i];
+        if (msg.msg_id <= rid) {
+          break;
+        }
+        rxTxMsgsIDs.push(
+          ...toCheckTsMsgIDs.filter(id => {
+            const txMsg = txMsgs[id];
+            return txMsg.rx_key === msg.rx_key;
+          })
+        );
+      }
+      const projTxMsgIDs = (state.projectTxMsgIDs[projectID] || []).filter(id => rxTxMsgsIDs.indexOf(id) < 0);
+      const projectTxMsgIDs = { ...state.projectTxMsgIDs, [projectID]: projTxMsgIDs };
+      return { ...state, projectTxMsgIDs };
     }
   }
 );
@@ -138,17 +180,52 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     } else {
       yield put(createAction(`_/appendProjectMsgs`, { id: projectID, msgs }));
     }
+    yield put(createAction(`_/checkProjectTxMsgsRxKey`, { projectID, rid }));
   },
   *syncSessionMsgID({ createAction, payload: { projectID, sessionID, sync_msg_id } }, { select, call, put }) {
     yield call(projectService.syncSessionMsgID, projectID, sessionID, sync_msg_id);
   },
   *sendMsg(
-    { createAction, payload: { projectID, sessionID, domain, type, content, msgType = "ripe" } },
+    { createAction, createEffectAction, payload: { projectID, sessionID, domain, type, content, msgType = "ripe" } },
     { select, call, put }
   ) {
     const staff = yield select(state => state.app.staff);
     const user_type = "staff";
     const user_id = staff.uid;
     yield put(createAction(`_/addTxMsg`, { projectID, sessionID, user_type, user_id, domain, type, content, msgType }));
+    yield put(createEffectAction(`_/handleTxMsgs`));
+  },
+  *handleTxMsgs({ projectDomain, projectType, createAction }, { select, call, put }) {
+    const singletonContext = newSingletonContext([projectDomain, projectType, "handleTxMsgs"]);
+    if (singletonContext.start()) {
+      do {
+        try {
+          const { txMsgs, txMsgIDs, projectMsgs } = yield select(state => state.project[projectDomain][projectType]._);
+          for (let tx_id of txMsgIDs) {
+            const txMsg = txMsgs[tx_id];
+            if (!txMsg) {
+              continue;
+            }
+
+            const { project_id: projectID, session_id: sessionID, msgType } = txMsg;
+            if (msgType === "ripe") {
+              const projMsgs = projectMsgs[projectID];
+              const { domain, type, content } = txMsg;
+              const { rx_key, ts } = yield call(projectService.sendSessionMsg, projectID, sessionID, {
+                domain,
+                type,
+                content
+              });
+              yield put(createAction(`_/updateSendedTxMsg`, { tx_id, rx_key, ts }));
+              yield put(createAction(`_/checkProjectTxMsgsRxKey`, { projectID, tx_id, rid: projMsgs.rid }));
+            } else if (msgType === "raw") {
+            }
+          }
+        } catch (err) {
+          singletonContext.stop();
+          throw err;
+        }
+      } while (singletonContext.is_pending());
+    }
   }
 });

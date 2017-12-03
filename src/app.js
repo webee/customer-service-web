@@ -21,6 +21,7 @@ const ERROR_MSG_DURATION = 3; // 3 seconds
 const app = dva({
   history: createHistory(),
   onError(e) {
+    console.error(e);
     message.error(e.message, ERROR_MSG_DURATION);
   },
   onReducer(reducer) {

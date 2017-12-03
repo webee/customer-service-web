@@ -34,9 +34,9 @@ export default class extends React.Component {
   list = undefined;
 
   rowRenderer = ({ index, key, parent, style }) => {
-    const { staffs, customers, projMsgs, projTxMsgs, txMsgs } = this.props;
+    const { staffs, customers, projMsgs, projTxMsgIDs, txMsgs } = this.props;
     const { msgs } = projMsgs;
-    const tx_msgs = projTxMsgs.map(tx_id => txMsgs[tx_id]);
+    const tx_msgs = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
     let msg = msgs[index];
     if (index >= msgs.length) {
       msg = tx_msgs[index - msgs.length];
@@ -124,41 +124,45 @@ export default class extends React.Component {
   };
 
   render() {
-    const { session, projMsgs, projTxMsgs, txMsgs, isCurrentOpened } = this.props;
+    const { session, projMsgs, projTxMsgIDs, txMsgs, isCurrentOpened } = this.props;
     const { isInRead } = this.state;
     const msgs = projMsgs.msgs || [];
-    const tx_msgs = projTxMsgs.map(tx_id => txMsgs[tx_id]);
+    const tx_msgs = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
     const lastRowIndex = msgs.length + tx_msgs.length - 1;
     // 解决向上滑动的bug
     const scrollToIndex = isInRead ? undefined : lastRowIndex;
     return (
       <AutoSizer onResize={this.onResize}>
-        {({ width, height }) => (
-          <div className={styles.main} style={{ width, height }}>
-            <List
-              ref={i => (this.list = i)}
-              className={styles.list}
-              deferredMeasurementCache={this.cache}
-              width={width}
-              height={height}
-              rowCount={msgs.length + tx_msgs.length}
-              scrollToIndex={scrollToIndex}
-              onScroll={this.onScroll}
-              onRowsRendered={this.onRowsRendered}
-              rowHeight={this.cache.rowHeight}
-              rowRenderer={this.rowRenderer}
-              noRowsRenderer={this.noRowsRenderer}
-              isCurrentOpened={isCurrentOpened}
-              tx_msgs={tx_msgs}
-            />
-            {height >= 64 &&
-              isInRead && (
-                <Badge className={styles.down} count={session.msg_id - session.sync_msg_id}>
-                  <Button ghost type="primary" shape="circle" icon="down" onClick={this.onDownClicked} />
-                </Badge>
-              )}
-          </div>
-        )}
+        {({ width, height }) => {
+          // FIXME: 高度变成0之后不能再检查到改变
+          // console.log({width, height});
+          return (
+            <div className={styles.main} style={{ width, height }}>
+              <List
+                ref={i => (this.list = i)}
+                className={styles.list}
+                deferredMeasurementCache={this.cache}
+                width={width}
+                height={height}
+                rowCount={msgs.length + tx_msgs.length}
+                scrollToIndex={scrollToIndex}
+                onScroll={this.onScroll}
+                onRowsRendered={this.onRowsRendered}
+                rowHeight={this.cache.rowHeight}
+                rowRenderer={this.rowRenderer}
+                noRowsRenderer={this.noRowsRenderer}
+                isCurrentOpened={isCurrentOpened}
+                tx_msgs={tx_msgs}
+              />
+              {height >= 64 &&
+                isInRead && (
+                  <Badge className={styles.down} count={session.msg_id - session.sync_msg_id}>
+                    <Button ghost type="primary" shape="circle" icon="down" onClick={this.onDownClicked} />
+                  </Badge>
+                )}
+            </div>
+          );
+        }}
       </AutoSizer>
     );
   }
@@ -176,7 +180,7 @@ export default class extends React.Component {
 
   _scrollToBottom() {
     const msgs = this.props.projMsgs.msgs || [];
-    const txMsgIDs = this.props.projTxMsgs;
+    const txMsgIDs = this.props.projTxMsgIDs;
     const lastRowIndex = msgs.length + txMsgIDs.length - 1;
     this.list.scrollToRow(lastRowIndex);
   }
