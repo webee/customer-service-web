@@ -82,28 +82,13 @@ export function asNestedReducer(reducer, nestNSNames = []) {
   };
 }
 
-export function createNSSubEffectFuncs(ns, effectFuncs) {
-  const nsSubEffectFuncs = {};
-  for (let name in effectFuncs) {
-    nsSubEffectFuncs[`${ns}${NS_SEP}${name}`] = function*(action, effects) {
-      const type = parseNSSubType(ns, action.type);
-      const effectFunc = effectFuncs[type];
-      if (effectFunc) {
-        yield* effectFunc(action, effects);
-      }
-    };
-  }
-  return nsSubEffectFuncs;
-}
 
-export function createNSSubReducer(ns, defaultState, reducers) {
-  return (state = defaultState, action) => {
-    const type = parseNSSubType(ns, action.type);
-    const reducer = reducers[type];
-    if (reducer) {
-      return reducer(state, action);
+export function collectTypeEffectFuncs(effectFuncs) {
+  return function*(action, effects) {
+    const effectFunc = effectFuncs[action.type];
+    if (effectFunc) {
+      yield* effectFunc(action, effects);
     }
-    return state;
   };
 }
 

@@ -1,4 +1,4 @@
-import { collectTypeReducers, createNSSubEffectFunc, createNSSubReducer } from "../utils";
+import { collectTypeReducers, createNSSubEffectFunc } from "../utils";
 import * as projectService from "../../services/project";
 
 const ns = "myHandling";

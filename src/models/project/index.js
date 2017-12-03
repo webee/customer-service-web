@@ -9,7 +9,6 @@ function* domainTypeEffectFunc(action, effects) {
 }
 
 const ns = "project";
-
 export const reducer = asNestedReducer(
   combineNSReducers({
     _: _Reducer,
@@ -24,7 +23,12 @@ export default {
   reducers: {},
   effects: toPromiseEffects({
     *dispatchDomainTypeEffect({ payload }, effects) {
-      yield domainTypeEffectFunc(payload, effects);
+      const { projectDomain, projectType } = payload;
+      const { all, call, put } = effects;
+      if (config.env !== "prod") {
+        yield put({ type: `/${ns}/${projectDomain}/${projectType}/${payload.type}@@START`, payload: payload.payload });
+      }
+      yield all([call(_EffectFunc, payload, effects), call(myHandlingEffectFunc, payload, effects)]);
     }
   })
 };

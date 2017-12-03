@@ -25,6 +25,9 @@ const app = dva({
   },
   onReducer(reducer) {
     return collectReducers(modelReducer, reducer);
+  },
+  onEffect(effectFunc) {
+    return effectFunc;
   }
 });
 
