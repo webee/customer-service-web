@@ -48,3 +48,17 @@ export function fetchProjectMsgs({ projectDomain, projectType }, { dispatch }, p
   });
   worker.start();
 }
+
+
+export function syncSessionMsgID({ projectDomain, projectType }, { dispatch }, projectID, sessionID, sync_msg_id) {
+  const taskName = syncSessionMsgID.name;
+  const worker = getWorker(taskName, [projectDomain, projectType, fetchProjectMsgs, projectID, sessionID], async (sync_msg_id) => {
+    await delay(100);
+    await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "_/syncSessionMsgID", {
+      projectID, sessionID, sync_msg_id
+    });
+  }, sync_msg_id);
+  worker.start(sync_msg_id, (prevMsgID, msgID) => {
+    return msgID > prevMsgID ? msgID : prevMsgID;
+  });
+}

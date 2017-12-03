@@ -3,17 +3,19 @@ const RUNNING = Symbol('RUNNING');
 const RUNNING_WITH_PENDING = Symbol('RUNNING_WITH_PENDING');
 
 export class SingletonWorker {
-  constructor(name, f, init = true) {
+  constructor(name, f, data, init = true) {
     this.name = name;
-    this.cxt = new SingletonContext(init);
+    this.ctx = new SingletonContext(init);
     // 任务函数
     this.f = f;
+    this.data = data;
   }
 
-  async start() {
-    if (this.cxt.start()) {
+  async start(data, checkData = (prevData, data) => data) {
+    this.data = checkData(this.data, data);
+    if (this.ctx.start()) {
       do {
-        const r = this.f();
+        const r = this.f(this.data);
         if (r instanceof Promise) {
           try {
             await r;
@@ -21,7 +23,7 @@ export class SingletonWorker {
             console.error(`SingletonWorker: ${this.name}, ${err}`);
           }
         }
-      } while (this.cxt.is_pending());
+      } while (this.ctx.is_pending());
     }
   }
 }
@@ -92,8 +94,11 @@ export class SingletonContext {
   }
 
   done() {
+    if (this.__cmpAndSetStatus(RUNNING, INIT)) {
+      return true;
+    }
     this.__cmpAndSetStatus(RUNNING_WITH_PENDING, RUNNING);
-    return this.__cmpAndSetStatus(RUNNING, INIT);
+    return false;
   }
 
   is_pending() {

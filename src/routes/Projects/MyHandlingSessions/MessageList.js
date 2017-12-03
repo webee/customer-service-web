@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
+import * as projectWorkers from "~/services/projectWorkers";
 import { Icon, Button, Badge } from "antd";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
@@ -16,11 +17,11 @@ export default class extends React.Component {
   };
 
   state = {
-    width: 0,
     isInRead: false,
     scrollTop: 0,
     scrollDirection: 0
   };
+  width = 0;
   cache = new CellMeasurerCache({
     defaultHeight: 50,
     fixedWidth: true
@@ -73,9 +74,9 @@ export default class extends React.Component {
   noRowsRenderer = () => <EmptyContent />;
 
   onResize = ({ width }) => {
-    if (this.state.width !== width) {
+    if (this.width !== width) {
       this.cache.clearAll();
-      this.setState({ width });
+      this.width = width;
     }
   };
 
@@ -110,11 +111,8 @@ export default class extends React.Component {
           id: session.id,
           sync_msg_id: msg.msg_id
         });
-        dispatchDomainTypeEffect(this.context, this.props, "_/syncSessionMsgID", {
-          projectID: session.project_id,
-          sessionID: session.id,
-          sync_msg_id: msg.msg_id
-        });
+        console.log('msg_id: ', msg.msg_id);
+        projectWorkers.syncSessionMsgID(this.context, this.props, session.project_id, session.id, msg.msg_id);
       }
     }
   };
@@ -156,9 +154,9 @@ export default class extends React.Component {
               />
               {height >= 64 &&
                 isInRead && (
-                  <Badge className={styles.down} count={session.msg_id - session.sync_msg_id}>
-                    <Button ghost type="primary" shape="circle" icon="down" onClick={this.onDownClicked} />
-                  </Badge>
+                  // <Badge className={styles.down} count={session.msg_id - session.sync_msg_id}>
+                    <Button className={styles.down} ghost type="primary" shape="circle" icon="down" onClick={this.onDownClicked} />
+                  // </Badge>
                 )}
             </div>
           );
