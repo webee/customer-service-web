@@ -4,7 +4,7 @@ import Rx from "rxjs/Rx";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
 import { dispatchDomainType } from "~/services/project";
-import * as projectNotify from "../../../services/projectNotify";
+import * as projectWorkers from "../../../services/projectWorkers";
 import SplitPane from "react-split-pane";
 import List from "react-virtualized/dist/commonjs/List";
 import SessionChatHeader from "./SessionChatHeader";
@@ -23,12 +23,12 @@ export default class View extends Component {
 
   componentDidMount() {
     const { session } = this.props;
-    projectNotify.fetchProjectMsgs(this.context, this.props, session.project_id);
+    projectWorkers.fetchProjectMsgs(this.context, this.props, session.project_id);
   }
 
   render() {
     const { projectDomain, projectType } = this.context;
-    const { dispatch, appData, session, project, projMsgs, isCurrentOpened } = this.props;
+    const { dispatch, appData, session, project, projMsgs, projTxMsgs, txMsgs, isCurrentOpened } = this.props;
     const { staffs, customers, domains } = appData;
     return (
       <div className={styles.splitter}>
@@ -68,6 +68,8 @@ export default class View extends Component {
                 staffs={staffs}
                 customers={customers}
                 projMsgs={projMsgs}
+                projTxMsgs={projTxMsgs}
+                txMsgs={txMsgs}
                 isCurrentOpened={isCurrentOpened}
                 onSendObservable={this.onSendObservable}
               />

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
 import { dispatchDomainTypeEffect } from "../../../services/project";
-import * as projectNotify from "../../../services/projectNotify";
+import * as projectWorkers from "../../../services/projectWorkers";
 import { List, Avatar, Badge, Tag } from "antd";
 import SplitPane from "react-split-pane";
 import styles from "./index.less";
@@ -18,7 +18,7 @@ export default class View extends React.Component {
   };
 
   componentDidMount() {
-    projectNotify.fetchMyHandlingSessions(this.context, this.props);
+    projectWorkers.fetchMyHandlingSessions(this.context, this.props);
   }
 
   render() {

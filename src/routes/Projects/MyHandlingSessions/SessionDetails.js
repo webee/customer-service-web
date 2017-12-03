@@ -31,11 +31,12 @@ export default class View extends Component {
 
   renderSessionChatDetail(id) {
     const { dispatch, appData, data, myHandlingData } = this.props;
-    const { sessions, projects, projectMsgs } = data;
+    const { sessions, projects, projectMsgs, projectTxMsgs, txMsgs } = data;
     const { currentOpenedSession } = myHandlingData;
     const session = sessions[id];
     const project = projects[session.project_id];
     const projMsgs = projectMsgs[session.project_id] || {};
+    const projTxMsgs = projectTxMsgs[session.project_id] || [];
     return (
       <SessionChatDetail
         dispatch={dispatch}
@@ -44,6 +45,8 @@ export default class View extends Component {
         isCurrentOpened={currentOpenedSession === session.id}
         project={project}
         projMsgs={projMsgs}
+        projTxMsgs={projTxMsgs}
+        txMsgs={txMsgs}
       />
     );
   }

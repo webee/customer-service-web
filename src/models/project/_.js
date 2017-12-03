@@ -11,7 +11,13 @@ export const reducer = collectTypeReducers(
     // 所有项目by id
     projects: {},
     // 项目消息by project id: {lid, rid, [msgs], noMore}
-    projectMsgs: {}
+    projectMsgs: {},
+    // tx_id, 每次自增1
+    tx_id: 0,
+    // 项目发送中的消息by tx_id
+    txMsgs: {},
+    // 项目发送消息列表by project id: [tx_id...]
+    projectTxMsgs: {}
   },
   {
     updateSessionSyncMsgID(state, { payload: { id, sync_msg_id } }) {
@@ -82,13 +88,31 @@ export const reducer = collectTypeReducers(
       });
       projectMsgs[id] = { lid, rid, msgs: newMsgs, noMore: newNoMore };
       return { ...state, projectMsgs };
+    },
+    addTxMsg(
+      state,
+      { payload: { projectID, sessionID: session_id, user_type, user_id, domain, type, content, msgType } }
+    ) {
+      let tx_id = state.tx_id + 1;
+      const status = msgType === "ripe" ? "ready" : "pending";
+      const ts = Math.round(new Date().getTime() / 1000);
+      const txMsg = { session_id, status, user_type, user_id, domain, type, content, ts };
+
+      const txMsgs = { ...state.txMsgs, [tx_id]: txMsg };
+      const projTxMsgs = [...(state.projectTxMsgs[projectID] || []), tx_id];
+      const projectTxMsgs = { ...state.projectTxMsgs, [projectID]: projTxMsgs };
+
+      return { ...state, tx_id, txMsgs, projectTxMsgs };
     }
   }
 );
 
 // effects
 export const effectFunc = createNSSubEffectFunc(ns, {
-  *loadProjectHistoryMsgs({ projectDomain, projectType, createAction, payload: { projectID, limit } }, { select, call, put }) {
+  *loadProjectHistoryMsgs(
+    { projectDomain, projectType, createAction, payload: { projectID, limit } },
+    { select, call, put }
+  ) {
     const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
     const { lid } = projectMsgs[projectID] || {};
     const { msgs } = yield call(projectService.fetchProjectMsgs, projectID, {
@@ -99,7 +123,10 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     const noMore = limit > 0 && msgs.length == 0;
     yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs, noMore }));
   },
-  *fetchProjectNewMsgs({ projectDomain, projectType, createAction, payload: { projectID, limit } }, { select, call, put }) {
+  *fetchProjectNewMsgs(
+    { projectDomain, projectType, createAction, payload: { projectID, limit } },
+    { select, call, put }
+  ) {
     const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
     const { rid } = projectMsgs[projectID] || {};
     const { msgs } = yield call(projectService.fetchProjectMsgs, projectID, {
@@ -112,7 +139,16 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       yield put(createAction(`_/appendProjectMsgs`, { id: projectID, msgs }));
     }
   },
-  *syncSessionMsgID({ payload: { projectID, sessionID, sync_msg_id } }, { select, call, put }) {
+  *syncSessionMsgID({ createAction, payload: { projectID, sessionID, sync_msg_id } }, { select, call, put }) {
     yield call(projectService.syncSessionMsgID, projectID, sessionID, sync_msg_id);
+  },
+  *sendMsg(
+    { createAction, payload: { projectID, sessionID, domain, type, content, msgType = "ripe" } },
+    { select, call, put }
+  ) {
+    const staff = yield select(state => state.app.staff);
+    const user_type = "staff";
+    const user_id = staff.uid;
+    yield put(createAction(`_/addTxMsg`, { projectID, sessionID, user_type, user_id, domain, type, content, msgType }));
   }
 });

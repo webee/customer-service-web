@@ -1,12 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
-import cs from "classnames";
 import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
 import { Icon, Button, Badge } from "antd";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
 import CellMeasurer, { CellMeasurerCache } from "react-virtualized/dist/commonjs/CellMeasurer";
 import EmptyContent from "./EmptyContent";
+import MessageItem from "./MessageItem";
 import styles from "./MessageList.less";
 
 export default class extends React.Component {
@@ -23,21 +23,25 @@ export default class extends React.Component {
   };
   cache = new CellMeasurerCache({
     defaultHeight: 50,
-    fixedWidth: true,
-    keyMapper: (rowIndex, columnIndex) => {
-      const { projMsgs: { msgs } } = this.props;
-      const msg = msgs[rowIndex];
-      return msg.msg_id;
-    }
+    fixedWidth: true
+    // keyMapper: (rowIndex, columnIndex) => {
+    //   const { projMsgs: { msgs } } = this.props;
+    //   const msg = msgs[rowIndex];
+    //   return msg.msg_id;
+    // }
   });
   // list ref
   list = undefined;
 
   rowRenderer = ({ index, key, parent, style }) => {
-    const { staffs, customers, projMsgs } = this.props;
+    const { staffs, customers, projMsgs, projTxMsgs, txMsgs } = this.props;
     const { msgs } = projMsgs;
-    const msg = msgs[index];
-    const { type, content, user_type, user_id } = msg;
+    const tx_msgs = projTxMsgs.map(tx_id => txMsgs[tx_id]);
+    let msg = msgs[index];
+    if (index >= msgs.length) {
+      msg = tx_msgs[index - msgs.length];
+    }
+    const { type, content, user_type, user_id, ts, status } = msg;
     let userName = user_id;
     switch (user_type) {
       case "staff":
@@ -49,19 +53,17 @@ export default class extends React.Component {
         userName = customer ? customer.name : userName;
         break;
     }
-    // TODO: 基于type来渲染
-    const itemClassNames = cs(styles.item, {
-      [styles.left]: user_type === "customer",
-      [styles.right]: user_type === "staff"
-    });
+    let position = "mid";
+    if (user_type === "customer") {
+      position = "left";
+    } else if (user_type === "staff") {
+      position = "right";
+    }
     return (
       <CellMeasurer cache={this.cache} columnIndex={0} key={key} parent={parent} rowIndex={index}>
         {({ measure }) => (
           <div style={style}>
-            <div className={itemClassNames}>
-              <div className={styles.head}>{userName}</div>
-              <div className={styles.body}>{content}</div>
-            </div>
+            <MessageItem position={position} userName={userName} ts={ts} msg={content} status={status} />
           </div>
         )}
       </CellMeasurer>
@@ -90,9 +92,8 @@ export default class extends React.Component {
 
     const { scrollDirection, isInRead: prevIsInRead } = this.state;
     const msgs = this.props.projMsgs.msgs || [];
-    const msg = msgs[stopIndex];
-    const lastRowIndex = msgs.length - 1;
-    let isInRead = stopIndex && lastRowIndex - stopIndex >= 1;
+    // isInRead以rx区的消息为准
+    let isInRead = stopIndex && msgs.length - 1 - stopIndex >= 1;
     if (!prevIsInRead) {
       isInRead = scrollDirection <= 0 && isInRead;
     }
@@ -101,17 +102,20 @@ export default class extends React.Component {
       dispatchDomainType(this.context, this.props, "myHandling/updateCurrentOpenedSessionState", { isInRead });
     }
 
-    // 同步已读消息id
-    if (msg.msg_id > session.sync_msg_id) {
-      dispatchDomainType(this.context, this.props, "_/updateSessionSyncMsgID", {
-        id: session.id,
-        sync_msg_id: msg.msg_id
-      });
-      dispatchDomainTypeEffect(this.context, this.props, "_/syncSessionMsgID", {
-        projectID: session.project_id,
-        sessionID: session.id,
-        sync_msg_id: msg.msg_id
-      });
+    if (stopIndex < msgs.length) {
+      const msg = msgs[stopIndex];
+      // 同步已读消息id
+      if (msg.msg_id > session.sync_msg_id) {
+        dispatchDomainType(this.context, this.props, "_/updateSessionSyncMsgID", {
+          id: session.id,
+          sync_msg_id: msg.msg_id
+        });
+        dispatchDomainTypeEffect(this.context, this.props, "_/syncSessionMsgID", {
+          projectID: session.project_id,
+          sessionID: session.id,
+          sync_msg_id: msg.msg_id
+        });
+      }
     }
   };
 
@@ -120,10 +124,11 @@ export default class extends React.Component {
   };
 
   render() {
-    const { session, projMsgs, isCurrentOpened } = this.props;
+    const { session, projMsgs, projTxMsgs, txMsgs, isCurrentOpened } = this.props;
     const { isInRead } = this.state;
     const msgs = projMsgs.msgs || [];
-    const lastRowIndex = msgs.length - 1;
+    const tx_msgs = projTxMsgs.map(tx_id => txMsgs[tx_id]);
+    const lastRowIndex = msgs.length + tx_msgs.length - 1;
     // 解决向上滑动的bug
     const scrollToIndex = isInRead ? undefined : lastRowIndex;
     return (
@@ -136,7 +141,7 @@ export default class extends React.Component {
               deferredMeasurementCache={this.cache}
               width={width}
               height={height}
-              rowCount={msgs.length}
+              rowCount={msgs.length + tx_msgs.length}
               scrollToIndex={scrollToIndex}
               onScroll={this.onScroll}
               onRowsRendered={this.onRowsRendered}
@@ -144,6 +149,7 @@ export default class extends React.Component {
               rowRenderer={this.rowRenderer}
               noRowsRenderer={this.noRowsRenderer}
               isCurrentOpened={isCurrentOpened}
+              tx_msgs={tx_msgs}
             />
             {height >= 64 &&
               isInRead && (
@@ -170,7 +176,8 @@ export default class extends React.Component {
 
   _scrollToBottom() {
     const msgs = this.props.projMsgs.msgs || [];
-    const lastRowIndex = msgs.length - 1;
+    const txMsgIDs = this.props.projTxMsgs;
+    const lastRowIndex = msgs.length + txMsgIDs.length - 1;
     this.list.scrollToRow(lastRowIndex);
   }
 }

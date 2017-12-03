@@ -46,15 +46,23 @@ export default class extends React.Component {
     }
 
     // send msg
-    dispatchDomainTypeEffect(this.context, this.props, "myHandling/sendSessionMsg", {
+    dispatchDomainTypeEffect(this.context, this.props, "_/sendMsg", {
       projectID: session.project_id,
       sessionID: session.id,
       domain: "",
       type: "text",
-      content: JSON.stringify({ text })
+      content: JSON.stringify({ text }),
+      msgType: "ripe"
     });
+    // dispatchDomainTypeEffect(this.context, this.props, "myHandling/sendSessionMsg", {
+    //   projectID: session.project_id,
+    //   sessionID: session.id,
+    //   domain: "",
+    //   type: "text",
+    //   content: JSON.stringify({ text })
+    // });
     onSend();
-    this.setState({text: ""});
+    this.setState({ text: "" });
   };
 
   render() {
@@ -66,15 +74,13 @@ export default class extends React.Component {
             <Icon type="folder" />
           </div>
           <div className={styles.right}>
-            <Button type="primary" onClick={this.send}>发送</Button>
+            <Button type="primary" onClick={this.send}>
+              发送
+            </Button>
           </div>
         </div>
         <div className={styles.input}>
-          <TextArea
-            value={this.state.text}
-            onChange={this.onChange}
-            onKeyPress={this.onKeyPress}
-          />
+          <TextArea value={this.state.text} onChange={this.onChange} onKeyPress={this.onKeyPress} />
         </div>
       </div>
     );
