@@ -2,6 +2,7 @@
   margin: 8px;
 
   display: flex;
+  justify-content: flex-start;
 
   .info {
     flex: 0 0 auto;
@@ -34,14 +35,12 @@
 
 
   &.left {
-    justify-content: flex-start;
+    flex-direction: row;
     .info {
-      order: 1;
       display: none;
     }
 
     .content {
-      order: 2;
       align-items: flex-start;
       margin-right: 120px;
       .body {
@@ -65,12 +64,10 @@
   }
 
   &.right {
-    justify-content: flex-end;
+    flex-direction: row-reverse;
     .info {
-      order: 2;
     }
     .content {
-      order: 1;
       align-items: flex-end;
       margin-left: 120px;
       .body {
