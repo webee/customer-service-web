@@ -8,6 +8,7 @@
     "start": "roadhog server",
     "start:no-proxy": "NO_PROXY=true roadhog server",
     "build": "roadhog build",
+    "debug-build": "roadhog build --debug -o debug-dist/${NODE_ENV}",
     "site": "roadhog-api-doc static && gh-pages -d dist",
     "analyze": "roadhog build --analyze",
     "lint:style": "stylelint \"src/**/*.less\" --syntax less",
