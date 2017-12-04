@@ -11,11 +11,18 @@
   "env": {
     "development": {
       "extraBabelPlugins": [
-        "dva-hmr"
+        "dva-hmr",
+        ["transform-define", { "process.env.NODE_ENV": "development" }]
+      ]
+    },
+    "beta": {
+      "extraBabelPlugins": [
+        ["transform-define", { "process.env.NODE_ENV": "beta" }]
       ]
     },
     "production": {
       "extraBabelPlugins": [
+        ["transform-define", { "process.env.NODE_ENV": "production" }]
       ]
     }
   },
