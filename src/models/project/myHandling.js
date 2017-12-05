@@ -130,12 +130,10 @@ function* updateSessionList({ createAction, payload: sessionList }, { call, put 
   const customers = [];
   projectList.forEach(p => {
     // staffs
-    staffs.push(p.staffs.leader);
-    staffs.push(...p.staffs.assistants);
-    staffs.push(...p.staffs.participants);
+    staffs.push(p.leader);
     // customers
     customers.push(p.owner);
-    customers.push(...p.customers.parties);
+    customers.push(...p.customers);
   });
   yield put({ type: "app/updateStaffs", payload: staffs });
   yield put({ type: "app/updateCustomers", payload: customers });

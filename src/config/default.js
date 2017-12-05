@@ -4,5 +4,5 @@ export const authPath = '/auth';
 export const jwtRefreshTime = 30 * 60 * 1000;
 
 export const axiosConfig = {
-  timeout: 5000,
+  timeout: 9000,
 };
