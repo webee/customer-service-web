@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import Loader from "react-loader";
 import { connect } from "dva";
 import classNames from "classnames";
 import DocumentTitle from "react-document-title";

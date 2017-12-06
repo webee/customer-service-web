@@ -18,7 +18,7 @@ export default class View extends Component {
     super(props);
 
     this.state = {
-      activeKey: "my_handling_sessions",
+      activeKey: "my_handling",
       expanded: false
     };
   }
@@ -60,17 +60,17 @@ export default class View extends Component {
         onChange={this.onTabChange}
         size="default"
         activeKey={activeKey}
-        defaultActiveKey="my_handling_sessions"
+        defaultActiveKey="my_handling"
         animated={false}
       >
-        <Tabs.TabPane tab="我接待中的会话" key="my_handling_sessions">
-          {this.getTabContent("my_handling_sessions")}
+        <Tabs.TabPane tab="我的接待" key="my_handling">
+          {this.getTabContent("my_handling")}
         </Tabs.TabPane>
-        <Tabs.TabPane tab="接待中的会话" key="other_handling_sessions">
-          {this.getTabContent("other_handling_sessions")}
+        <Tabs.TabPane tab="正在接待" key="other_handling">
+          {this.getTabContent("other_handling")}
         </Tabs.TabPane>
-        <Tabs.TabPane tab="最近接待的会话" key="handled_sessions">
-          {this.getTabContent("handled_sessions")}
+        <Tabs.TabPane tab="最近接待" key="handled">
+          {this.getTabContent("handled")}
         </Tabs.TabPane>
       </Tabs>
     );
@@ -81,17 +81,17 @@ const PureTabContentView = props => {
   const { dispatch, name } = props;
   const { projectDomain, projectType, data, appData } = props;
   switch (name) {
-    case "my_handling_sessions":
+    case "my_handling":
       return (
         <MyHandlingSessionsView dispatch={dispatch} appData={appData} data={data._} myHandlingData={data.myHandling} />
       );
-    case "other_handling_sessions":
+    case "other_handling":
       return (
         <h1>
           {projectDomain}/{projectType}: 接待中的会话
         </h1>
       );
-    case "handled_sessions":
+    case "handled":
       return (
         <div style={{ flex: "1 0 auto" }}>
           <h1>

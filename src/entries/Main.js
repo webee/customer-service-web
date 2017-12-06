@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Loader from "react-loader";
+import Loader from "~/components/Loader";
 import { connect } from "dva";
 import { withRouter, Route, Link, Switch, Redirect } from "dva/router";
 import { Menu, Icon, Switch as SwitchComp, Modal, Form, Avatar, Dropdown } from "antd";
@@ -217,7 +217,7 @@ class Main extends React.Component {
     const { staff, app, projectDomains, ui_settings } = this.props;
     const loaded = staff && app && projectDomains;
     if (!loaded) {
-      return <Loader loaded={false} />;
+      return <Loader />;
     }
 
     const navData = getNavData(projectDomains);
