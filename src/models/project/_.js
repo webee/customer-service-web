@@ -1,5 +1,6 @@
 import { collectTypeReducers, createNSSubEffectFunc, listToDict } from "../utils";
 import * as projectService from "../../services/project";
+import * as msgCodecService from "../../services/msgCodec";
 import { newSingletonContext } from "../../utils/notify";
 import { asYieldFunc } from "../../utils/commons";
 
@@ -95,7 +96,7 @@ export const reducer = collectTypeReducers(
     },
     addTxMsg(
       state,
-      { payload: { projectID: project_id, sessionID: session_id, user_type, user_id, domain, type, content, msgType } }
+      { payload: { projectID: project_id, sessionID: session_id, user_type, user_id, domain, type, msg, msgType } }
     ) {
       if (!(msgType === "ripe" || msgType === "raw")) {
         return state;
@@ -104,7 +105,7 @@ export const reducer = collectTypeReducers(
       let tx_id = state.tx_id + 1;
       const status = msgType === "ripe" ? "ready" : "pending";
       const ts = Math.round(new Date().getTime() / 1000);
-      const txMsg = { project_id, session_id, status, user_type, user_id, msgType, domain, type, content, ts };
+      const txMsg = { project_id, session_id, status, user_type, user_id, msgType, domain, type, msg, ts };
 
       const txMsgs = { ...state.txMsgs, [tx_id]: txMsg };
       const txMsgIDs = [...state.txMsgIDs, tx_id];
@@ -163,7 +164,8 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       desc: true
     });
     const noMore = limit > 0 && msgs.length == 0;
-    yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs, noMore }));
+    const decodedMsgs = msgs.map(msg => ({...msg, ...msgCodecService.decodeMsg(msg)}));
+    yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs: decodedMsgs, noMore }));
   },
   *fetchProjectNewMsgs(
     { projectDomain, projectType, createAction, payload: { projectID, limit } },
@@ -175,24 +177,26 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       lid: rid,
       limit
     });
+    const decodedMsgs = msgs.map(msg => ({...msg, ...msgCodecService.decodeMsg(msg)}));
     if (!rid) {
-      yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs }));
+      yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs: decodedMsgs }));
     } else {
-      yield put(createAction(`_/appendProjectMsgs`, { id: projectID, msgs }));
+      yield put(createAction(`_/appendProjectMsgs`, { id: projectID, msgs: decodedMsgs }));
     }
+    // 检查刚接收的消息是否为已发送状态的tx消息
     yield put(createAction(`_/checkProjectTxMsgsRxKey`, { projectID, rid }));
   },
   *syncSessionMsgID({ createAction, payload: { projectID, sessionID, sync_msg_id } }, { select, call, put }) {
     yield call(projectService.syncSessionMsgID, projectID, sessionID, sync_msg_id);
   },
   *sendMsg(
-    { createAction, createEffectAction, payload: { projectID, sessionID, domain, type, content, msgType = "ripe" } },
+    { createAction, createEffectAction, payload: { projectID, sessionID, domain, type, msg, msgType = "ripe" } },
     { select, call, put }
   ) {
     const staff = yield select(state => state.app.staff);
     const user_type = "staff";
     const user_id = staff.uid;
-    yield put(createAction(`_/addTxMsg`, { projectID, sessionID, user_type, user_id, domain, type, content, msgType }));
+    yield put(createAction(`_/addTxMsg`, { projectID, sessionID, user_type, user_id, domain, type, msg, msgType }));
     yield put(createEffectAction(`_/handleTxMsgs`));
   },
   *handleTxMsgs({ projectDomain, projectType, createAction }, { select, call, put }) {
@@ -210,12 +214,12 @@ export const effectFunc = createNSSubEffectFunc(ns, {
             const { project_id: projectID, session_id: sessionID, msgType } = txMsg;
             if (msgType === "ripe") {
               const projMsgs = projectMsgs[projectID];
-              const { domain, type, content } = txMsg;
-              const { rx_key, ts } = yield call(projectService.sendSessionMsg, projectID, sessionID, {
+              const { domain, type, msg } = txMsg;
+              const { rx_key, ts } = yield call(projectService.sendSessionMsg, projectID, sessionID, msgCodecService.encodeMsg({
                 domain,
                 type,
-                content
-              });
+                msg
+              }));
               yield put(createAction(`_/updateSendedTxMsg`, { tx_id, rx_key, ts }));
               yield put(createAction(`_/checkProjectTxMsgsRxKey`, { projectID, tx_id, rid: projMsgs.rid }));
             } else if (msgType === "raw") {

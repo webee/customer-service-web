@@ -51,16 +51,9 @@ export default class extends React.Component {
       sessionID: session.id,
       domain: "",
       type: "text",
-      content: JSON.stringify({ text }),
+      msg: { text },
       msgType: "ripe"
     });
-    // dispatchDomainTypeEffect(this.context, this.props, "myHandling/sendSessionMsg", {
-    //   projectID: session.project_id,
-    //   sessionID: session.id,
-    //   domain: "",
-    //   type: "text",
-    //   content: JSON.stringify({ text })
-    // });
     onSend();
     this.setState({ text: "" });
   };

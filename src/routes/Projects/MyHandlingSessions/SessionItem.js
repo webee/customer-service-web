@@ -19,9 +19,9 @@ export default ({ name, description, ts, unread, online, style, selected, onClic
           <div className={styles.title}>
             <b>{name}</b>
           </div>
-          <div className={styles.body}>{typeof ts === "string" ? ts : moment.unix(ts).fromNow()}</div>
+          <div className={styles.ts}>{typeof ts === "string" ? ts : moment.unix(ts).fromNow()}</div>
         </div>
-        <div className={classNames(styles.bottom, styles.body)}>{description}</div>
+        <div className={styles.bottom}>{description}</div>
       </div>
     </div>
   );

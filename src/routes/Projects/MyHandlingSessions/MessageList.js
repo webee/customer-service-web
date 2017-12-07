@@ -36,13 +36,13 @@ export default class extends React.Component {
 
   rowRenderer = ({ index, key, parent, style }) => {
     const { staffs, customers, projMsgs, projTxMsgIDs, txMsgs } = this.props;
-    const { msgs } = projMsgs;
-    const tx_msgs = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
-    let msg = msgs[index];
-    if (index >= msgs.length) {
-      msg = tx_msgs[index - msgs.length];
+    const messages = projMsgs.msgs;
+    const tx_messages = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
+    let message = messages[index];
+    if (index >= messages.length) {
+      message = tx_messages[index - messages.length];
     }
-    const { type, content, user_type, user_id, ts, status } = msg;
+    const { domain, type, content, user_type, user_id, ts, status } = message;
     let userName = user_id;
     switch (user_type) {
       case "staff":
@@ -92,9 +92,9 @@ export default class extends React.Component {
     }
 
     const { scrollDirection, isInRead: prevIsInRead } = this.state;
-    const msgs = this.props.projMsgs.msgs || [];
+    const messages = this.props.projMsgs.msgs || [];
     // isInRead以rx区的消息为准
-    let isInRead = stopIndex && msgs.length - 1 - stopIndex >= 1;
+    let isInRead = stopIndex && messages.length - 1 - stopIndex >= 1;
     if (!prevIsInRead) {
       isInRead = scrollDirection <= 0 && isInRead;
     }
@@ -103,16 +103,16 @@ export default class extends React.Component {
       dispatchDomainType(this.context, this.props, "myHandling/updateCurrentOpenedSessionState", { isInRead });
     }
 
-    if (stopIndex < msgs.length) {
-      const msg = msgs[stopIndex];
+    if (stopIndex < messages.length) {
+      const message = messages[stopIndex];
       // 同步已读消息id
-      if (msg.msg_id > session.sync_msg_id) {
+      if (message.msg_id > session.sync_msg_id) {
         dispatchDomainType(this.context, this.props, "_/updateSessionSyncMsgID", {
           id: session.id,
-          sync_msg_id: msg.msg_id
+          sync_msg_id: message.msg_id
         });
-        console.log('msg_id: ', msg.msg_id);
-        projectWorkers.syncSessionMsgID(this.context, this.props, session.project_id, session.id, msg.msg_id);
+        console.log('msg_id: ', message.msg_id);
+        projectWorkers.syncSessionMsgID(this.context, this.props, session.project_id, session.id, message.msg_id);
       }
     }
   };
@@ -124,9 +124,9 @@ export default class extends React.Component {
   render() {
     const { session, projMsgs, projTxMsgIDs, txMsgs, isCurrentOpened } = this.props;
     const { isInRead } = this.state;
-    const msgs = projMsgs.msgs || [];
-    const tx_msgs = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
-    const lastRowIndex = msgs.length + tx_msgs.length - 1;
+    const messages = projMsgs.msgs || [];
+    const tx_messages = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
+    const lastRowIndex = messages.length + tx_messages.length - 1;
     // 解决向上滑动的bug
     const scrollToIndex = isInRead ? undefined : lastRowIndex;
     return (
@@ -142,15 +142,16 @@ export default class extends React.Component {
                 deferredMeasurementCache={this.cache}
                 width={width}
                 height={height}
-                rowCount={msgs.length + tx_msgs.length}
+                rowCount={messages.length + tx_messages.length}
                 scrollToIndex={scrollToIndex}
+                scrollToAlignment="end"
                 onScroll={this.onScroll}
                 onRowsRendered={this.onRowsRendered}
                 rowHeight={this.cache.rowHeight}
                 rowRenderer={this.rowRenderer}
                 noRowsRenderer={this.noRowsRenderer}
                 isCurrentOpened={isCurrentOpened}
-                tx_msgs={tx_msgs}
+                tx_messages={tx_messages}
               />
               {height >= 64 &&
                 isInRead && (
@@ -177,9 +178,9 @@ export default class extends React.Component {
   }
 
   _scrollToBottom() {
-    const msgs = this.props.projMsgs.msgs || [];
+    const messages = this.props.projMsgs.msgs || [];
     const txMsgIDs = this.props.projTxMsgIDs;
-    const lastRowIndex = msgs.length + txMsgIDs.length - 1;
+    const lastRowIndex = messages.length + txMsgIDs.length - 1;
     this.list.scrollToRow(lastRowIndex);
   }
 }

@@ -1,5 +1,6 @@
 import { collectTypeReducers, createNSSubEffectFunc } from "../utils";
 import * as projectService from "../../services/project";
+import * as msgCodecService from "../../services/msgCodec";
 
 const ns = "myHandling";
 // reducers
@@ -28,7 +29,7 @@ export const reducer = collectTypeReducers(
       if (state.listSessions.indexOf(id) >= 0) {
         return state;
       }
-      const listSessions = [ ...state.listSessions, id ];
+      const listSessions = [...state.listSessions, id];
       return { ...state, listSessions };
     },
     removeFromListSessions(state, { payload: id }) {
@@ -95,17 +96,22 @@ export const reducer = collectTypeReducers(
 export const effectFunc = createNSSubEffectFunc(ns, {
   *fetchSessions({ projectDomain, projectType, createAction, createEffectAction, payload }, { call, put }) {
     const sessionList = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
+    sessionList.forEach(s => {
+      if (s.msg) {
+        s.msg = { ...s.msg, ...msgCodecService.decodeMsg(s.msg) };
+      }
+    });
     yield updateSessionList({ createAction, payload: sessionList }, { call, put });
     yield put(createAction(`${ns}/saveListSessions`, sessionList.map(s => s.id)));
   },
   *fetchSessionItem({ projectDomain, projectType, createAction, payload: sessionID }, { call, put }) {
     const s = yield call(projectService.fetchSessionItem, projectDomain, projectType, sessionID);
+    if (s.msg) {
+      s.msg = { ...s.msg, ...msgCodecService.decodeMsg(s.msg) };
+    }
 
     yield updateSessionList({ createAction, payload: [s] }, { call, put });
     yield put(createAction(`${ns}/addToListSessions`, s.id));
-  },
-  *sendSessionMsg({ payload: { projectID, sessionID, domain, type, content } }, { call, put }) {
-    const { rx_key, ts } = yield call(projectService.sendSessionMsg, projectID, sessionID, { domain, type, content });
   },
   *finishHandlingSession({ createEffectAction, payload: { projectID, sessionID } }, { call, put }) {
     yield call(projectService.finishHandlingSession, projectID, sessionID);

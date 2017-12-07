@@ -36,9 +36,23 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
+        .title {
+          flex: auto;
+          overflow: hidden;
+          line-height: 1.5em;
+          font-size: 14px;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+        .ts {
+          flex: 0 0 auto;
+          line-height: 1.5em;
+          font-size: 12px;
+        }
       }
       .bottom {
         font-size: 12px;
+        line-height: 1.5em;
 
         flex: auto;
         overflow: hidden;
@@ -46,15 +60,5 @@
         white-space: nowrap;
         text-overflow: ellipsis;
       }
-    }
-
-    .title {
-      line-height: 1.5em;
-      font-size: 14px;
-    }
-
-    .body {
-      line-height: 1.5em;
-      font-size: 12px;
     }
   }
