@@ -6,7 +6,7 @@ import styles from "./SessionItem.less";
 
 export default ({ name, description, ts, unread, online, style, selected, onClick }) => {
   const className = classNames(styles.main, { [styles.selected]: selected });
-  const avatarClassName = classNames({ [styles.active]: online });
+  const avatarClassName = classNames({ [styles.online]: online });
   return (
     <div className={className} style={style} onClick={onClick}>
       <div className={styles.avatar}>

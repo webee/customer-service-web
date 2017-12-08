@@ -8,7 +8,6 @@
     flex: 0 0 auto;
     width: 24px;
     background-color: SkyBlue;
-    font-size: 13pt;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -18,13 +17,18 @@
   .content {
     display: flex;
     flex-direction: column;
+    overflow-y: hidden;
     .head {
       line-height: 1.5em;
       font-size: 13pt;
     }
 
     .body {
+      font-size: 14pt;
+      line-height: 1.5em;
       border-radius: 3px;
+      max-width: 100%;
+      overflow-y: hidden;
     }
   }
 

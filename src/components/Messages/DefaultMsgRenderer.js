@@ -7,6 +7,12 @@ export default class DefaultMsgRenderer {
     if (type === STRING_MSG_TYPE) {
       return <StringMsg msg={msg} />;
     }
-    return <UnknownMsg msg={msg} />;
+    try {
+      const content = typeof msg === "string" ? msg : JSON.stringify(msg);
+      return <UnknownMsg msg={content} />;
+    } catch (err) {
+      console.error(err);
+      return <UnknownMsg err={err} />;
+    }
   }
 }

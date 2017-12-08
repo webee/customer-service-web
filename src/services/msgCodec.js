@@ -2,8 +2,7 @@ import { DefaultDomainMsgCodecFetcher, JSONMsgCodec } from "~/libs/MsgCodecs";
 
 // domain msg codec fetcher
 const domainMsgCodecFetcher = new DefaultDomainMsgCodecFetcher();
-// const commonMsgTypes = new Set(["text", "file", "image", "voice"]);
-const commonMsgTypes = new Set(["text"]);
+const commonMsgTypes = new Set(["text", "file", "image", "voice"]);
 domainMsgCodecFetcher.register(["", "cs"], new JSONMsgCodec(commonMsgTypes));
 
 export function registerDomainMsgCodec(domain, ...msgCodecs) {

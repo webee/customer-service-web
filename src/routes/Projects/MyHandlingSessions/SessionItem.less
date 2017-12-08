@@ -1,8 +1,3 @@
-.selected {
-  background-color: #40a0f0;
-  color: white;
-}
-
 .main {
     height: 60px;
     display: flex;
@@ -15,7 +10,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      .active {
+      .online {
         background-color: #87d068;
       }
     }
@@ -26,7 +21,7 @@
 
       display: flex;
       flex-direction: column;
-      justify-content: space-around;
+      justify-content: center;
 
       .top {
         flex: auto;
@@ -38,9 +33,9 @@
         align-items: flex-end;
         .title {
           flex: auto;
-          overflow: hidden;
           line-height: 1.5em;
           font-size: 14px;
+          overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
         }
@@ -51,14 +46,23 @@
         }
       }
       .bottom {
+        flex: auto;
         font-size: 12px;
         line-height: 1.5em;
+        color: Grey;
 
-        flex: auto;
         overflow: hidden;
-
         white-space: nowrap;
         text-overflow: ellipsis;
+      }
+    }
+    &.selected {
+      background-color: #40a0f0;
+      color: white;
+      .description {
+        .bottom {
+          color: white;
+        }
       }
     }
   }

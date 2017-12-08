@@ -7,7 +7,7 @@ domainMsgRendererFetcher.register(
   ["", "cs"],
   new MsgComponentRenderer({
     text: commonTypeComponents.TextMsg,
-    // file: commonTypeComponents.FileMsg,
+    file: commonTypeComponents.FileMsg,
     // iamge: commonTypeComponents.ImageMsg,
     // voice: commonTypeComponents.VoiceMsg
   })
