@@ -7,7 +7,7 @@ export default class DefaultDomainMsgCodecFetcher {
 
   get(domain) {
     const msgCodec = this.domainMsgCodecs[domain];
-    if (msgCodec) {
+    if (!msgCodec) {
       return this.defaultMsgCodec;
     }
     return msgCodec;

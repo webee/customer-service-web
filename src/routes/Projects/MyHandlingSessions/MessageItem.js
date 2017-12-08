@@ -1,7 +1,7 @@
 import React from "react";
 import cs from "classnames";
 import { Icon } from "antd";
-import { StringMsg, TextMsg } from "~/components/Messages";
+import * as msgRendererService from "~/services/msgRenderer";
 import styles from "./MessageItem.less";
 
 const statusIconTypes = {
@@ -15,11 +15,11 @@ const statusIconTypes = {
 
 export default class extends React.PureComponent {
   renderStatus(status) {
-    return <Icon type={statusIconTypes[status]} />
+    return <Icon type={statusIconTypes[status]} />;
   }
 
   render() {
-    const { position, userName, ts, msg, status } = this.props;
+    const { position, userName, ts, domain, type, msg, status } = this.props;
     const itemClassNames = cs(styles.item, {
       [styles.left]: position === "left",
       [styles.mid]: position === "mid",
@@ -30,7 +30,9 @@ export default class extends React.PureComponent {
         <div className={styles.info}>{this.renderStatus(status)}</div>
         <div className={styles.content}>
           <div className={styles.head}>{userName}</div>
-          <StringMsg msg={msg} className={styles.body} />
+          <div className={styles.body}>
+          {msgRendererService.renderMsg({domain, type, msg})}
+          </div>
         </div>
       </div>
     );

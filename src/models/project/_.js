@@ -103,9 +103,10 @@ export const reducer = collectTypeReducers(
       }
 
       let tx_id = state.tx_id + 1;
+      const is_tx = true;
       const status = msgType === "ripe" ? "ready" : "pending";
       const ts = Math.round(new Date().getTime() / 1000);
-      const txMsg = { project_id, session_id, status, user_type, user_id, msgType, domain, type, msg, ts };
+      const txMsg = { project_id, session_id, is_tx, status, user_type, user_id, msgType, domain, type, msg, ts };
 
       const txMsgs = { ...state.txMsgs, [tx_id]: txMsg };
       const txMsgIDs = [...state.txMsgIDs, tx_id];
@@ -213,6 +214,7 @@ export const effectFunc = createNSSubEffectFunc(ns, {
 
             const { project_id: projectID, session_id: sessionID, msgType } = txMsg;
             if (msgType === "ripe") {
+              // TODO: 处理异常
               const projMsgs = projectMsgs[projectID];
               const { domain, type, msg } = txMsg;
               const { rx_key, ts } = yield call(projectService.sendSessionMsg, projectID, sessionID, msgCodecService.encodeMsg({

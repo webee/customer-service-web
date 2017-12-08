@@ -42,7 +42,7 @@ export default class extends React.Component {
     if (index >= messages.length) {
       message = tx_messages[index - messages.length];
     }
-    const { domain, type, content, user_type, user_id, ts, status } = message;
+    const { domain, type, msg , user_type, user_id, ts, status } = message;
     let userName = user_id;
     switch (user_type) {
       case "staff":
@@ -64,7 +64,7 @@ export default class extends React.Component {
       <CellMeasurer cache={this.cache} columnIndex={0} key={key} parent={parent} rowIndex={index}>
         {({ measure }) => (
           <div style={style}>
-            <MessageItem position={position} userName={userName} ts={ts} msg={content} status={status} />
+            <MessageItem position={position} userName={userName} ts={ts} domain={domain} type={type} msg={msg} status={status} />
           </div>
         )}
       </CellMeasurer>

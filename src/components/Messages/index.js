@@ -1,6 +1,2 @@
-export StringMsg from "./StringMsg";
-export TextMsg from "./TextMsg";
-
-export default ({}) => {
-  return;
-};
+export MsgComponentRenderer from './MsgComponentRenderer';
+export DefaultDomainMsgRendererFetcher from './DefaultDomainMsgRendererFetcher';
