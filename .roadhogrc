@@ -1,5 +1,5 @@
 {
-  "entry": "src/index.js",
+  "entry": "src/launcher.js",
   "hash": true,
   "extraBabelPlugins": [
     "transform-runtime",
