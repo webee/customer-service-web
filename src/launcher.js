@@ -4,7 +4,7 @@ import Loader from "./components/Loader";
 import styles from "./launcher.less";
 
 // start launcher.
-ReactDOM.render(<Loader type="pacman" />, document.querySelector("#root"));
+ReactDOM.render(<Loader type="pacman" fadeIn="none" />, document.querySelector("#root"));
 
 // async load app.
 (() => {
