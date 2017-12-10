@@ -35,6 +35,7 @@ export default class extends React.Component {
   list = undefined;
 
   rowRenderer = ({ index, key, parent, style }) => {
+    const { width } = parent.props;
     const { staffs, customers, projMsgs, projTxMsgIDs, txMsgs } = this.props;
     const messages = projMsgs.msgs;
     const tx_messages = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
@@ -42,7 +43,7 @@ export default class extends React.Component {
     if (index >= messages.length) {
       message = tx_messages[index - messages.length];
     }
-    const { domain, type, msg , user_type, user_id, ts, status } = message;
+    const { domain, type, msg, user_type, user_id, ts, status } = message;
     let userName = user_id;
     switch (user_type) {
       case "staff":
@@ -62,11 +63,17 @@ export default class extends React.Component {
     }
     return (
       <CellMeasurer cache={this.cache} columnIndex={0} key={key} parent={parent} rowIndex={index}>
-        {({ measure }) => (
-          <div style={style}>
-            <MessageItem position={position} userName={userName} ts={ts} domain={domain} type={type} msg={msg} status={status} />
-          </div>
-        )}
+        <div style={style}>
+          <MessageItem
+            position={position}
+            userName={userName}
+            ts={ts}
+            domain={domain}
+            type={type}
+            msg={msg}
+            status={status}
+          />
+        </div>
       </CellMeasurer>
     );
   };
@@ -111,7 +118,6 @@ export default class extends React.Component {
           id: session.id,
           sync_msg_id: message.msg_id
         });
-        console.log('msg_id: ', message.msg_id);
         projectWorkers.syncSessionMsgID(this.context, this.props, session.project_id, session.id, message.msg_id);
       }
     }
@@ -156,7 +162,14 @@ export default class extends React.Component {
               {height >= 64 &&
                 isInRead && (
                   // <Badge className={styles.down} count={session.msg_id - session.sync_msg_id}>
-                    <Button className={styles.down} ghost type="primary" shape="circle" icon="down" onClick={this.onDownClicked} />
+                  <Button
+                    className={styles.down}
+                    ghost
+                    type="primary"
+                    shape="circle"
+                    icon="down"
+                    onClick={this.onDownClicked}
+                  />
                   // </Badge>
                 )}
             </div>
