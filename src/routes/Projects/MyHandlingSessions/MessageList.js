@@ -16,23 +16,26 @@ export default class extends React.Component {
     projectType: PropTypes.string
   };
 
-  state = {
-    isInRead: false,
-    scrollTop: 0,
-    scrollDirection: 0
-  };
-  width = 0;
-  cache = new CellMeasurerCache({
-    defaultHeight: 50,
-    fixedWidth: true
-    // keyMapper: (rowIndex, columnIndex) => {
-    //   const { projMsgs: { msgs } } = this.props;
-    //   const msg = msgs[rowIndex];
-    //   return msg.msg_id;
-    // }
-  });
-  // list ref
-  list = undefined;
+  constructor(props) {
+    super(props);
+    this.state = {
+      isInRead: false,
+      scrollTop: 0,
+      scrollDirection: 0
+    };
+    this.width = 0;
+    this.cache = new CellMeasurerCache({
+      defaultHeight: 50,
+      fixedWidth: true
+      // keyMapper: (rowIndex, columnIndex) => {
+      //   const { projMsgs: { msgs } } = this.props;
+      //   const msg = msgs[rowIndex];
+      //   return msg.msg_id;
+      // }
+    });
+    // list ref
+    this.list = undefined;
+  }
 
   rowRenderer = ({ index, key, parent, style }) => {
     const { width } = parent.props;
@@ -66,8 +69,7 @@ export default class extends React.Component {
         {({ measure }) => (
           <div style={style}>
             <MessageItem
-              measure={measure}
-              width={width}
+              ctx={{measure, width, index}}
               position={position}
               userName={userName}
               ts={ts}

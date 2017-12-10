@@ -3,16 +3,16 @@ import UnknownMsg from "./default/UnknownMsg";
 import StringMsg from "./default/StringMsg";
 
 export default class DefaultMsgRenderer {
-  render({ type, msg }, props = {}) {
+  render({ type, msg }, ctx = {}) {
     if (type === STRING_MSG_TYPE) {
-      return <StringMsg msg={msg} />;
+      return <StringMsg msg={msg} {...ctx} />;
     }
     try {
       const content = typeof msg === "string" ? msg : JSON.stringify(msg);
-      return <UnknownMsg msg={content} {...props} />;
+      return <UnknownMsg msg={content} {...ctx} />;
     } catch (err) {
       console.warn(err);
-      return <UnknownMsg err={err} {...props} />;
+      return <UnknownMsg err={err} {...ctx} />;
     }
   }
 }

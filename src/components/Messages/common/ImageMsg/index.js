@@ -30,7 +30,7 @@ function resize(w, h, { minWidth, maxWidth, minHeight, maxHeight }) {
 export default class extends React.PureComponent {
   constructor(props) {
     super(props);
-    const { msg, width } = props;
+    const { msg } = props;
     const { w, h } = msg;
     this.state = {
       // 图片原始尺寸
@@ -52,9 +52,10 @@ export default class extends React.PureComponent {
   }
 
   render() {
-    const { msg, width } = this.props;
     const { w, h } = this.state;
+    const { msg, width } = this.props;
     const { name, url } = msg;
+    // const { width } = ctx;
     const maxWidth = width - 150;
     const sizeSpecs = { minWidth: 32, maxWidth, minHeight: 32, maxHeight: 300 };
     const [xw, xh] = resize(w, h, sizeSpecs);

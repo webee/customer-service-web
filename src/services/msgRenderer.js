@@ -9,7 +9,7 @@ domainMsgRendererFetcher.register(
     text: commonTypeComponents.TextMsg,
     file: commonTypeComponents.FileMsg,
     image: commonTypeComponents.ImageMsg,
-    // voice: commonTypeComponents.VoiceMsg
+    voice: commonTypeComponents.VoiceMsg
   })
 );
 
@@ -17,6 +17,6 @@ export function registerDomainMsgRenderer(domain, ...msgRenderers) {
   domainMsgRendererFetcher.register(domain, ...msgRenderers);
 }
 
-export function renderMsg({ domain, type, msg }, props = {}) {
-  return domainMsgRendererFetcher.get(domain).render({ type, msg }, props);
+export function renderMsg({ domain, type, msg }, ctx = {}) {
+  return domainMsgRendererFetcher.get(domain).render({ type, msg }, { domain, type, ...ctx });
 }

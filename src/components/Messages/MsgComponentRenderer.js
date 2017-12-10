@@ -7,10 +7,10 @@ export default class MsgRenderer {
     this.typeComponents = { ...this.typeComponents, ...typeComponents };
   }
 
-  render({ type, msg }, props = {}) {
+  render({ type, msg }, ctx = {}) {
     if (this.typeComponents.hasOwnProperty(type)) {
       const MsgComp = this.typeComponents[type];
-      return <MsgComp msg={msg} {...props} />;
+      return <MsgComp msg={msg} {...ctx} />;
     }
   }
 }
