@@ -12,7 +12,7 @@ export default class JSONMsgCodec {
       try {
         return { type, content: JSON.stringify(msg) };
       } catch (err) {
-        console.error(err);
+        console.warn(err);
       }
     }
   }
@@ -22,7 +22,7 @@ export default class JSONMsgCodec {
       try {
         return { type, msg: JSON.parse(content) };
       } catch (err) {
-        console.error(err);
+        console.warn(err);
       }
     }
   }

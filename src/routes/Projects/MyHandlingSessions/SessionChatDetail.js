@@ -57,7 +57,7 @@ export default class View extends Component {
               className={styles.splitPane}
               primary="second"
               split="horizontal"
-              defaultSize={150}
+              defaultSize={120}
               minSize={100}
               maxSize={300}
               paneClassName={styles.main}

@@ -3,15 +3,15 @@ export default class CombinedMsgRenderer {
     this.msgRenderers = msgRenderers;
   }
 
-  render(msg) {
+  render(...args) {
     for (const msgRenderer of this.msgRenderers) {
       try {
-        const res = msgRenderer.render(msg);
+        const res = msgRenderer.render(...args);
         if (res) {
           return res;
         }
       } catch (err) {
-        console.error(err);
+        console.warn(err);
       }
     }
   }

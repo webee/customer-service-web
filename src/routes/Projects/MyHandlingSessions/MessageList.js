@@ -63,17 +63,21 @@ export default class extends React.Component {
     }
     return (
       <CellMeasurer cache={this.cache} columnIndex={0} key={key} parent={parent} rowIndex={index}>
-        <div style={style}>
-          <MessageItem
-            position={position}
-            userName={userName}
-            ts={ts}
-            domain={domain}
-            type={type}
-            msg={msg}
-            status={status}
-          />
-        </div>
+        {({ measure }) => (
+          <div style={style}>
+            <MessageItem
+              measure={measure}
+              width={width}
+              position={position}
+              userName={userName}
+              ts={ts}
+              domain={domain}
+              type={type}
+              msg={msg}
+              status={status}
+            />
+          </div>
+        )}
       </CellMeasurer>
     );
   };
