@@ -7,7 +7,7 @@
   .info {
     flex: 0 0 auto;
     width: 24px;
-    background-color: SkyBlue;
+    // background-color: SkyBlue;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -23,27 +23,16 @@
       font-size: 13pt;
     }
 
-    .body {
-      font-size: 14pt;
-      line-height: 1.5em;
-      border-radius: 3px;
-      max-width: 100%;
-      overflow: auto;
-      &.raw {
-        position: relative;
-        .raw_state {
-          position: absolute;
-          left: 0;
-          top: 0;
-          height: 100%;
-          width: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background-color: rgba(0, 0, 0, 0.7);
-          color: white;
-          font-size: 12pt;
-        }
+    .decorate {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      .body {
+        font-size: 14pt;
+        line-height: 1.5em;
+        border-radius: 3px;
+        max-width: 100%;
+        overflow: auto;
       }
     }
   }
@@ -58,8 +47,10 @@
     .content {
       align-items: flex-start;
       margin-right: 120px;
-      .body {
-        background-color: #E4E7EB;
+      .decorate {
+        .body {
+          background-color: #E4E7EB;
+        }
       }
     }
   }
@@ -73,7 +64,10 @@
       align-items: center;
       margin-left: 60px;
       margin-right: 60px;
-      .body {
+      .decorate {
+        justify-content: center;
+        .body {
+        }
       }
     }
   }
@@ -85,8 +79,29 @@
     .content {
       align-items: flex-end;
       margin-left: 120px;
-      .body {
-        background-color: #CAE5FE;
+      .decorate {
+        flex-direction: row-reverse;
+        .body {
+          background-color: #CAE5FE;
+          display: flex;
+          align-items: center;
+          &.raw {
+            position: relative;
+            .raw_state {
+              position: absolute;
+              left: 0;
+              top: 0;
+              height: 100%;
+              width: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              background-color: rgba(0, 0, 0, 0.7);
+              color: white;
+              font-size: 12pt;
+            }
+          }
+        }
       }
     }
   }

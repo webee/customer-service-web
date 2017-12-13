@@ -11,12 +11,14 @@ const statusIconTypes = {
   ready: "check-circle-o",
   sending: "loading",
   syncing: "sync",
-  failed: "exclamation-circle"
+  failed: { type: "exclamation-circle", style: { color: "red" } }
 };
 
 export default class extends React.PureComponent {
   renderStatus(status) {
-    return <Icon type={statusIconTypes[status]} />;
+    let t = statusIconTypes[status];
+    t = typeof t === "string" ? { type: t, style: {} } : t;
+    return <Icon {...t} />;
   }
 
   renderRawState(state) {
@@ -31,13 +33,31 @@ export default class extends React.PureComponent {
     );
   }
 
+  onFailedClicked = message => {
+    const { handleFailedMsg } = this.props;
+    handleFailedMsg(message);
+  };
+
+  renderFailed(message, is_failed) {
+    if (is_failed) {
+      return (
+        <Icon
+          type="close-circle"
+          style={{ fontSize: 24, color: "red", margin: 8 }}
+          onClick={() => this.onFailedClicked(message)}
+        />
+      );
+    }
+  }
+
   render() {
     const { position, userName, message, ctx } = this.props;
-    const { domain, type, msg, state, status, ts, msgType } = message;
+    const { domain, type, msg_id, msg, state, status, ts, msgType, is_failed } = message;
+    const position_right = position === "right";
     const itemClassNames = cs(styles.item, {
       [styles.left]: position === "left",
       [styles.mid]: position === "mid",
-      [styles.right]: position === "right"
+      [styles.right]: position_right
     });
     const isRaw = msgType === "raw";
     const bodyClassNames = cs(styles.body, {
@@ -48,9 +68,12 @@ export default class extends React.PureComponent {
         <div className={styles.info}>{this.renderStatus(status)}</div>
         <div className={styles.content}>
           <div className={styles.head}>{userName}</div>
-          <div className={bodyClassNames}>
-            {msgRendererService.renderMsg({ domain, type, msg }, ctx)}
-            {isRaw && this.renderRawState(state)}
+          <div className={styles.decorate}>
+            <div className={bodyClassNames}>
+              {msgRendererService.renderMsg({ domain, type, msg }, ctx)}
+              {isRaw && this.renderRawState(state)}
+            </div>
+            {position_right && this.renderFailed(message, is_failed)}
           </div>
         </div>
       </div>

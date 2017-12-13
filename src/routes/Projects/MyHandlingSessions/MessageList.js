@@ -43,6 +43,15 @@ export default class extends React.PureComponent {
     this.list = undefined;
   }
 
+  handleFailedMsg = msg => {
+    const { session } = this.props;
+    dispatchDomainTypeEffect(this.context, this.props, "_/resendFailedMsg", {
+      projectID: session.project_id,
+      sessionID: session.id,
+      msg
+    });
+  };
+
   rowRenderer = ({ index, key, parent, style }) => {
     const { width } = parent.props;
     const { staffs, customers, projMsgs, projTxMsgIDs, txMsgs } = this.props;
@@ -79,6 +88,7 @@ export default class extends React.PureComponent {
               position={position}
               userName={userName}
               message={message}
+              handleFailedMsg={this.handleFailedMsg}
             />
           </div>
         )}
@@ -113,7 +123,7 @@ export default class extends React.PureComponent {
         isInRead = !(clientHeight + scrollTop >= scrollHeight);
       } else {
         // 由非阅读状态进入阅读状态
-        isInRead = clientHeight + scrollTop + 20 < scrollHeight;
+        isInRead = clientHeight + scrollTop + 10 < scrollHeight;
       }
       if (prevIsInRead !== isInRead) {
         // console.log("scroll: ", clientHeight, scrollHeight, scrollTop);
