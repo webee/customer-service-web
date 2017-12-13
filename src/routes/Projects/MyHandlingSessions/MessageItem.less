@@ -29,6 +29,22 @@
       border-radius: 3px;
       max-width: 100%;
       overflow: auto;
+      &.raw {
+        position: relative;
+        .raw_state {
+          position: absolute;
+          left: 0;
+          top: 0;
+          height: 100%;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background-color: rgba(0, 0, 0, 0.7);
+          color: white;
+          font-size: 12pt;
+        }
+      }
     }
   }
 

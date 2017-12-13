@@ -78,11 +78,7 @@ export default class extends React.PureComponent {
               ctx={{ measure, width, index }}
               position={position}
               userName={userName}
-              ts={ts}
-              domain={domain}
-              type={type}
-              msg={msg}
-              status={status}
+              message={message}
             />
           </div>
         )}

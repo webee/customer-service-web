@@ -118,6 +118,8 @@ class Main extends React.Component {
     dispatch({ type: "app/loadUISettings" });
     // fetch app info
     dispatch({ type: "app/fetchAppInfo" });
+    // fetch xfiles token
+    dispatch({ type: "app/fetchXFilesInfo" });
     // open xchat
     dispatch({ type: "app/openXChat" });
   }

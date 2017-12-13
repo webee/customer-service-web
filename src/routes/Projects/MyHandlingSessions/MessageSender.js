@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import cs from "classnames";
 import { Button, Icon, Input } from "antd";
+import Upload from "~/components/Upload";
 import { dispatchDomainTypeEffect } from "../../../services/project";
 import styles from "./MessageSender.less";
 
@@ -37,6 +38,19 @@ export default class extends React.Component {
     }
   };
 
+  sendMsgs(msgs) {
+    const { session, onSend } = this.props;
+    // domain, type, msg, msgType
+    for (let msg of msgs) {
+      dispatchDomainTypeEffect(this.context, this.props, "_/sendMsg", {
+        projectID: session.project_id,
+        sessionID: session.id,
+        ...msg
+      });
+    }
+    onSend();
+  }
+
   send = () => {
     const { session, onSend } = this.props;
     const { text } = this.state;
@@ -45,16 +59,14 @@ export default class extends React.Component {
       return;
     }
 
-    // send msg
-    dispatchDomainTypeEffect(this.context, this.props, "_/sendMsg", {
-      projectID: session.project_id,
-      sessionID: session.id,
-      domain: "",
-      type: "text",
-      msg: { text },
-      msgType: "ripe"
-    });
-    onSend();
+    this.sendMsgs([
+      {
+        msgType: "ripe",
+        domain: "",
+        type: "text",
+        msg: { text }
+      }
+    ]);
     this.setState({ text: "" });
   };
 
@@ -63,8 +75,12 @@ export default class extends React.Component {
       <div className={styles.main}>
         <div className={styles.toolbar}>
           <div className={styles.left}>
-            <Icon type="picture" />
-            <Icon type="folder" />
+            <Upload multiple accept="image/*" onChange={this.onUploadImages}>
+              <Icon type="picture" />
+            </Upload>
+            <Upload multiple onChange={this.onUploadFiles}>
+              <Icon type="folder" />
+            </Upload>
           </div>
           <div className={styles.right}>
             <Button type="primary" onClick={this.send}>
@@ -78,4 +94,32 @@ export default class extends React.Component {
       </div>
     );
   }
+
+  onUploadImages = ({ target: { files } }) => {
+    const msgs = [];
+    for (let f of files) {
+      msgs.push({
+        msgType: "raw",
+        domain: "",
+        type: "image",
+        msg: { name: f.name, size: f.size, url: URL.createObjectURL(f) },
+        state: { file: f }
+      });
+    }
+    this.sendMsgs(msgs);
+  };
+
+  onUploadFiles = ({ target: { files } }) => {
+    const msgs = [];
+    for (let f of files) {
+      msgs.push({
+        msgType: "raw",
+        domain: "",
+        type: "file",
+        msg: { name: f.name, size: f.size, url: URL.createObjectURL(f) },
+        state: { file: f }
+      });
+    }
+    this.sendMsgs(msgs);
+  };
 }

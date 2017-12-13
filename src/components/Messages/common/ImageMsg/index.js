@@ -57,7 +57,7 @@ export default class extends React.PureComponent {
     const { name, url } = msg;
     // const { width } = ctx;
     const maxWidth = width - 150;
-    const sizeSpecs = { minWidth: 32, maxWidth, minHeight: 32, maxHeight: 300 };
+    const sizeSpecs = { minWidth: 64, maxWidth, minHeight: 64, maxHeight: 300 };
     const [xw, xh] = resize(w, h, sizeSpecs);
     return (
       <div className={styles.main} style={sizeSpecs}>

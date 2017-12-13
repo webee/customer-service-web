@@ -28,3 +28,8 @@ export async function getXChatInfo() {
   const resp = await request.get("/xchat");
   return resp.data;
 }
+
+export async function getXFilesInfo() {
+  const resp = await request.get("/xfiles");
+  return resp.data;
+}

@@ -44,7 +44,7 @@ export default ({ msg }) => {
         <div className={styles.detail}>
           <div className={styles.info}>{prettySize}</div>
           <div className={styles.action}>
-            <a href={url} download disabled={!url}>
+            <a href={url} download={name} disabled={!url}>
               下载
             </a>
           </div>

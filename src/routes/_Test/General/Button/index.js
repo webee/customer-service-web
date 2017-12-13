@@ -1,13 +1,27 @@
-import { Card, Button } from 'antd';
+import React from "react";
+import { Card, Button } from "antd";
+import Upload from "~/components/Upload";
 
+export default class extends React.Component {
+  onUploadChange = e => {
+    console.log("files: ", e.target.files);
+  };
 
-export default () => {
-  return (
-    <Card title="按钮展示">
-      <Button type="primary">Primary</Button>
-      <Button>Default</Button>
-      <Button type="dashed">Dashed</Button>
-      <Button type="danger">Danger</Button>
-    </Card>
-  );
-};
+  render() {
+    return (
+      <div>
+        <Card title="按钮展示">
+          <Button type="primary">Primary</Button>
+          <Button>Default</Button>
+          <Button type="dashed">Dashed</Button>
+          <Button type="danger">Danger</Button>
+        </Card>
+        <Card title="下载">
+          <Upload multiple onChange={this.onUploadChange}>
+            <button>Upload</button>
+          </Upload>
+        </Card>
+      </div>
+    );
+  }
+}

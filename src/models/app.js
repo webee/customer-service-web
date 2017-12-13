@@ -1,8 +1,9 @@
 import { notification } from "antd";
-import { toPromiseEffects } from './utils';
+import { toPromiseEffects } from "./utils";
 import { XChatClient, wampDebug, XCHAT_STATUS } from "xchat-client";
 import { listToDict } from "./utils";
 import * as appService from "../services/app";
+import * as xfilesService from "../services/xfiles";
 import * as projectNotify from "../services/projectNotify";
 import { createProjectDomainTypeAction } from "../services/project";
 
@@ -26,9 +27,9 @@ export default {
     staffs: {},
     // 所有customer by uid
     customers: {},
-    // xchat info
-    xchatInfo: null,
-    xchatStatusInfo: null
+    xchatInfo: {},
+    xfilesInfo: {},
+    xchatStatusInfo: {}
   },
   reducers: {
     saveUISettings(state, { payload }) {
@@ -51,11 +52,14 @@ export default {
       return { ...state, staffs: { ...state.staffs, ...staffs } };
     },
     updateCustomers(state, { payload: customerList }) {
-      const customers = listToDict(customerList, u => u.uid)
+      const customers = listToDict(customerList, u => u.uid);
       return { ...state, customers: { ...state.customers, ...customers } };
     },
     saveXChatInfo(state, { payload: xchatInfo }) {
       return { ...state, xchatInfo };
+    },
+    saveXFilesInfo(state, { payload: xfilesInfo }) {
+      return { ...state, xfilesInfo };
     },
     updateXChatStatusInfo(state, { payload: xchatStatusInfo }) {
       return { ...state, xchatStatusInfo };
@@ -84,6 +88,11 @@ export default {
       yield all(projectDomainTypeActions);
 
       yield put({ type: "saveAppInfo", payload: staffAppInfo });
+    },
+    *fetchXFilesInfo(action, { call, put }) {
+      const xfilesInfo = yield call(appService.getXFilesInfo);
+      yield put({ type: "saveXFilesInfo", payload: xfilesInfo });
+      xfilesService.setupToken(xfilesInfo.token);
     },
     *openXChat(action, { call, put }) {
       const xchatInfo = yield call(appService.getXChatInfo);
