@@ -26,7 +26,7 @@ const DEFAULT_ICON_TYPE = { type: "file" };
 
 export default ({ msg }) => {
   const { name = "", url, size } = msg;
-  const prettySize = unitUtil.prettyByteSize(size);
+  const prettySize = typeof size === "number" ? unitUtil.prettyByteSize(size) : "未知大小";
   const [namePart, extPart, ext] = pathUtil.splitFileNameAndExt(name);
   const { type, color } = extToIcon[ext] || DEFAULT_ICON_TYPE;
 
@@ -44,7 +44,7 @@ export default ({ msg }) => {
         <div className={styles.detail}>
           <div className={styles.info}>{prettySize}</div>
           <div className={styles.action}>
-            <a href={url} download>
+            <a href={url} download disabled={!url}>
               下载
             </a>
           </div>

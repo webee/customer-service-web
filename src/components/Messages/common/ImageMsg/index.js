@@ -61,7 +61,7 @@ export default class extends React.PureComponent {
     const [xw, xh] = resize(w, h, sizeSpecs);
     return (
       <div className={styles.main} style={sizeSpecs}>
-        <img onLoad={this.onLoad} src={url} alt={name} style={{ width: xw, height: xh }} />
+        <img onLoad={this.onLoad} src={url} alt={name||url} style={{ width: xw, height: xh }} />
       </div>
     );
   }
