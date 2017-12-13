@@ -2,6 +2,7 @@ import { collectTypeReducers, createNSSubEffectFunc } from "../utils";
 import * as projectService from "../../services/project";
 import * as msgCodecService from "../../services/msgCodec";
 
+const DEFAULT_SESSION_STATE = { isInRead: false };
 const ns = "myHandling";
 // reducers
 export const reducer = collectTypeReducers(
@@ -20,9 +21,8 @@ export const reducer = collectTypeReducers(
     openedSessions: [],
     // 当前正在处理的打开的接待中的会话
     currentOpenedSession: null,
-    currentOpenedSessionState: {
-      isInRead: false
-    }
+    // by session id: {isInRead}
+    openedSessionsState: {}
   },
   {
     addToListSessions(state, { payload: id }) {
@@ -62,11 +62,14 @@ export const reducer = collectTypeReducers(
       if (openedSessions.indexOf(id) < 0) {
         openedSessions.push(id);
       }
-      return { ...state, openedSessions, currentOpenedSession, currentOpenedSessionState: { isInRead: false } };
+      const curSessionState = state.openedSessionsState[id] || DEFAULT_SESSION_STATE;
+      const openedSessionsState = { ...state.openedSessionsState, [id]: curSessionState };
+      return { ...state, openedSessions, currentOpenedSession, openedSessionsState };
     },
-    updateCurrentOpenedSessionState(state, { payload: sessionState }) {
-      const currentOpenedSessionState = { ...state.currentOpenedSessionState, ...sessionState };
-      return { ...state, currentOpenedSessionState };
+    updateOpenedSessionState(state, { payload: { id, sessionState } }) {
+      const curSessionState = state.openedSessionsState[id] || DEFAULT_SESSION_STATE;
+      const openedSessionsState = { ...state.openedSessionsState, [id]: { ...curSessionState, ...sessionState } };
+      return { ...state, openedSessionsState };
     },
     activateOpenedSession(state, { payload: id }) {
       if (state.openedSessions.indexOf(id) < 0) {
@@ -75,17 +78,19 @@ export const reducer = collectTypeReducers(
       if (state.currentOpenedSession === id) {
         return state;
       }
-      return { ...state, currentOpenedSession: id, currentOpenedSessionState: { isInRead: false } };
+      return { ...state, currentOpenedSession: id };
     },
     closeOpenedSession(state, { payload: id }) {
       if (state.openedSessions.indexOf(id) < 0) {
         return state;
       }
       const openedSessions = state.openedSessions.filter(i => i != id);
+      const openedSessionsState = { ...state.openedSessionsState };
+      delete openedSessionsState[id];
       let currentOpenedSession = state.currentOpenedSession;
       if (currentOpenedSession === id) {
         currentOpenedSession = openedSessions[0];
-        return { ...state, openedSessions, currentOpenedSession, currentOpenedSessionState: { isInRead: false } };
+        return { ...state, openedSessions, currentOpenedSession, openedSessionsState };
       }
       return { ...state, openedSessions };
     }

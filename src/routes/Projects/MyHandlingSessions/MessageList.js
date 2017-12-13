@@ -10,7 +10,7 @@ import EmptyContent from "./EmptyContent";
 import MessageItem from "./MessageItem";
 import styles from "./MessageList.less";
 
-export default class extends React.Component {
+export default class extends React.PureComponent {
   static contextTypes = {
     projectDomain: PropTypes.string,
     projectType: PropTypes.string
@@ -19,19 +19,25 @@ export default class extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isInRead: false,
-      scrollTop: 0,
-      scrollDirection: 0
+      isInRead: false
     };
+    this.mesuredRowIndex = 0;
+    this.scrollTop = 0;
+    this.scrollDirection = 0;
     this.width = 0;
     this.cache = new CellMeasurerCache({
       defaultHeight: 50,
-      fixedWidth: true
-      // keyMapper: (rowIndex, columnIndex) => {
-      //   const { projMsgs: { msgs } } = this.props;
-      //   const msg = msgs[rowIndex];
-      //   return msg.msg_id;
-      // }
+      fixedWidth: true,
+      keyMapper: (rowIndex, columnIndex) => {
+        const { projMsgs, projTxMsgIDs, txMsgs, isCurrentOpened } = this.props;
+        const messages = projMsgs.msgs;
+        const tx_messages = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
+        let message = messages[rowIndex];
+        if (rowIndex >= messages.length) {
+          message = tx_messages[rowIndex - messages.length];
+        }
+        return message.msg_id;
+      }
     });
     // list ref
     this.list = undefined;
@@ -69,7 +75,7 @@ export default class extends React.Component {
         {({ measure }) => (
           <div style={style}>
             <MessageItem
-              ctx={{measure, width, index}}
+              ctx={{ measure, width, index }}
               position={position}
               userName={userName}
               ts={ts}
@@ -94,8 +100,34 @@ export default class extends React.Component {
   };
 
   onScroll = ({ clientHeight, scrollHeight, scrollTop }) => {
-    const { scrollTop: prevScrollTop } = this.state;
-    this.setState({ scrollTop, scrollDirection: scrollTop - prevScrollTop });
+    const { session, isCurrentOpened } = this.props;
+    if (!isCurrentOpened) {
+      return;
+    }
+
+    const { scrollTop: prevScrollTop, isInRead: prevIsInRead } = this.state;
+    const scrollDirection = scrollTop - prevScrollTop;
+    this.scrollTop = scrollTop;
+    this.scrollDirection = scrollDirection;
+
+    if (clientHeight > 0) {
+      let isInRead = prevIsInRead;
+      if (prevIsInRead) {
+        // 由阅读状态进入非阅读状态
+        isInRead = !(clientHeight + scrollTop >= scrollHeight);
+      } else {
+        // 由非阅读状态进入阅读状态
+        isInRead = clientHeight + scrollTop + 20 < scrollHeight;
+      }
+      if (prevIsInRead !== isInRead) {
+        // console.log("scroll: ", clientHeight, scrollHeight, scrollTop);
+        this.setState({ isInRead });
+        dispatchDomainType(this.context, this.props, "myHandling/updateOpenedSessionState", {
+          id: session.id,
+          sessionState: { isInRead }
+        });
+      }
+    }
   };
 
   onRowsRendered = ({ overscanStartIndex, overscanStopIndex, startIndex, stopIndex }) => {
@@ -103,30 +135,31 @@ export default class extends React.Component {
     if (!isCurrentOpened) {
       return;
     }
+    // console.log("render: ", startIndex, stopIndex);
 
-    const { scrollDirection, isInRead: prevIsInRead } = this.state;
     const messages = this.props.projMsgs.msgs || [];
-    // isInRead以rx区的消息为准
-    let isInRead = stopIndex && messages.length - 1 - stopIndex >= 1;
-    if (!prevIsInRead) {
-      isInRead = scrollDirection <= 0 && isInRead;
-    }
-    if (prevIsInRead !== isInRead) {
-      this.setState({ isInRead });
-      dispatchDomainType(this.context, this.props, "myHandling/updateCurrentOpenedSessionState", { isInRead });
-    }
+    // const { isInRead: prevIsInRead } = this.state;
+    // const scrollDirection = this.scrollDirection;
+    // // isInRead以rx区的消息为准
+    // let isInRead = prevIsInRead;
+    // if (!prevIsInRead) {
+    //   isInRead = scrollDirection <= 0 && stopIndex && messages.length - 1 - stopIndex >= 1;
+    // } else {
+    //   // 有发送消息
+    //   isInRead = scrollDirection > 0 && stopIndex && messages.length - 1 - stopIndex < 0;
+    // }
+    // if (prevIsInRead !== isInRead) {
+    //   console.log("render: ", startIndex, stopIndex);
+    //   this.setState({ isInRead });
+    // dispatchDomainType(this.context, this.props, "myHandling/updateOpenedSessionState", {
+    //   id: session.id,
+    //   sessionState: { isInRead }
+    // });
+    // }
 
-    if (stopIndex < messages.length) {
-      const message = messages[stopIndex];
-      // 同步已读消息id
-      if (message.msg_id > session.sync_msg_id) {
-        dispatchDomainType(this.context, this.props, "_/updateSessionSyncMsgID", {
-          id: session.id,
-          sync_msg_id: message.msg_id
-        });
-        projectWorkers.syncSessionMsgID(this.context, this.props, session.project_id, session.id, message.msg_id);
-      }
-    }
+    // 同步已读消息id
+    const message = messages[stopIndex < messages.length ? stopIndex : messages.length - 1];
+    this._syncMsgID(message.msg_id);
   };
 
   onDownClicked = () => {
@@ -135,10 +168,11 @@ export default class extends React.Component {
 
   render() {
     const { session, projMsgs, projTxMsgIDs, txMsgs, isCurrentOpened } = this.props;
-    const { isInRead } = this.state;
+    const { rowCount: prevRowCount, isInRead } = this.state;
     const messages = projMsgs.msgs || [];
     const tx_messages = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
-    const lastRowIndex = messages.length + tx_messages.length - 1;
+    const rowCount = messages.length + tx_messages.length;
+    const lastRowIndex = rowCount - 1;
     // 解决向上滑动的bug
     const scrollToIndex = isInRead ? undefined : lastRowIndex;
     return (
@@ -154,7 +188,7 @@ export default class extends React.Component {
                 deferredMeasurementCache={this.cache}
                 width={width}
                 height={height}
-                rowCount={messages.length + tx_messages.length}
+                rowCount={rowCount}
                 scrollToIndex={scrollToIndex}
                 scrollToAlignment="end"
                 onScroll={this.onScroll}
@@ -185,6 +219,28 @@ export default class extends React.Component {
     );
   }
 
+  _calcRowIndex(props) {
+    const { projMsgs, projTxMsgIDs } = props;
+    const messages = projMsgs.msgs || [];
+    return messages.length + projTxMsgIDs.length - 1;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.isCurrentOpened) {
+      const mesuredRowIndex = this.mesuredRowIndex;
+      const rowIndex = this._calcRowIndex(this.props);
+      if (rowIndex > mesuredRowIndex) {
+        for (let i = mesuredRowIndex; i <= rowIndex; i++) {
+          if (this.cache.rowHeight({ index: i }) === 0) {
+            this.cache.clear(i, 0);
+          }
+        }
+        this.mesuredRowIndex = rowIndex;
+        this.forceUpdate();
+      }
+    }
+  }
+
   componentDidMount() {
     const { onSendObservable } = this.props;
     this.onSend = onSendObservable.subscribe(() => {
@@ -201,5 +257,16 @@ export default class extends React.Component {
     const txMsgIDs = this.props.projTxMsgIDs;
     const lastRowIndex = messages.length + txMsgIDs.length - 1;
     this.list.scrollToRow(lastRowIndex);
+  }
+
+  _syncMsgID(msg_id) {
+    const { session } = this.props;
+    if (msg_id > session.sync_msg_id) {
+      dispatchDomainType(this.context, this.props, "_/updateSessionSyncMsgID", {
+        id: session.id,
+        sync_msg_id: msg_id
+      });
+      projectWorkers.syncSessionMsgID(this.context, this.props, session.project_id, session.id, msg_id);
+    }
   }
 }

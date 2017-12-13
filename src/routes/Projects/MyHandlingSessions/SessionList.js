@@ -131,7 +131,8 @@ export default class View extends Component {
 
   render() {
     const { myHandlingData } = this.props;
-    const { currentOpenedSessionState } = myHandlingData;
+    const { currentOpenedSession, openedSessionsState } = myHandlingData;
+    const currentOpenedSessionState = openedSessionsState[currentOpenedSession];
     const sessionList = this.getSessionList();
     return (
       <div className={styles.main}>
