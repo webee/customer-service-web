@@ -22,7 +22,9 @@ export default class extends React.PureComponent {
       isInRead: false
     };
     this.mesuredRowIndex = 0;
+    this.clientHeight = 0;
     this.scrollTop = 0;
+    this.scrollHeight = 0;
     this.scrollDirection = 0;
     this.width = 0;
     this.cache = new CellMeasurerCache({
@@ -107,14 +109,17 @@ export default class extends React.PureComponent {
 
   onScroll = ({ clientHeight, scrollHeight, scrollTop }) => {
     const { session, isCurrentOpened } = this.props;
-    if (!isCurrentOpened) {
-      return;
-    }
 
     const { scrollTop: prevScrollTop, isInRead: prevIsInRead } = this.state;
     const scrollDirection = scrollTop - prevScrollTop;
+    this.clientHeight = clientHeight;
     this.scrollTop = scrollTop;
+    this.scrollHeight = scrollHeight;
     this.scrollDirection = scrollDirection;
+
+    if (!isCurrentOpened) {
+      return;
+    }
 
     if (clientHeight > 0) {
       let isInRead = prevIsInRead;
@@ -222,6 +227,12 @@ export default class extends React.PureComponent {
     if (this.props.isCurrentOpened && !nextProps.isCurrentOpened) {
       // 不是当前打开标签，则默认进入阅读模式
       this._updateIsInReadState(true);
+    } else if (!this.props.isCurrentOpened && nextProps.isCurrentOpened) {
+      if (this.state.isInRead) {
+        if (this.clientHeight + this.scrollTop >= this.scrollHeight) {
+          this._updateIsInReadState(false);
+        }
+      }
     }
   }
 
