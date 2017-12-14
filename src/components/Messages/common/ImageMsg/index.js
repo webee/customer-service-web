@@ -56,12 +56,12 @@ export default class extends React.PureComponent {
     const { msg, width } = this.props;
     const { name, url } = msg;
     // const { width } = ctx;
-    const maxWidth = width - 150;
-    const sizeSpecs = { minWidth: 64, maxWidth, minHeight: 64, maxHeight: 300 };
+    const maxWidth = width - 200;
+    const sizeSpecs = { minWidth: 64, maxWidth, minHeight: 64, maxHeight: 240 };
     const [xw, xh] = resize(w, h, sizeSpecs);
     return (
       <div className={styles.main} style={sizeSpecs}>
-        <img onLoad={this.onLoad} src={url} alt={name||url} style={{ width: xw, height: xh }} />
+        <img onLoad={this.onLoad} src={url} alt={name || url} style={{ width: xw, height: xh }} />
       </div>
     );
   }

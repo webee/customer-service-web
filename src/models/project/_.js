@@ -269,7 +269,7 @@ export const effectFunc = createNSSubEffectFunc(ns, {
   ) {
     const singletonContext = newSingletonContext([projectDomain, projectType, "handleTxMsgs", msgType, status]);
     if (singletonContext.start()) {
-      const { select, call, put } = effects;
+      const { select, fork, call, put } = effects;
       do {
         try {
           while (true) {
@@ -295,15 +295,11 @@ export const effectFunc = createNSSubEffectFunc(ns, {
               yield put(createAction(`_/appendProjectMsgs`, { id: projectID, msgs: [{ ...txMsg, is_failed: true }] }));
               yield put(createAction(`_/markTxMsgAsFailed`, { projectID, tx_id }));
             } else if (txMsg.msgType === "ripe") {
-              yield* handleRipeMsg(
-                { projectMsgs, projectID, sessionID, txMsg, createAction, createEffectAction },
-                effects
-              );
+              yield put(createAction(`_/updateTxMsg`, { tx_id, status: "sending" }));
+              yield call(handleRipeMsg, { projectMsgs, txMsg, createAction, createEffectAction }, effects);
             } else if (txMsg.msgType === "raw") {
-              yield* handleRawMsg(
-                { projectMsgs, projectID, sessionID, txMsg, createAction, createEffectAction },
-                effects
-              );
+              yield put(createAction(`_/updateTxMsg`, { tx_id, status: "cooking" }));
+              yield fork(handleRawMsg, { txMsg, createAction, createEffectAction }, effects);
             }
           }
         } catch (err) {
@@ -315,11 +311,10 @@ export const effectFunc = createNSSubEffectFunc(ns, {
   }
 });
 
-function* handleRipeMsg({ projectMsgs, projectID, sessionID, txMsg, createAction }, { call, put }) {
+function* handleRipeMsg({ projectMsgs, txMsg, createAction }, { call, put }) {
+  const { domain, type, msg, tx_id, project_id: projectID, session_id: sessionID } = txMsg;
   const projMsgs = projectMsgs[projectID];
-  const { domain, type, msg, tx_id } = txMsg;
   try {
-    yield put(createAction(`_/updateTxMsg`, { tx_id, status: "sending" }));
     const { rx_key, ts } = yield call(
       projectService.sendSessionMsg,
       projectID,
@@ -339,14 +334,17 @@ function* handleRipeMsg({ projectMsgs, projectID, sessionID, txMsg, createAction
   }
 }
 
-function* handleRawMsg({ projectMsgs, projectID, txMsg, createAction, createEffectAction }, { call, put }) {
+function* handleRawMsg({ txMsg, createAction, createEffectAction }, { call, put }) {
+  console.log("raw: ", txMsg);
+  const { tx_id, state } = txMsg;
   try {
     const cookedTxMsg = yield call(msgCookService.cookTxMsg, txMsg, { createAction });
+    const { msgType } = cookedTxMsg;
+    cookedTxMsg.status = msgTypeInitialStatus[msgType];
     yield put(createAction(`_/updateTxMsg`, cookedTxMsg));
     yield put(createEffectAction(`_/handleTxMsgs`, cookedTxMsg));
   } catch (err) {
     console.error(err);
-    const { tx_id, state } = txMsg;
     yield put(createAction(`_/updateTxMsg`, { tx_id, status: "failed", state: { ...state, p: undefined } }));
   }
 }

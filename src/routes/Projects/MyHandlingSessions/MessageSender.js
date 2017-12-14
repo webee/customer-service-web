@@ -4,6 +4,7 @@ import cs from "classnames";
 import { Button, Icon, Input } from "antd";
 import Upload from "~/components/Upload";
 import { dispatchDomainTypeEffect } from "../../../services/project";
+import { getImageFileDimension } from "../../../utils/file";
 import styles from "./MessageSender.less";
 
 const { TextArea } = Input;
@@ -95,17 +96,24 @@ export default class extends React.Component {
     );
   }
 
-  onUploadImages = ({ target: { files } }) => {
-    const msgs = [];
-    for (let f of files) {
-      msgs.push({
+  onUploadImages = async ({ target: { files } }) => {
+    async function createImageMsgFromFile(file) {
+      const { width: w, height: h } = await getImageFileDimension(file);
+      return {
         msgType: "raw",
         domain: "",
         type: "image",
-        msg: { name: f.name, size: f.size, url: URL.createObjectURL(f) },
-        state: { file: f }
-      });
+        msg: { name: file.name, size: file.size, url: URL.createObjectURL(file), w, h },
+        state: { file }
+      };
     }
+
+    const promises = [];
+    for (let f of files) {
+      promises.push(createImageMsgFromFile(f));
+    }
+
+    const msgs = await Promise.all(promises);
     this.sendMsgs(msgs);
   };
 

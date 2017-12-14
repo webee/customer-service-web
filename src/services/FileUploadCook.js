@@ -25,8 +25,7 @@ export default class FileUploadCook {
       const { fid } = await xfilesService.upload(state.file, this.onUploadTxProgress(txMsg, ctx));
       const msg = { ...txMsg.msg, url: `${xfilesService.baseURL}${fid}` };
       const msgType = "ripe";
-      const status = "ready";
-      return { ...txMsg, msg, msgType, status };
+      return { ...txMsg, msg, msgType };
     }
   }
 }
