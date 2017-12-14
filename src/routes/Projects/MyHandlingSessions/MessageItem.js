@@ -33,25 +33,21 @@ export default class extends React.PureComponent {
     );
   }
 
-  onFailedClicked = message => {
-    const { handleFailedMsg } = this.props;
-    handleFailedMsg(message);
-  };
-
   renderFailed(message, is_failed) {
+    const { handleFailedMsg } = this.props;
     if (is_failed) {
       return (
         <Icon
           type="close-circle"
           style={{ fontSize: 24, color: "red", margin: 8 }}
-          onClick={() => this.onFailedClicked(message)}
+          onClick={handleFailedMsg}
         />
       );
     }
   }
 
   render() {
-    const { position, userName, message, ctx } = this.props;
+    const { position, userName, message, ctx, onClickMsg } = this.props;
     const { domain, type, msg_id, msg, state, status, ts, msgType, is_failed } = message;
     const position_right = position === "right";
     const itemClassNames = cs(styles.item, {
@@ -69,9 +65,9 @@ export default class extends React.PureComponent {
         <div className={styles.content}>
           <div className={styles.head}>{userName}</div>
           <div className={styles.decorate}>
-            <div className={bodyClassNames}>
+            <div className={bodyClassNames} onClick={onClickMsg}>
               {msgRendererService.renderMsg({ domain, type, msg }, ctx)}
-              {isRaw && !is_failed && this.renderRawState(state)}
+              {isRaw && status !== "failed" && this.renderRawState(state)}
             </div>
             {position_right && this.renderFailed(message, is_failed)}
           </div>

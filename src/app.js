@@ -3,6 +3,7 @@ import createHistory from "history/createBrowserHistory";
 import "moment/locale/zh-cn";
 import createLoading from "dva-loading";
 import { message } from "antd";
+import Modal from "react-modal";
 // lib csses
 import "react-virtualized/styles.css";
 import envConfig from "./config";
@@ -14,6 +15,7 @@ import modelReducer from "./models/reducer";
 
 // debug
 console.debug("env config: ", envConfig);
+Modal.setAppElement("#modal-root");
 
 const ERROR_MSG_DURATION = 3; // 3 seconds
 // 1. Initialize

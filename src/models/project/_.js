@@ -346,5 +346,7 @@ function* handleRawMsg({ txMsg, createAction, createEffectAction }, { call, put 
   } catch (err) {
     console.error(err);
     yield put(createAction(`_/updateTxMsg`, { tx_id, status: "failed", state: { ...state, p: undefined } }));
+    const { msgType, status } = txMsg;
+    yield put(createEffectAction(`_/handleTxMsgs`, {msgType, status}));
   }
 }

@@ -5,6 +5,7 @@ import * as projectWorkers from "~/services/projectWorkers";
 import { Icon, Button, Badge } from "antd";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
+import Lightbox from "react-image-lightbox";
 import CellMeasurer, { CellMeasurerCache } from "react-virtualized/dist/commonjs/CellMeasurer";
 import EmptyContent from "./EmptyContent";
 import MessageItem from "./MessageItem";
@@ -19,7 +20,10 @@ export default class extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      isInRead: false
+      isInRead: false,
+      lightboxIsOpen: false,
+      lightboxImageIndex: 0,
+      images: this._calcImages(props.projMsgs.msgs || [])
     };
     this.mesuredRowIndex = 0;
     this.clientHeight = 0;
@@ -45,13 +49,27 @@ export default class extends React.PureComponent {
     this.list = undefined;
   }
 
-  handleFailedMsg = msg => {
+  handleFailedMsg = msg => () => {
     const { session } = this.props;
     dispatchDomainTypeEffect(this.context, this.props, "_/resendFailedMsg", {
       projectID: session.project_id,
       sessionID: session.id,
       msg
     });
+  };
+
+  onClickMsg = msg => () => {
+    const { msg_id } = msg;
+    let lightboxImageIndex = 0;
+    for (let i = 0; i < this.state.images.length; i++) {
+      const img = this.state.images[i];
+      if (img.msg_id === msg_id) {
+        lightboxImageIndex = i;
+        break;
+      }
+    }
+
+    this.setState({ lightboxIsOpen: true, lightboxImageIndex });
   };
 
   rowRenderer = ({ index, key, parent, style }) => {
@@ -90,7 +108,8 @@ export default class extends React.PureComponent {
               position={position}
               userName={userName}
               message={message}
-              handleFailedMsg={this.handleFailedMsg}
+              handleFailedMsg={this.handleFailedMsg(message)}
+              onClickMsg={this.onClickMsg(message)}
             />
           </div>
         )}
@@ -179,6 +198,7 @@ export default class extends React.PureComponent {
     const lastRowIndex = rowCount - 1;
     // 解决向上滑动的bug
     const scrollToIndex = isInRead ? undefined : lastRowIndex;
+    const { lightboxIsOpen, lightboxImageIndex, images } = this.state;
     return (
       <AutoSizer onResize={this.onResize}>
         {({ width, height }) => {
@@ -186,6 +206,26 @@ export default class extends React.PureComponent {
           // console.log({width, height});
           return (
             <div className={styles.main} style={{ width, height }}>
+              {lightboxIsOpen && (
+                <Lightbox
+                  mainSrc={images[lightboxImageIndex].url}
+                  nextSrc={images[(lightboxImageIndex + 1) % images.length].url}
+                  prevSrc={images[(lightboxImageIndex + images.length - 1) % images.length].url}
+                  imageTitle={`${lightboxImageIndex + 1}/${images.length}`}
+                  imageCaption={images[lightboxImageIndex].name}
+                  onCloseRequest={() => this.setState({ lightboxIsOpen: false })}
+                  onMovePrevRequest={() =>
+                    this.setState({
+                      lightboxImageIndex: (lightboxImageIndex + images.length - 1) % images.length
+                    })
+                  }
+                  onMoveNextRequest={() =>
+                    this.setState({
+                      lightboxImageIndex: (lightboxImageIndex + 1) % images.length
+                    })
+                  }
+                />
+              )}
               <List
                 ref={i => (this.list = i)}
                 className={styles.list}
@@ -234,6 +274,20 @@ export default class extends React.PureComponent {
         }
       }
     }
+    const nextMsgs = nextProps.projMsgs.msgs || [];
+    const nextMsgCount = nextMsgs.length;
+    const msgCount = (this.props.projMsgs.msgs || []).length;
+    if (nextMsgCount !== msgCount) {
+      this.setState({ images: this._calcImages(nextMsgs) });
+    }
+  }
+
+  _calcImages(msgs) {
+    return msgs.filter(m => m.type === "image").map(m => ({
+      msg_id: m.msg_id,
+      url: m.msg.url,
+      name: m.msg.name
+    }));
   }
 
   _updateIsInReadState(isInRead) {
