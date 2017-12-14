@@ -200,16 +200,16 @@ export default class extends React.PureComponent {
   renderLightbox() {
     const { lightboxImageIndex, images } = this.state;
     const image = images[lightboxImageIndex];
-    const { msg, name, url } = image;
-    const userName = this.getUserName(msg);
+    const { msg, name } = image;
     const ts = moment.unix(msg.ts).format();
-    const imageCaption = `${userName}@${ts}: ${name} | ${url}`;
+    const imageCaption = `${ts}: ${name}`;
+    const imageTitle = `${lightboxImageIndex + 1}/${images.length}`;
     return (
       <Lightbox
         mainSrc={image.url}
         nextSrc={images[(lightboxImageIndex + 1) % images.length].url}
         prevSrc={images[(lightboxImageIndex + images.length - 1) % images.length].url}
-        imageTitle={`${lightboxImageIndex + 1}/${images.length}`}
+        imageTitle={imageTitle}
         imageCaption={imageCaption}
         onCloseRequest={() => this.setState({ lightboxIsOpen: false })}
         onMovePrevRequest={() =>
