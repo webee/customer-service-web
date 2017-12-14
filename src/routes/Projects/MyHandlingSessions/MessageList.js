@@ -125,14 +125,7 @@ export default class extends React.PureComponent {
         // 由非阅读状态进入阅读状态
         isInRead = clientHeight + scrollTop + 10 < scrollHeight;
       }
-      if (prevIsInRead !== isInRead) {
-        // console.log("scroll: ", clientHeight, scrollHeight, scrollTop);
-        this.setState({ isInRead });
-        dispatchDomainType(this.context, this.props, "myHandling/updateOpenedSessionState", {
-          id: session.id,
-          sessionState: { isInRead }
-        });
-      }
+      this._updateIsInReadState(isInRead);
     }
   };
 
@@ -225,6 +218,25 @@ export default class extends React.PureComponent {
     );
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.isCurrentOpened && !nextProps.isCurrentOpened) {
+      // 不是当前打开标签，则默认进入阅读模式
+      this._updateIsInReadState(true);
+    }
+  }
+
+  _updateIsInReadState(isInRead) {
+    if (this.state.isInRead !== isInRead) {
+      const { session } = this.props;
+      // console.log("scroll: ", clientHeight, scrollHeight, scrollTop);
+      this.setState({ isInRead });
+      dispatchDomainType(this.context, this.props, "myHandling/updateOpenedSessionState", {
+        id: session.id,
+        sessionState: { isInRead }
+      });
+    }
+  }
+
   _calcRowIndex(props) {
     const { projMsgs, projTxMsgIDs } = props;
     const messages = projMsgs.msgs || [];
@@ -250,7 +262,7 @@ export default class extends React.PureComponent {
   componentDidMount() {
     const { onSendObservable } = this.props;
     this.onSend = onSendObservable.subscribe(() => {
-      this._scrollToBottom();
+      this._updateIsInReadState(false);
     });
   }
 
