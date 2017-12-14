@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
 import * as projectWorkers from "~/services/projectWorkers";
 import { Icon, Button, Badge } from "antd";
+import moment from "moment";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
 import Lightbox from "react-image-lightbox";
@@ -72,16 +73,9 @@ export default class extends React.PureComponent {
     this.setState({ lightboxIsOpen: true, lightboxImageIndex });
   };
 
-  rowRenderer = ({ index, key, parent, style }) => {
-    const { width } = parent.props;
-    const { staffs, customers, projMsgs, projTxMsgIDs, txMsgs } = this.props;
-    const messages = projMsgs.msgs;
-    const tx_messages = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
-    let message = messages[index];
-    if (index >= messages.length) {
-      message = tx_messages[index - messages.length];
-    }
-    const { domain, type, msg, user_type, user_id, ts, status } = message;
+  getUserName(message) {
+    const { staffs, customers } = this.props;
+    const { user_type, user_id } = message;
     let userName = user_id;
     switch (user_type) {
       case "staff":
@@ -93,6 +87,20 @@ export default class extends React.PureComponent {
         userName = customer ? customer.name : userName;
         break;
     }
+    return userName;
+  }
+
+  rowRenderer = ({ index, key, parent, style }) => {
+    const { width } = parent.props;
+    const { staffs, customers, projMsgs, projTxMsgIDs, txMsgs } = this.props;
+    const messages = projMsgs.msgs;
+    const tx_messages = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
+    let message = messages[index];
+    if (index >= messages.length) {
+      message = tx_messages[index - messages.length];
+    }
+    const { user_type } = message;
+    let userName = this.getUserName(message);
     let position = "mid";
     if (user_type === "customer") {
       position = "left";
@@ -189,6 +197,35 @@ export default class extends React.PureComponent {
     this._scrollToBottom();
   };
 
+  renderLightbox() {
+    const { lightboxImageIndex, images } = this.state;
+    const image = images[lightboxImageIndex];
+    const { msg, name, url } = image;
+    const userName = this.getUserName(msg);
+    const ts = moment.unix(msg.ts).format();
+    const imageCaption = `${userName}@${ts}: ${name} | ${url}`;
+    return (
+      <Lightbox
+        mainSrc={image.url}
+        nextSrc={images[(lightboxImageIndex + 1) % images.length].url}
+        prevSrc={images[(lightboxImageIndex + images.length - 1) % images.length].url}
+        imageTitle={`${lightboxImageIndex + 1}/${images.length}`}
+        imageCaption={imageCaption}
+        onCloseRequest={() => this.setState({ lightboxIsOpen: false })}
+        onMovePrevRequest={() =>
+          this.setState({
+            lightboxImageIndex: (lightboxImageIndex + images.length - 1) % images.length
+          })
+        }
+        onMoveNextRequest={() =>
+          this.setState({
+            lightboxImageIndex: (lightboxImageIndex + 1) % images.length
+          })
+        }
+      />
+    );
+  }
+
   render() {
     const { session, projMsgs, projTxMsgIDs, txMsgs, isCurrentOpened } = this.props;
     const { rowCount: prevRowCount, isInRead } = this.state;
@@ -198,7 +235,6 @@ export default class extends React.PureComponent {
     const lastRowIndex = rowCount - 1;
     // 解决向上滑动的bug
     const scrollToIndex = isInRead ? undefined : lastRowIndex;
-    const { lightboxIsOpen, lightboxImageIndex, images } = this.state;
     return (
       <AutoSizer onResize={this.onResize}>
         {({ width, height }) => {
@@ -206,26 +242,7 @@ export default class extends React.PureComponent {
           // console.log({width, height});
           return (
             <div className={styles.main} style={{ width, height }}>
-              {lightboxIsOpen && (
-                <Lightbox
-                  mainSrc={images[lightboxImageIndex].url}
-                  nextSrc={images[(lightboxImageIndex + 1) % images.length].url}
-                  prevSrc={images[(lightboxImageIndex + images.length - 1) % images.length].url}
-                  imageTitle={`${lightboxImageIndex + 1}/${images.length}`}
-                  imageCaption={images[lightboxImageIndex].name}
-                  onCloseRequest={() => this.setState({ lightboxIsOpen: false })}
-                  onMovePrevRequest={() =>
-                    this.setState({
-                      lightboxImageIndex: (lightboxImageIndex + images.length - 1) % images.length
-                    })
-                  }
-                  onMoveNextRequest={() =>
-                    this.setState({
-                      lightboxImageIndex: (lightboxImageIndex + 1) % images.length
-                    })
-                  }
-                />
-              )}
+              {this.state.lightboxIsOpen && this.renderLightbox()}
               <List
                 ref={i => (this.list = i)}
                 className={styles.list}
@@ -286,7 +303,8 @@ export default class extends React.PureComponent {
     return msgs.filter(m => m.type === "image").map(m => ({
       msg_id: m.msg_id,
       url: m.msg.url,
-      name: m.msg.name
+      name: m.msg.name,
+      msg: m
     }));
   }
 
