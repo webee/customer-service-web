@@ -7,6 +7,7 @@ export const axiosConfig = {
   timeout: 9000
 };
 
+export const xfilesBaseURL = "https://xfiles.qinqinxiaobao.com/";
 export const xfilesAxiosConfig = {
   baseURL: "https://xfiles.qinqinxiaobao.com/api/"
 };

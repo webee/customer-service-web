@@ -71,7 +71,7 @@ export default class extends React.PureComponent {
           <div className={styles.decorate}>
             <div className={bodyClassNames}>
               {msgRendererService.renderMsg({ domain, type, msg }, ctx)}
-              {isRaw && this.renderRawState(state)}
+              {isRaw && !is_failed && this.renderRawState(state)}
             </div>
             {position_right && this.renderFailed(message, is_failed)}
           </div>

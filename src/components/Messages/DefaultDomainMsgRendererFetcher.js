@@ -18,7 +18,7 @@ export default class DefaultDomainMsgRendererFetcher {
     if (Array.isArray(domain)) {
       domains = domain;
     } else {
-      domain.push(domain);
+      domains.push(domain);
     }
 
     domains.forEach(d => {

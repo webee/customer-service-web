@@ -1,10 +1,15 @@
 import { collectTypeReducers, createNSSubEffectFunc, listToDict } from "../utils";
 import * as projectService from "../../services/project";
 import * as msgCodecService from "../../services/msgCodec";
+import * as msgCookService from "../../services/msgCook";
 import { newSingletonContext } from "../../utils/notify";
 import { asYieldFunc } from "../../utils/commons";
 
 const ns = "_";
+const msgTypeInitialStatus = {
+  raw: "pending",
+  ripe: "ready"
+};
 
 // reducers
 export const reducer = collectTypeReducers(
@@ -70,9 +75,9 @@ export const reducer = collectTypeReducers(
 
         if (!rid || msg.msg_id > rid) {
           rid = msg.msg_id;
-          newMsgs.push(msg);
+          newMsgs.push({ ...msg, is_rx: true });
         } else if (msg.is_failed) {
-          newMsgs.push(msg);
+          newMsgs.push({ ...msg, is_rx: true });
         }
       });
       projectMsgs[id] = { lid, rid, msgs: newMsgs };
@@ -86,7 +91,7 @@ export const reducer = collectTypeReducers(
       msgs.forEach(msg => {
         if (!lid || msg.msg_id < lid) {
           lid = msg.msg_id;
-          newMsgs.unshift(msg);
+          newMsgs.unshift({ ...msg, is_rx: true });
         }
 
         if (!rid) {
@@ -110,7 +115,7 @@ export const reducer = collectTypeReducers(
       const tx_id = state.tx_id + 1;
       const msg_id = -tx_id;
       const is_tx = true;
-      const status = msgType === "ripe" ? "ready" : "pending";
+      const status = msgTypeInitialStatus[msgType];
       const ts = Math.round(new Date().getTime() / 1000);
       txMsg = { ...txMsg, tx_id, msg_id, project_id, session_id, is_tx, status, msgType, ts };
 
@@ -136,6 +141,14 @@ export const reducer = collectTypeReducers(
     updateTxMsg(state, { payload: { tx_id, ...attrs } }) {
       const txMsgs = { ...state.txMsgs };
       txMsgs[tx_id] = { ...txMsgs[tx_id], ...attrs };
+
+      return { ...state, txMsgs };
+    },
+    updateTxMsgCookingProgress(state, { payload: { tx_id, p } }) {
+      const txMsgs = { ...state.txMsgs };
+      const txMsg = { ...txMsgs[tx_id] };
+      txMsg.state = { ...(txMsg.state || {}), p };
+      txMsgs[tx_id] = txMsg;
 
       return { ...state, txMsgs };
     },
@@ -224,7 +237,7 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     yield put(
       createAction(`_/addTxMsg`, { project_id, session_id, user_type, user_id, domain, type, msg, msgType, state })
     );
-    yield put(createEffectAction(`_/handleTxMsgs`));
+    yield put(createEffectAction(`_/handleTxMsgs`, { msgType, status: msgTypeInitialStatus[msgType] }));
   },
   *resendFailedMsg(
     { createAction, createEffectAction, payload: { projectID: project_id, sessionID: session_id, msg } },
@@ -232,39 +245,65 @@ export const effectFunc = createNSSubEffectFunc(ns, {
   ) {
     if (msg.is_failed) {
       yield put(
-        createAction(`_/addTxMsg`, { project_id, session_id, ...msg, is_failed: undefined, rx_key: undefined })
+        createAction(`_/addTxMsg`, {
+          project_id,
+          session_id,
+          ...msg,
+          is_failed: undefined,
+          rx_key: undefined,
+          state: {
+            ...(msg.state || {}),
+            // p是规定好的表示cooking进度的状态量
+            p: undefined
+          }
+        })
       );
       yield put(createAction(`_/removeProjectMsg`, { id: project_id, msg_id: msg.msg_id }));
-      yield put(createEffectAction(`_/handleTxMsgs`));
+      const { msgType } = msg;
+      yield put(createEffectAction(`_/handleTxMsgs`, { msgType, status: msgTypeInitialStatus[msgType] }));
     }
   },
-  *handleTxMsgs({ projectDomain, projectType, createAction }, effects) {
-    const { select, call, put } = effects;
-    const singletonContext = newSingletonContext([projectDomain, projectType, "handleTxMsgs"]);
+  *handleTxMsgs(
+    { projectDomain, projectType, createAction, createEffectAction, payload: { msgType, status } },
+    effects
+  ) {
+    const singletonContext = newSingletonContext([projectDomain, projectType, "handleTxMsgs", msgType, status]);
     if (singletonContext.start()) {
+      const { select, call, put } = effects;
       do {
         try {
           while (true) {
             const { txMsgs, txMsgIDs, projectMsgs } = yield select(
               state => state.project[projectDomain][projectType]._
             );
-            if (txMsgIDs.length <= 0) {
+            const filteredTxMsgIDs = txMsgIDs.filter(tx_id => {
+              const txMsg = txMsgs[tx_id];
+              return (txMsg && txMsg.msgType === msgType && txMsg.status === status) || txMsg.status === "failed";
+            });
+            if (filteredTxMsgIDs.length <= 0) {
               break;
             }
-            const tx_id = txMsgIDs[0];
+            const tx_id = filteredTxMsgIDs[0];
             const txMsg = txMsgs[tx_id];
             if (!txMsg) {
               yield put(createAction(`_/markTxMsgAsHandled`, tx_id));
               continue;
             }
 
-            const { project_id: projectID, session_id: sessionID, msgType, is_failed } = txMsg;
-            if (is_failed) {
-              yield put(createAction(`_/appendProjectMsgs`, { id: projectID, msgs: [txMsg] }));
+            const { project_id: projectID, session_id: sessionID } = txMsg;
+            if (txMsg.status === "failed") {
+              yield put(createAction(`_/appendProjectMsgs`, { id: projectID, msgs: [{ ...txMsg, is_failed: true }] }));
               yield put(createAction(`_/markTxMsgAsFailed`, { projectID, tx_id }));
-            } else if (msgType === "ripe") {
-              yield* handleRipeMsg({ projectMsgs, projectID, sessionID, txMsg, createAction }, effects);
-            } else if (msgType === "raw") {
+            } else if (txMsg.msgType === "ripe") {
+              yield* handleRipeMsg(
+                { projectMsgs, projectID, sessionID, txMsg, createAction, createEffectAction },
+                effects
+              );
+            } else if (txMsg.msgType === "raw") {
+              yield* handleRawMsg(
+                { projectMsgs, projectID, sessionID, txMsg, createAction, createEffectAction },
+                effects
+              );
             }
           }
         } catch (err) {
@@ -295,6 +334,19 @@ function* handleRipeMsg({ projectMsgs, projectID, sessionID, txMsg, createAction
     yield put(createAction(`_/updateTxMsg`, { tx_id, rx_key, ts, status: "syncing" }));
     yield put(createAction(`_/checkProjectTxMsgsRxKey`, { projectID, tx_id, rid: projMsgs.rid }));
   } catch (err) {
-    yield put(createAction(`_/updateTxMsg`, { tx_id, status: "failed", is_failed: true }));
+    console.error(err);
+    yield put(createAction(`_/updateTxMsg`, { tx_id, status: "failed" }));
+  }
+}
+
+function* handleRawMsg({ projectMsgs, projectID, txMsg, createAction, createEffectAction }, { call, put }) {
+  try {
+    const cookedTxMsg = yield call(msgCookService.cookTxMsg, txMsg, { createAction });
+    yield put(createAction(`_/updateTxMsg`, cookedTxMsg));
+    yield put(createEffectAction(`_/handleTxMsgs`, cookedTxMsg));
+  } catch (err) {
+    console.error(err);
+    const { tx_id, state } = txMsg;
+    yield put(createAction(`_/updateTxMsg`, { tx_id, status: "failed", state: { ...state, p: undefined } }));
   }
 }
