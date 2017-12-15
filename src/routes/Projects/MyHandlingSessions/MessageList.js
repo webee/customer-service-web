@@ -60,17 +60,18 @@ export default class extends React.PureComponent {
   };
 
   onClickMsg = msg => () => {
-    const { msg_id } = msg;
-    let lightboxImageIndex = 0;
-    for (let i = 0; i < this.state.images.length; i++) {
-      const img = this.state.images[i];
-      if (img.msg_id === msg_id) {
-        lightboxImageIndex = i;
-        break;
+    const { type, msg_id } = msg;
+    if (type === "image") {
+      let lightboxImageIndex = 0;
+      for (let i = 0; i < this.state.images.length; i++) {
+        const img = this.state.images[i];
+        if (img.msg_id === msg_id) {
+          lightboxImageIndex = i;
+          break;
+        }
       }
+      this.setState({ lightboxIsOpen: true, lightboxImageIndex });
     }
-
-    this.setState({ lightboxIsOpen: true, lightboxImageIndex });
   };
 
   getUserName(message) {
