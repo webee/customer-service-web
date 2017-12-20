@@ -37,6 +37,7 @@ const asProjectDomainType = (projectDomain, projectType) => {
 };
 
 function getProjectDomainNavData(projectDomains) {
+  // NOTE: 这里也可以消除domain这一级，铺平pathname
   return projectDomains.map(d => {
     return {
       icon: "message",
@@ -44,6 +45,7 @@ function getProjectDomainNavData(projectDomains) {
       pathname: `projects/${d.name}`,
       open: true,
       noLink: true,
+      defPath: d.types[0].name,
       items: d.types.map(t => {
         return {
           title: t.title,
@@ -59,22 +61,28 @@ function getProjectDomainNavData(projectDomains) {
   });
 }
 
-function getNavData(projectDomains) {
-  return [
-    {
-      icon: "home",
-      title: "首页",
-      pathname: "",
-      component: require("../routes/Home")
-    },
-    ...getProjectDomainNavData(projectDomains),
-    {
-      icon: "setting",
-      title: "设置",
-      pathname: "setting",
-      component: require("../routes/Setting")
-    }
-  ];
+function getNavData(title, projectDomains) {
+  return {
+    icon: "rocket",
+    title: title,
+    defPath: "",
+    noMatch: undefined,
+    items: [
+      {
+        icon: "home",
+        title: "首页",
+        pathname: "",
+        component: require("../routes/Home")
+      },
+      ...getProjectDomainNavData(projectDomains),
+      {
+        icon: "setting",
+        title: "设置",
+        pathname: "setting",
+        component: require("../routes/Setting")
+      }
+    ]
+  };
 }
 
 class Main extends React.Component {
@@ -222,13 +230,12 @@ class Main extends React.Component {
       return <Loader />;
     }
 
-    const navData = getNavData(projectDomains);
+    const navData = getNavData(app.title, projectDomains);
 
     return (
       <MainLayout
-        name={app.title}
-        headerMenu={this.getHeaderMenu()}
         navData={navData}
+        headerMenu={this.getHeaderMenu()}
         disableBreadcrumb={ui_settings.disable_breadcrumb}
         disableFooter={ui_settings.disable_footer}
         onLogoClick={this.onLogoClick}
@@ -244,7 +251,7 @@ function mapStateToProps(state) {
     ui_settings: appData.ui_settings,
     staff: appData.staff,
     app: appData.app,
-    projectDomains: appData.projectDomains,
+    projectDomains: appData.projectDomains
   };
 }
 

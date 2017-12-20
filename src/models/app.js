@@ -35,10 +35,9 @@ export default {
     saveUISettings(state, { payload }) {
       return { ...state, ui_settings: { ...state.ui_settings, ...payload } };
     },
-    saveAppInfo(state, { payload: { app, staff, project_domain_tree } }) {
+    saveAppInfo(state, { payload: { app, staff, project_domains: projectDomains } }) {
       const domains = {};
-      const projectDomains = project_domain_tree;
-      project_domain_tree.forEach(pd => {
+      projectDomains.forEach(pd => {
         const types = {};
         pd.types.forEach(pt => {
           types[pt.name] = pt;
@@ -79,10 +78,10 @@ export default {
       const staffAppInfo = yield call(appService.fetchStaffAppInfo);
       // init project state
       const projectDomainTypeActions = [];
-      staffAppInfo.project_domain_tree.forEach(d => {
-        d.types.forEach(t => {
+      staffAppInfo.project_domains.forEach(domain => {
+        domain.types.forEach(type => {
           // NOTE: initialize project domain/type states.
-          projectDomainTypeActions.push(put(createProjectDomainTypeAction(d.name, t.name, "@@INIT")));
+          projectDomainTypeActions.push(put(createProjectDomainTypeAction(domain.name, type.name, "@@INIT")));
         });
       });
       yield all(projectDomainTypeActions);

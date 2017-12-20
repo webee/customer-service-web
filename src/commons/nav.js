@@ -1,7 +1,7 @@
 
-export function getURLDataMapFromNavData(root_path, navData) {
+export function getURLDataMapFromNavData(root_path, navItems) {
   let urlNameMap = {};
-  navData.forEach(item => {
+  navItems.forEach(item => {
     const path = item.pathname ? `${root_path}/${item.pathname}` : root_path;
     urlNameMap[path] = { ...item, items: undefined, instance: undefined }
     if (item.instance) {
@@ -14,9 +14,9 @@ export function getURLDataMapFromNavData(root_path, navData) {
   return urlNameMap;
 }
 
-export function getMenuDataFromNavData(root_path, navData) {
+export function getMenuDataFromNavData(root_path, navItems) {
   const menuData = [];
-  navData.forEach(item => {
+  navItems.forEach(item => {
     const {icon, title, pathname, open, items} = item;
     const path = pathname ? `${root_path}/${pathname}`: (root_path || '/');
 

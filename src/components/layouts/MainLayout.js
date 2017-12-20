@@ -4,11 +4,7 @@ import classNames from "classnames";
 import DocumentTitle from "react-document-title";
 import { withRouter, Route, Link, Switch, Redirect } from "dva/router";
 import { getRootPath, Routes } from "../../commons/router";
-import {
-  getURLDataMapFromNavData,
-  getMenuDataFromNavData
-} from "../../commons/nav";
-import NotFound from "../NotFound";
+import { getURLDataMapFromNavData, getMenuDataFromNavData } from "../../commons/nav";
 import { Layout, Menu, Icon, Avatar, Dropdown, BackTop } from "antd";
 import Breadcrumb from "./Breadcrumb";
 import SiderMenu from "./SiderMenu";
@@ -31,20 +27,20 @@ export default class MainLayout extends React.Component {
   };
 
   render() {
-    const { match, location, name, headerMenu, navData, onLogoClick } = this.props;
+    const { match, location, headerMenu, navData, onLogoClick } = this.props;
+    const { title: name } = navData;
     const { bottom } = this.props;
     // 以navData为基础生成1. 导航菜单，2. 面包屑 3. routes
     console.debug("navData: ", navData);
     const root_path = getRootPath(match.path);
     const path = location.pathname.replace(/\/*$/, "") || "/";
-    const urlDataMap = getURLDataMapFromNavData(root_path, navData);
-    const menuData = getMenuDataFromNavData(root_path, navData);
+    const urlDataMap = getURLDataMapFromNavData(root_path, navData.items);
+    const menuData = getMenuDataFromNavData(root_path, navData.items);
     console.debug("urlDatamap: ", urlDataMap);
     console.debug("path: ", path);
     const urlData = urlDataMap[path === "/" ? "" : path] || {};
 
-    const disableBreadcrumb =
-      this.props.disableBreadcrumb || urlData.noBreadcrumb;
+    const disableBreadcrumb = this.props.disableBreadcrumb || urlData.noBreadcrumb;
     const disableFooter = this.props.disableFooter || urlData.noFooter;
     const disableHeader = this.props.disableHeader || urlData.noHeader;
     const fixed = urlData.fixed;
@@ -58,9 +54,7 @@ export default class MainLayout extends React.Component {
     });
     const contentStyle = {};
     if (fixed) {
-      contentStyle["height"] = disableFooter
-        ? "calc(100vh - 64px)"
-        : "calc(100vh - 64px - 48px)";
+      contentStyle["height"] = disableFooter ? "calc(100vh - 64px)" : "calc(100vh - 64px - 48px)";
     }
 
     const layout = (
@@ -91,36 +85,15 @@ export default class MainLayout extends React.Component {
             </Header>
           )}
           <Content className={contentClassName} style={contentStyle}>
-            {disableBreadcrumb ? (
-              ""
-            ) : (
-              <Breadcrumb
-                root_path={root_path}
-                path={path}
-                urlDataMap={urlDataMap}
-              />
-            )}
+            {disableBreadcrumb ? "" : <Breadcrumb root_path={root_path} path={path} urlDataMap={urlDataMap} />}
             <div className={contentMainClassName}>
-              <Routes path={root_path} navData={navData} NoMatch={NotFound} />
+              <Routes path={root_path} navItems={navData.items} defPath={navData.defPath} noMatch={navData.noMatch} />
             </div>
           </Content>
-          {disableFooter ? (
-            ""
-          ) : (
-            <Footer className={styles.footer}>
-              webee.yw(webee.yw@gmail.com) @2017
-            </Footer>
-          )}
+          {disableFooter ? "" : <Footer className={styles.footer}>webee.yw(webee.yw@gmail.com) @2017</Footer>}
           {bottom}
         </Layout>
-        {fixed ? (
-          ""
-        ) : (
-          <BackTop
-            target={() => document.getElementsByClassName(styles.main)[0]}
-            visibilityHeight={500}
-          />
-        )}
+        {fixed ? "" : <BackTop target={() => document.getElementsByClassName(styles.main)[0]} visibilityHeight={500} />}
       </Layout>
     );
 

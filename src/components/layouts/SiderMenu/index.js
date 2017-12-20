@@ -22,17 +22,13 @@ function findOpenKeys(path, menuData) {
 }
 
 function findSelectedKey(path, menuData) {
-  let selectedKey = '';
+  let selectedKey = undefined;
   menuData.forEach(item => {
     if (path.startsWith(item.path)) {
-      if (item.path.length > selectedKey.length) {
+      if (path === item.path) {
         selectedKey = item.path;
-      }
-      if (item.items) {
-        const subSelectedKey = findSelectedKey(path, item.items);
-        if (subSelectedKey) {
-          selectedKey = subSelectedKey;
-        }
+      } else if (item.items) {
+        selectedKey = findSelectedKey(path, item.items);
       }
     }
   });
