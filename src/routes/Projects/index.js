@@ -33,6 +33,16 @@ export default class View extends Component {
     return { projectDomain, projectType };
   }
 
+  componentDidMount() {
+    const { projectDomain, projectType } = this.props;
+    console.log(`mount: ${projectDomain}/${projectType}`);
+  }
+
+  componentWillUnmount() {
+    const { projectDomain, projectType } = this.props;
+    console.log(`unmount: ${projectDomain}/${projectType}`);
+  }
+
   onTabChange = activeKey => {
     this.setState({ activeKey });
   };

@@ -1,4 +1,4 @@
-export default class MsgRenderer {
+export default class MsgComponentRenderer {
   constructor(typeComponents) {
     this.typeComponents = typeComponents;
   }

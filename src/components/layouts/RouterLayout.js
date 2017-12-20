@@ -10,22 +10,22 @@ import NotFound from '../NotFound';
 @withRouter
 export default class RouterLayout extends React.Component {
   render() {
-    const { match, location, name, navData } = this.props;
+    const { match, location, navData } = this.props;
     console.debug('navData: ', navData);
     const root_path = getRootPath(match.path);
     const path = location.pathname.replace(/\/*$/,'') || '/';
-    const urlDataMap = getURLDataMapFromNavData(root_path, navData);
+    const urlDataMap = getURLDataMapFromNavData(root_path, navData.items);
     console.debug('urlDataMap: ', urlDataMap);
     const urlData = urlDataMap[path === '/' ? '' : path] || {};
 
     // title
-    let title = name;
+    let title = navData.title;
     if (urlData) {
-      title = `${urlData.title} - ${name}`;
+      title = `${urlData.title} - ${navData.title}`;
     }
     return (
       <DocumentTitle title={title}>
-          <Routes path={root_path} navData={navData} NoMatch={NotFound} />
+          <Routes path={root_path} navItems={navData.items} NoMatch={NotFound} />
       </DocumentTitle>
     );
   }

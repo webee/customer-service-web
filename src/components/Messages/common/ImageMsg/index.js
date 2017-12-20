@@ -48,12 +48,19 @@ export default class extends React.PureComponent {
 
   componentDidUpdate() {
     // re measure
-    this.props.measure();
+    const { measure } = this.props;
+    if (measure) {
+      measure();
+    }
   }
 
   render() {
+    const { msg, width, as_description } = this.props;
+    if (as_description) {
+      return this.renderDescription();
+    }
+
     const { w, h } = this.state;
-    const { msg, width } = this.props;
     const { name, url } = msg;
     // const { width } = ctx;
     const maxWidth = width - 180;
@@ -64,5 +71,10 @@ export default class extends React.PureComponent {
         <img onLoad={this.onLoad} src={url} alt={name || url} style={{ width: xw, height: xh }} />
       </div>
     );
+  }
+
+  renderDescription() {
+    const { msg: { name } } = this.props;
+    return `[图片] ${name}`;
   }
 }

@@ -2,6 +2,7 @@ import React from "react";
 import { dispatchDomainTypeEffect } from "../../../services/project";
 import { Button, Icon, message } from "antd";
 import styles from "./SessionChatHeader.less";
+import { genCustomerMobileName } from "./utils";
 
 export default class extends React.PureComponent {
   onToolbarClick = t => {
@@ -25,7 +26,7 @@ export default class extends React.PureComponent {
       <div className={styles.main}>
         <div className={styles.info}>
           <h1>
-            {domain.title}/{type.title}: {owner.name}({owner.uid})
+            {domain.title}/{type.title}: {genCustomerMobileName(owner)}
           </h1>
         </div>
         <div className={styles.toobar}>

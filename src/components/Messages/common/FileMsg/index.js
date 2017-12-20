@@ -24,7 +24,11 @@ const extToIcon = {
 };
 const DEFAULT_ICON_TYPE = { type: "file" };
 
-export default ({ msg }) => {
+export default ({ msg, as_description }) => {
+  if (as_description) {
+    return `[文件] ${msg.name}`;
+  }
+
   const { name = "", url, size } = msg;
   const prettySize = typeof size === "number" ? unitUtil.prettyByteSize(size) : "未知大小";
   const [namePart, extPart, ext] = pathUtil.splitFileNameAndExt(name);

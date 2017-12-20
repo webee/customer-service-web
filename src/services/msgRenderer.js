@@ -20,3 +20,7 @@ export function registerDomainMsgRenderer(domain, ...msgRenderers) {
 export function renderMsg({ domain, type, msg }, ctx = {}) {
   return domainMsgRendererFetcher.get(domain).render({ type, msg }, { domain, type, ...ctx });
 }
+
+export function describeMsg({ domain, type, msg }, ctx = {}) {
+  return domainMsgRendererFetcher.get(domain).render({ type, msg }, { domain, type, ...ctx, as_description: true });
+}

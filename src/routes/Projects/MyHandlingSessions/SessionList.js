@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
 import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
+import * as msgRendererService from "~/services/msgRenderer";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import List from "react-virtualized/dist/commonjs/List";
 import SessionItem from "./SessionItem";
@@ -10,6 +11,7 @@ import EmptyContent from "./EmptyContent";
 import { Input, Checkbox, Button, Icon, Switch, Dropdown, Menu } from "antd";
 import Moment from "react-moment";
 import styles from "./SessionList.less";
+import { genCustomerMobileName } from "./utils";
 
 const Search = Input.Search;
 
@@ -161,13 +163,16 @@ export default class View extends Component {
   rowRenderer = ({ index, key, style, parent }) => {
     const { sessionList, currentOpenedSessionState } = parent.props;
     const session = sessionList[index];
+    const { msg } = session;
     const project = session.project;
+    const { owner } = project;
     // 当前打开并且不处在阅读状态则未读不显示
-    const unread = session.isCurrentOpened && !currentOpenedSessionState.isInRead ? 0 : session.msg_id - session.sync_msg_id;
+    const unread =
+      session.isCurrentOpened && !currentOpenedSessionState.isInRead ? 0 : session.msg_id - session.sync_msg_id;
     const item = {
       id: session.id,
-      name: project.owner.name,
-      description: `${session.msg.type}:${session.msg.content}`,
+      name: genCustomerMobileName(owner),
+      description: msgRendererService.describeMsg(msg),
       online: project.is_online,
       ts: session.msg.ts,
       unread: unread,

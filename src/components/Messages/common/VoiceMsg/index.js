@@ -14,7 +14,11 @@ export default class extends React.PureComponent {
   // }
 
   render() {
-    const { msg } = this.props;
+    const { msg, as_description } = this.props;
+    if (as_description) {
+      return `[语音] ${msg.duration}s`;
+    }
+
     const { url, duration } = msg;
 
     return (
