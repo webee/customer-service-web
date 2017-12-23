@@ -1,0 +1,21 @@
+.main {
+  .item {
+    display: flex;
+    word-break: break-all;
+    .label {
+      flex: 0 0 auto;
+      width: 33%;
+      text-align: right;
+      &::after {
+        content: ":";
+      }
+    }
+    .value {
+      margin-left: 8px;
+      text-align: left;
+    }
+  }
+  .item+.item {
+    margin-top: 0.75em;
+  }
+}
