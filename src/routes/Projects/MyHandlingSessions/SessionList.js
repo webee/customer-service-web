@@ -82,7 +82,7 @@ export default class View extends Component {
             onChange={this.getFilterSwitchOnChange("hasUnread")}
           />
           <Dropdown overlay={this.renderSortByMenu()}>
-            <Button size="small" style={{ marginLeft: 8 }}>
+            <Button size="small">
               排序 <Icon type="down" />
             </Button>
           </Dropdown>

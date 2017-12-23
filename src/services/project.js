@@ -69,6 +69,11 @@ export async function fetchProjectMsgs(projectID, { lid, rid, limit, desc }) {
   return resp.data;
 }
 
+export async function getProjectAccessFuncionURL(id, name) {
+  const resp = await request.get(`/projects/${id}/access_functions/${name}/url`);
+  return resp.data;
+}
+
 export async function sendSessionMsg(projectID, sessionID, { domain = "", type = "", content }) {
   const resp = await request.post(`/sessions/${projectID}/${sessionID}/send_msg`, {
     domain,

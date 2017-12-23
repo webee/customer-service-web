@@ -15,12 +15,13 @@ export default {
 
   state: {
     ui_settings: {},
-    staff: null,
+    staff: {},
     app: null,
     // project domain type tree
-    projectDomains: null,
+    projectDomains: [],
     // 所有domains by name
     domains: {},
+    access_functions: [],
 
     // 以下不影响main entry
     // 所有staff by uid
@@ -35,7 +36,7 @@ export default {
     saveUISettings(state, { payload }) {
       return { ...state, ui_settings: { ...state.ui_settings, ...payload } };
     },
-    saveAppInfo(state, { payload: { app, staff, project_domains: projectDomains } }) {
+    saveAppInfo(state, { payload: { app, staff, project_domains: projectDomains, access_functions=[] } }) {
       const domains = {};
       projectDomains.forEach(pd => {
         const types = {};
@@ -44,7 +45,7 @@ export default {
         });
         domains[pd.name] = { ...pd, types };
       });
-      return { ...state, app, staff, projectDomains, domains };
+      return { ...state, app, staff, projectDomains, domains, access_functions };
     },
     updateStaffs(state, { payload: staffList }) {
       const staffs = listToDict(staffList, u => u.uid);

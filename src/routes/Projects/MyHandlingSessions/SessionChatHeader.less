@@ -5,28 +5,25 @@
 
   .info {
     margin-left: 8px;
-    flex: 0 0 auto;
+    overflow: hidden;
+
     h1 {
       line-height: 1.5em;
-      font-size: 18px;
+      font-size: 12pt;
       margin: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   }
   .toobar {
-    margin-right: 8px;
     flex: 1 0 auto;
     display: flex;
     justify-content: flex-end;
-    font-size: 16pt;
 
-    >i {
-      margin-right: 12px;
-      font-size: 36px;
-      cursor: pointer;
-    }
-
-    >button {
-      font-size: 16pt;
+    button {
+      font-size: 14pt;
+      margin-right: 6px;
     }
   }
 }

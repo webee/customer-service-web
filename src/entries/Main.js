@@ -225,7 +225,7 @@ class Main extends React.Component {
     const { match, location } = this.props;
     const root_path = getRootPath(match.path);
     const { staff, app, projectDomains, ui_settings } = this.props;
-    const loaded = staff && app && projectDomains;
+    const loaded = !!app;
     if (!loaded) {
       return <Loader />;
     }
