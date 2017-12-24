@@ -5,7 +5,7 @@ export function createDomainTypeWrapperAction(projectDomain, projectType, type, 
   return { type, payload: { projectDomain, projectType, ...action, ...extras } };
 }
 
-export function createProjectDomainTypeAction(projectDomain, projectType, type="", payload=undefined) {
+export function createProjectDomainTypeAction(projectDomain, projectType, type = "", payload = undefined) {
   return {
     type: `/project/${projectDomain}/${projectType}/${type}`,
     payload
@@ -69,8 +69,10 @@ export async function fetchProjectMsgs(projectID, { lid, rid, limit, desc }) {
   return resp.data;
 }
 
-export async function getProjectAccessFuncionURL(id, name) {
-  const resp = await request.get(`/projects/${id}/access_functions/${name}/url`);
+export async function getProjectAccessFuncionURL(id, name, uid) {
+  const resp = await request.get(`/projects/${id}/access_functions/${name}/url`, {
+    params: { uid }
+  });
   return resp.data;
 }
 

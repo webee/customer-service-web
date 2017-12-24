@@ -5,6 +5,7 @@ import { delay } from "~/utils/commons";
 import { Menu, Dropdown, Button, Icon, message } from "antd";
 import styles from "./SessionChatHeader.less";
 import { genCustomerMobileName } from "./utils";
+import { accessFunction } from "./accessFunctions";
 
 const MAX_ACCESS_FUNCTIONS = 3;
 
@@ -31,9 +32,7 @@ export default class extends React.PureComponent {
       async () => {
         const { project } = this.props;
         try {
-          const { url } = await projectService.getProjectAccessFuncionURL(project.id, name);
-          const a = document.createElement("a");
-          window.open(url, "_blank");
+          accessFunction(project.id, name);
         } catch (err) {
           console.error(err);
           message.error(`访问功能失败`);

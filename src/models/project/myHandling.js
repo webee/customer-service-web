@@ -131,7 +131,10 @@ export const effectFunc = createNSSubEffectFunc(ns, {
 
 function* updateSessionList({ createAction, payload: sessionList }, { call, put }) {
   yield put(
-    createAction(`_/updateSessions`, sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined })))
+    createAction(
+      `_/updateSessions`,
+      sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined, handler: s.handler.uid }))
+    )
   );
   // TODO: 修改staffs和customers, 使用id引用
   const projectList = sessionList.map(s => s.project);
@@ -149,6 +152,10 @@ function* updateSessionList({ createAction, payload: sessionList }, { call, put 
 
   const staffs = [];
   const customers = [];
+  sessionList.forEach(s => {
+    // staffs
+    staffs.push(s.handler);
+  });
   projectList.forEach(p => {
     // staffs
     staffs.push(p.leader);

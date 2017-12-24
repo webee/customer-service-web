@@ -5,10 +5,11 @@ import ProjectInfo from "./ProjectInfo";
 
 export default class extends React.Component {
   render() {
+    const { session, project, staffs, customers } = this.props;
     return (
       <Tabs className={styles.main} defaultActiveKey="info" type="card">
         <Tabs.TabPane tab="信息" key="info">
-          <ProjectInfo />
+          <ProjectInfo session={session} project={project} staffs={staffs} customers={customers} />
         </Tabs.TabPane>
         <Tabs.TabPane tab="历史" key="history">
           这里是项目历史消息
