@@ -161,11 +161,12 @@ export default class View extends Component {
   }
 
   rowRenderer = ({ index, key, style, parent }) => {
+    const { appData } = this.props;
     const { sessionList, currentOpenedSessionState } = parent.props;
     const session = sessionList[index];
     const { msg } = session;
     const project = session.project;
-    const { owner } = project;
+    const owner =  appData.customers[project.owner];
     // 当前打开并且不处在阅读状态则未读不显示
     const unread =
       session.isCurrentOpened && !currentOpenedSessionState.isInRead ? 0 : session.msg_id - session.sync_msg_id;

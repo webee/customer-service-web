@@ -45,10 +45,10 @@ export default class extends React.PureComponent {
   };
 
   render() {
-    const { projectDomain, projectType, domains, access_functions, project } = this.props;
+    const { projectDomain, projectType, domains, access_functions, project, customers } = this.props;
     const domain = domains[projectDomain];
     const type = domain.types[projectType];
-    const { owner } = project;
+    const owner = customers[project.owner];
     return (
       <div className={styles.main}>
         <div className={styles.info}>

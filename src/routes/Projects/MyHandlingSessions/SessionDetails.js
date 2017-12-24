@@ -52,11 +52,11 @@ export default class View extends Component {
   }
 
   getSessionName(id) {
-    const { data } = this.props;
+    const { data, appData } = this.props;
     const { sessions, projects } = data;
     const session = sessions[id];
     const project = projects[session.project_id];
-    const { owner } = project;
+    const owner = appData.customers[project.owner];
     return owner.name;
   }
 

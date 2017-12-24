@@ -135,7 +135,17 @@ function* updateSessionList({ createAction, payload: sessionList }, { call, put 
   );
   // TODO: 修改staffs和customers, 使用id引用
   const projectList = sessionList.map(s => s.project);
-  yield put(createAction(`_/updateProjects`, projectList));
+  yield put(
+    createAction(
+      `_/updateProjects`,
+      projectList.map(p => ({
+        ...p,
+        owner: p.owner.uid,
+        leader: p.leader.uid,
+        customers: p.customers.map(c => c.uid)
+      }))
+    )
+  );
 
   const staffs = [];
   const customers = [];
