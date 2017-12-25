@@ -144,7 +144,6 @@ class Main extends React.Component {
 
   getHeaderMenu() {
     const { staff, location } = this.props;
-    console.log("location:", location);
     const menu = (
       <Menu className={MainLayoutStyles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
         <Menu.Item disabled>
@@ -224,13 +223,21 @@ class Main extends React.Component {
   render() {
     const { match, location } = this.props;
     const root_path = getRootPath(match.path);
-    const { staff, app, projectDomains, ui_settings } = this.props;
+    const { app, projectDomains, ui_settings } = this.props;
     const loaded = !!app;
     if (!loaded) {
       return <Loader />;
     }
 
-    const navData = getNavData(app.title, projectDomains);
+    // TODO: NOTE: 动态navData, 重新生成会造成重新渲染所有路由
+    let navData = this.navData;
+    if (projectDomains != this.projectDomains) {
+      navData = getNavData(app.title, projectDomains);
+      this.navData = navData;
+      this.projectDomains = projectDomains;
+    } else {
+      navData.title = app.title
+    }
 
     return (
       <MainLayout
@@ -247,9 +254,10 @@ class Main extends React.Component {
 
 function mapStateToProps(state) {
   const appData = state.app;
+  const { staff, staffs } = appData;
   return {
     ui_settings: appData.ui_settings,
-    staff: appData.staff,
+    staff: staffs[staff],
     app: appData.app,
     projectDomains: appData.projectDomains
   };

@@ -15,7 +15,7 @@ export default {
 
   state: {
     ui_settings: {},
-    staff: {},
+    staff: null,
     app: null,
     // project domain type tree
     projectDomains: [],
@@ -36,7 +36,7 @@ export default {
     saveUISettings(state, { payload }) {
       return { ...state, ui_settings: { ...state.ui_settings, ...payload } };
     },
-    saveAppInfo(state, { payload: { app, staff, project_domains: projectDomains, access_functions=[] } }) {
+    saveAppInfo(state, { payload: { app, staff, project_domains: projectDomains, access_functions = [] } }) {
       const domains = {};
       projectDomains.forEach(pd => {
         const types = {};
@@ -87,7 +87,9 @@ export default {
       });
       yield all(projectDomainTypeActions);
 
-      yield put({ type: "saveAppInfo", payload: staffAppInfo });
+      const { staff } = staffAppInfo;
+      yield put({ type: "updateStaffs", payload: [staff] });
+      yield put({ type: "saveAppInfo", payload: { ...staffAppInfo, staff: staff.uid } });
     },
     *fetchXFilesInfo(action, { call, put }) {
       const xfilesInfo = yield call(appService.getXFilesInfo);

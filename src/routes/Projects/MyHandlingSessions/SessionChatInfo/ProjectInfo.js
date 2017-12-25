@@ -38,11 +38,7 @@ export default class extends React.Component {
   getBizInfoLabelValues() {
     const { project } = this.props;
     const { meta_data, ext_data } = project;
-    const data = [
-      ...meta_data,
-      ...ext_data,
-      ["好长的名字名字名字名字", "value", "这个更长啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊"]
-    ];
+    const data = [...meta_data, ...ext_data];
     return data.map(d => ({ label: d[0], value: this.renderDataItem(d[1], d[2]) }));
   }
 
@@ -68,14 +64,11 @@ export default class extends React.Component {
         </CompactCard>
         {tags.length > 0 && (
           <CompactCard title="标签" bordered={false}>
-            {project.tags.map((tag, i) => (
-              <Tag key={i} color="#2db7f5" style={{ fontSize: 14, margin: 4 }}>
-                {tag}
-              </Tag>
-            ))}
+            {project.tags.map(this.renderTag)}
           </CompactCard>
         )}
         <CompactCard title="参与用户" bordered={false}>
+        {/*显示出用户和相关客服的在线状态*/}
           {project.customers.map(this.renderCustomerDetailsButton)}
         </CompactCard>
         <CompactCard title="相关客服" bordered={false}>
@@ -84,6 +77,12 @@ export default class extends React.Component {
             labelStyle={{ color: "gray" }}
             valueStyle={{ color: "black" }}
           />
+        </CompactCard>
+        <CompactCard title="会话信息" bordered={false}>
+          {/*开始时间*/}
+          {session.closed && (
+          {/*结束时间*/}
+          )}
         </CompactCard>
       </Fragment>
     );
@@ -125,6 +124,14 @@ export default class extends React.Component {
       >
         {c.name || c.mobile}
       </Button>
+    );
+  };
+
+  renderTag = (tag, i) => {
+    return (
+      <Tag key={i} color="#2db7f5" style={{ fontSize: 14, margin: 4 }}>
+        {tag}
+      </Tag>
     );
   };
 }
