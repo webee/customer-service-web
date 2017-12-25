@@ -1,5 +1,5 @@
 import { promiseDispatch } from "../models/utils";
-import request, { getQsArgBool } from "../utils/request";
+import request from "../utils/request";
 
 export function createDomainTypeWrapperAction(projectDomain, projectType, type, action, extras = {}) {
   return { type, payload: { projectDomain, projectType, ...action, ...extras } };
@@ -63,7 +63,7 @@ export async function fetchProjectMsgs(projectID, { lid, rid, limit, desc }) {
       lid,
       rid,
       limit,
-      desc: getQsArgBool(desc, { t: "t", f: "" })
+      desc
     }
   });
   return resp.data;

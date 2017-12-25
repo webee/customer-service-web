@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import Loader from "~/components/Loader";
 import { connect } from "dva";
-import { withRouter, Route, Link, Switch, Redirect } from "dva/router";
+import { Route, Link, Switch, Redirect } from "dva/router";
 import { Menu, Icon, Switch as SwitchComp, Modal, Form, Avatar, Dropdown } from "antd";
 import { getRootPath } from "../commons/router";
 const { SubMenu, ItemGroup } = Menu;
@@ -99,6 +99,12 @@ function getNavData(title, projectDomains) {
       },
       ...getProjectDomainNavData(projectDomains),
       {
+        icon: "team",
+        title: "客服",
+        pathname: "staffs",
+        component: require("../routes/Staffs")
+      },
+      {
         icon: "setting",
         title: "设置",
         pathname: "setting",
@@ -158,6 +164,16 @@ class Main extends React.Component {
   componentWillUnmount() {
     const { dispatch } = this.props;
     dispatch({ type: "app/closeXChat" });
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const { location, ui_settings, staff, app, projectDomains } = this.props;
+    return !(
+      location == nextProps.location &&
+      ui_settings == nextProps.ui_settings &&
+      (staff && nextProps.staff && staff.updated == nextProps.staff.updated) &&
+      app.updated == nextProps.app.updated
+    );
   }
 
   onLogoClick = () => {
@@ -252,15 +268,7 @@ class Main extends React.Component {
       return <Loader />;
     }
 
-    // TODO: NOTE: 动态navData, 重新生成会造成重新渲染所有路由
-    let navData = this.navData;
-    if (projectDomains != this.projectDomains) {
-      navData = getNavData(app.title, projectDomains);
-      this.navData = navData;
-      this.projectDomains = projectDomains;
-    } else {
-      navData.title = app.title;
-    }
+    const navData = getNavData(app.title, projectDomains);
 
     return (
       <MainLayout

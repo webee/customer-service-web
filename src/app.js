@@ -39,6 +39,7 @@ app.use(createLoading());
 // 3. Register models
 app.model(require("./models/auth"));
 app.model(require("./models/app"));
+app.model(require("./models/staffs"));
 app.model(require("./models/project").default);
 
 export default app;

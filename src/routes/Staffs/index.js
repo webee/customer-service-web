@@ -1,0 +1,131 @@
+import React from "react";
+import { connect } from "dva";
+import moment from "moment";
+import { Card, Table, Icon, Pagination } from "antd";
+import styles from "./index.css";
+
+const renderBoolean = val => {
+  return <Icon type={val ? "check-circle" : "close-circle"} style={{ color: val ? "green" : "black" }} />;
+};
+
+const renderNotBoolean = val => renderBoolean(!val);
+const renderTs = (ts, def, format = "LLLL") => (ts ? moment.unix(ts).format(format) : def);
+
+function getSorterOrder(sorter, field) {
+  return sorter.field == field ? sorter.order : false;
+}
+
+@connect((state, ownProps) => {
+  return { ...state.staffs, loading: state.loading };
+})
+export default class extends React.Component {
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({ type: "staffs/fetchStaffs" });
+  }
+
+  get columns() {
+    const { filters, sorter } = this.props;
+    return [
+      {
+        title: "姓名",
+        dataIndex: "name",
+        width: 160
+      },
+      {
+        title: "uid",
+        dataIndex: "uid",
+        width: 120
+      },
+      {
+        title: "创建日期",
+        dataIndex: "created",
+        key: "created",
+        sorter: true,
+        sortOrder: getSorterOrder(sorter, "created"),
+        width: 160,
+        render: ts => renderTs(ts, "", "LL")
+      },
+      {
+        title: "可用",
+        dataIndex: "is_deleted",
+        width: 100,
+        filterMultiple: false,
+        filters: [
+          {
+            text: "可用",
+            value: false
+          },
+          {
+            text: "停用",
+            value: true
+          }
+        ],
+        filteredValue: filters["is_deleted"],
+        render: renderNotBoolean
+      },
+      {
+        title: "在线",
+        dataIndex: "is_online",
+        width: 100,
+        filterMultiple: false,
+        filters: [
+          {
+            text: "在线",
+            value: true
+          },
+          {
+            text: "离线",
+            value: false
+          }
+        ],
+        filteredValue: filters["is_online"],
+        render: renderBoolean
+      },
+      {
+        title: "最后在线时间",
+        dataIndex: "last_online_ts",
+        key: "last_online_ts",
+        sorter: true,
+        sortOrder: getSorterOrder(sorter, "last_online_ts"),
+        width: 300,
+        render: ts => renderTs(ts, <span style={{ color: "grey" }}>未上线过</span>)
+      },
+      {
+        title: "定位标签",
+        dataIndex: "context_labels"
+      }
+    ];
+  }
+
+  get data() {
+    const { staffs } = this.props;
+    return staffs.map((s, i) => ({ key: i, ...s }));
+  }
+
+  render() {
+    const { loading, pagination } = this.props;
+    const isFetchingStaffs = loading.effects["staffs/fetchStaffs"];
+
+    return (
+      <Card title="客服" bordered={false}>
+        <Table
+          loading={isFetchingStaffs}
+          scroll={{ x: true }}
+          bordered={true}
+          pagination={pagination}
+          columns={this.columns}
+          dataSource={this.data}
+          onChange={this.handleTableChange}
+        />
+      </Card>
+    );
+  }
+
+  handleTableChange = (pagination, filters, sorter) => {
+    console.debug("handleTableChange: ", pagination, filters, sorter);
+    const { dispatch } = this.props;
+    dispatch({ type: "staffs/updateTableInfos", payload: { pagination, filters, sorter } });
+    dispatch({ type: "staffs/fetchStaffs" });
+  };
+}
