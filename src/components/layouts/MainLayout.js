@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { connect } from "dva";
 import classNames from "classnames";
 import DocumentTitle from "react-document-title";
 import { withRouter, Route, Link, Switch, Redirect } from "dva/router";
@@ -12,7 +11,7 @@ import styles from "./MainLayout.less";
 const { Header, Content, Footer } = Layout;
 
 @withRouter
-export default class MainLayout extends React.Component {
+export default class extends React.PureComponent {
   state = {
     collapsed: false
   };
@@ -31,13 +30,14 @@ export default class MainLayout extends React.Component {
     const { title: name } = navData;
     const { bottom } = this.props;
     // 以navData为基础生成1. 导航菜单，2. 面包屑 3. routes
-    console.debug("navData: ", navData);
+    console.debug("MainLayout, navData: ", navData);
     const root_path = getRootPath(match.path);
+    console.debug("MainLayout, root_path: ", root_path);
     const path = location.pathname.replace(/\/*$/, "") || "/";
     const urlDataMap = getURLDataMapFromNavData(root_path, navData.items);
     const menuData = getMenuDataFromNavData(root_path, navData.items);
-    console.debug("urlDatamap: ", urlDataMap);
-    console.debug("path: ", path);
+    console.debug("MainLayout, urlDatamap: ", urlDataMap);
+    console.debug("MainLayout, path: ", path);
     const urlData = urlDataMap[path === "/" ? "" : path] || {};
 
     const disableBreadcrumb = this.props.disableBreadcrumb || urlData.noBreadcrumb;
