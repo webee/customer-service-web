@@ -24,7 +24,7 @@ import MainLayoutStyles from "../components/layouts/MainLayout.less";
 //         pathname: ':projectDomain/:projectType',
 //         component: require('../routes/Projects'),
 //         items: getProjectDomainNavData(projectDomains),
-//       }
+//       },
 //     },
 // 		{icon: 'setting', title: '设置', pathname: 'setting', component: require('../routes/Setting')},
 //   ];
@@ -50,11 +50,34 @@ function getProjectDomainNavData(projectDomains) {
         return {
           title: t.title,
           pathname: t.name,
-          component: asProjectDomainType(d.name, t.name)(require("../routes/Projects")),
           fixed: true,
           noHeader: true,
           noBreadcrumb: true,
-          noFooter: true
+          noFooter: true,
+          defPath: "my_handling",
+          instance: {
+            pathname: ":tab",
+            component: asProjectDomainType(d.name, t.name)(require("../routes/Projects")),
+            fixed: true,
+            noHeader: true,
+            noBreadcrumb: true,
+            noFooter: true,
+            noMenu: true,
+            items: [
+              {
+                title: `${t.title}/我的接待`,
+                pathname: "my_handling"
+              },
+              {
+                title: `${t.title}/正在接待`,
+                pathname: "handling"
+              },
+              {
+                title: `${t.title}/最近接待`,
+                pathname: "handled"
+              }
+            ]
+          }
         };
       })
     };
@@ -236,7 +259,7 @@ class Main extends React.Component {
       this.navData = navData;
       this.projectDomains = projectDomains;
     } else {
-      navData.title = app.title
+      navData.title = app.title;
     }
 
     return (

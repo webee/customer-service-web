@@ -25,10 +25,9 @@ function findSelectedKey(path, menuData) {
   let selectedKey = undefined;
   menuData.forEach(item => {
     if (path.startsWith(item.path)) {
-      if (path === item.path) {
-        selectedKey = item.path;
-      } else if (item.items) {
-        selectedKey = findSelectedKey(path, item.items);
+      selectedKey = item.path;
+      if (item.items) {
+        selectedKey = findSelectedKey(path, item.items) || selectedKey;
       }
     }
   });

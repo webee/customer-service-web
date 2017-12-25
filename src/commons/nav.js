@@ -1,14 +1,17 @@
-
 export function getURLDataMapFromNavData(root_path, navItems) {
   let urlNameMap = {};
   navItems.forEach(item => {
-    const path = item.pathname ? `${root_path}/${item.pathname}` : root_path;
-    urlNameMap[path] = { ...item, items: undefined, instance: undefined }
-    if (item.instance) {
-      urlNameMap = { ...urlNameMap, ...getURLDataMapFromNavData(path, item.instance.items)}
+    const { pathname, items, instance } = item;
+    const path = pathname ? `${root_path}/${pathname}` : root_path;
+    urlNameMap[path] = { ...item, items: undefined, instance: undefined };
+    if (items && items.length > 0) {
+      urlNameMap = { ...urlNameMap, ...getURLDataMapFromNavData(path, items) };
     }
-    if (item.items) {
-      urlNameMap = { ...urlNameMap, ...getURLDataMapFromNavData(path, item.items)}
+    if (instance && instance.items && instance.items.length > 0) {
+      urlNameMap = {
+        ...urlNameMap,
+        ...getURLDataMapFromNavData(path, instance.items.map(item => ({ ...instance, ...item, items: undefined })))
+      };
     }
   });
   return urlNameMap;
@@ -17,18 +20,22 @@ export function getURLDataMapFromNavData(root_path, navItems) {
 export function getMenuDataFromNavData(root_path, navItems) {
   const menuData = [];
   navItems.forEach(item => {
-    const {icon, title, pathname, open, items} = item;
-    const path = pathname ? `${root_path}/${pathname}`: (root_path || '/');
+    const { icon, title, pathname, open, instance, items } = item;
+    const path = pathname ? `${root_path}/${pathname}` : root_path || "/";
 
-    if (item.instance) {
-      menuData.push(...getMenuDataFromNavData(path, item.instance.items));
-    } else {
-      const menuDataItem = {key: path, icon, title, path, open};
-      menuData.push(menuDataItem);
-      if (item.items) {
-        menuDataItem['items'] = getMenuDataFromNavData(path, item.items);
-      }
+    const menuDataItems = [];
+    if (instance && !instance.noMenu && instance.items && instance.items.length > 0) {
+      menuDataItems.push(...getMenuDataFromNavData(path, instance.items));
     }
+    if (items && items.length > 0) {
+      menuDataItems.push(...getMenuDataFromNavData(path, items));
+    }
+
+    const menuDataItem = { key: path, icon, title, path, open };
+    if (menuDataItems.length > 0) {
+      menuDataItem["items"] = menuDataItems;
+    }
+    menuData.push(menuDataItem);
   });
   return menuData;
 }

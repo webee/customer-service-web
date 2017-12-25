@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { routerRedux } from "dva/router";
 import PropTypes from "prop-types";
 import { connect } from "dva";
 import { Tabs, Button, Icon } from "antd";
@@ -18,7 +19,6 @@ export default class View extends Component {
     super(props);
 
     this.state = {
-      activeKey: "my_handling",
       expanded: false
     };
   }
@@ -43,8 +43,9 @@ export default class View extends Component {
     console.log(`unmount: ${projectDomain}/${projectType}`);
   }
 
-  onTabChange = activeKey => {
-    this.setState({ activeKey });
+  onTabChange = tab => {
+    const {dispatch} = this.props;
+    dispatch(routerRedux.push({pathname: `./${tab}`}));
   };
 
   onToggleExpand = () => {
@@ -61,23 +62,25 @@ export default class View extends Component {
   }
 
   render() {
-    const { activeKey, expanded } = this.state;
+    const { expanded } = this.state;
+    const { match } = this.props;
+    const { tab } = match.params;
     return expanded ? (
-      this.getTabContent(activeKey)
+      this.getTabContent(tab)
     ) : (
       <Tabs
         className={styles.main}
         onChange={this.onTabChange}
         size="default"
-        activeKey={activeKey}
+        activeKey={tab}
         defaultActiveKey="my_handling"
         animated={false}
       >
         <Tabs.TabPane tab="我的接待" key="my_handling">
           {this.getTabContent("my_handling")}
         </Tabs.TabPane>
-        <Tabs.TabPane tab="正在接待" key="other_handling">
-          {this.getTabContent("other_handling")}
+        <Tabs.TabPane tab="正在接待" key="handling">
+          {this.getTabContent("handling")}
         </Tabs.TabPane>
         <Tabs.TabPane tab="最近接待" key="handled">
           {this.getTabContent("handled")}
@@ -95,7 +98,7 @@ const PureTabContentView = props => {
       return (
         <MyHandlingSessionsView dispatch={dispatch} appData={appData} data={data._} myHandlingData={data.myHandling} />
       );
-    case "other_handling":
+    case "handling":
       return (
         <h1>
           {projectDomain}/{projectType}: 接待中的会话

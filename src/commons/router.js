@@ -6,22 +6,23 @@ export function getRootPath(path) {
 
 export function getRouteDataFromNavData(root_path, navItems, noMatch) {
   return navItems.map(item => {
-    let { pathname, component, render } = item;
+    let { pathname, component, render, defPath, items, instance } = item;
     let exact = pathname === "";
     let path = !exact ? `${root_path}/${pathname}` : root_path || "/";
-    if (item.items) {
+    if (items) {
       render = ({ match }) => (
-        <Routes path={match.path} navItems={item.items} defPath={item.defPath} noMatch={noMatch} />
+        <Routes path={match.path} navItems={items} defPath={defPath} noMatch={noMatch} />
       );
     } else {
-      let { component } = item;
-      if (item.instance) {
-        path = `${path}/${item.instance.pathname}`;
-        component = item.instance.component;
+      let curPath = path;
+      if (instance) {
+        curPath = `${path}/${instance.pathname}`;
+        component = instance.component;
       }
       render = () => (
         <Switch>
-          <Route exact path={path} component={item.component} render={item.render} />
+          <Route exact path={curPath} component={component} render={item.render} />
+          {defPath !== undefined && <Redirect exact from={path} to={`${path}/${defPath}`} />}
           {noMatch && <Route component={noMatch} />}
           <Redirect to={path} />
         </Switch>
