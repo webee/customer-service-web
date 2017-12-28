@@ -7,9 +7,7 @@ import styles from "./launcher.less";
 ReactDOM.render(<Loader type="pacman" fadeIn="none" />, document.querySelector("#root"));
 
 // async load app.
-(() => {
-  NProgress.inc(0.1);
-  import("./index").then(() => {
-    NProgress.done();
-  });
-})();
+NProgress.inc(0.1);
+import("./index").then(() => {
+  NProgress.done();
+});

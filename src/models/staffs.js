@@ -16,6 +16,7 @@ export default {
       current: 1,
       pageSize: 10,
       total: 0,
+      showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
       showSizeChanger: true,
       pageSizeOptions: ["10", "20", "30", "40", "50", "1", "2", "3"]
     },

@@ -285,10 +285,10 @@ class Main extends React.Component {
 
 function mapStateToProps(state) {
   const appData = state.app;
-  const { staff, staffs } = appData;
+  const { staff } = appData;
   return {
     ui_settings: appData.ui_settings,
-    staff: staffs[staff],
+    staff,
     app: appData.app,
     projectDomains: appData.projectDomains
   };

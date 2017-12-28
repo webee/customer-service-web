@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "dva";
 import moment from "moment";
 import { Card, Table, Icon, Pagination } from "antd";
+import SearchForm from "./SearchForm";
 import styles from "./index.css";
 
 const renderBoolean = val => {
@@ -16,9 +17,12 @@ function getSorterOrder(sorter, field) {
 }
 
 @connect((state, ownProps) => {
-  return { ...state.staffs, loading: state.loading };
+  return { ...state.staffs, appData: state.app, loading: state.loading };
 })
 export default class extends React.Component {
+  state = {
+    params: {}
+  };
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({ type: "staffs/fetchStaffs" });
@@ -104,14 +108,22 @@ export default class extends React.Component {
   }
 
   render() {
-    const { loading, pagination } = this.props;
+    const { loading, pagination, appData } = this.props;
+    const { staff, staffs } = appData;
+    const staff_label_tree = appData.app.staff_label_tree;
     const isFetchingStaffs = loading.effects["staffs/fetchStaffs"];
 
     return (
       <Card title="客服" bordered={false}>
+        <SearchForm
+          onSearch={this.onSearch}
+          staff={staff}
+          staffs={Object.values(staffs)}
+          staffLabelTree={staff_label_tree}
+        />
         <Table
           loading={isFetchingStaffs}
-          scroll={{ x: true }}
+          scroll={{ x: 1200 }}
           bordered={true}
           pagination={pagination}
           columns={this.columns}
@@ -122,10 +134,21 @@ export default class extends React.Component {
     );
   }
 
+  onSearch = params => {
+    console.debug("onSearch: ", params);
+    this.setState({ params }, this.fetchStaffs);
+  };
+
   handleTableChange = (pagination, filters, sorter) => {
     console.debug("handleTableChange: ", pagination, filters, sorter);
     const { dispatch } = this.props;
     dispatch({ type: "staffs/updateTableInfos", payload: { pagination, filters, sorter } });
-    dispatch({ type: "staffs/fetchStaffs" });
+    this.fetchStaffs();
+  };
+
+  fetchStaffs = () => {
+    const { dispatch } = this.props;
+    const { params } = this.state;
+    dispatch({ type: "staffs/fetchStaffs", payload: params });
   };
 }

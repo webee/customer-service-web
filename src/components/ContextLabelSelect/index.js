@@ -178,7 +178,7 @@ export default class extends React.Component {
     if (onChange) {
       const { path, exceed, uids } = this.state;
       if (exceed) {
-        onChange({ path: undefined, uids: [] });
+        onChange(undefined);
       } else {
         onChange({ path, uids });
       }

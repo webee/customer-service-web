@@ -15,13 +15,12 @@ export default {
 
   state: {
     ui_settings: {},
-    staff: null,
+    staff: {},
     app: null,
     // project domain type tree
     projectDomains: [],
     // 所有domains by name
     domains: {},
-    access_functions: [],
 
     // 以下不影响main entry
     // 所有staff by uid
@@ -36,7 +35,7 @@ export default {
     saveUISettings(state, { payload }) {
       return { ...state, ui_settings: { ...state.ui_settings, ...payload } };
     },
-    saveAppInfo(state, { payload: { app, staff, project_domains: projectDomains, access_functions = [] } }) {
+    saveAppInfo(state, { payload: { app, staff, project_domains: projectDomains } }) {
       const domains = {};
       projectDomains.forEach(pd => {
         const types = {};
@@ -45,11 +44,15 @@ export default {
         });
         domains[pd.name] = { ...pd, types };
       });
-      return { ...state, app, staff, projectDomains, domains, access_functions };
+      return { ...state, app, staff, projectDomains, domains };
     },
     updateStaffs(state, { payload: staffList }) {
       const staffs = listToDict(staffList, u => u.uid);
-      return { ...state, staffs: { ...state.staffs, ...staffs } };
+      let staff = state.staff;
+      if (staff && staff.uid in staffs) {
+        staff = staffs[staff.uid];
+      }
+      return { ...state, staff, staffs: { ...state.staffs, ...staffs } };
     },
     updateCustomers(state, { payload: customerList }) {
       const customers = listToDict(customerList, u => u.uid);
@@ -89,7 +92,7 @@ export default {
 
       const { staff } = staffAppInfo;
       yield put({ type: "updateStaffs", payload: [staff] });
-      yield put({ type: "saveAppInfo", payload: { ...staffAppInfo, staff: staff.uid } });
+      yield put({ type: "saveAppInfo", payload: { ...staffAppInfo, staff } });
     },
     *fetchXFilesInfo(action, { call, put }) {
       const xfilesInfo = yield call(appService.getXFilesInfo);
