@@ -29,7 +29,8 @@ export default class View extends Component {
   render() {
     const { projectDomain, projectType } = this.context;
     const { dispatch, appData, session, project, projMsgs, projTxMsgIDs, txMsgs, isCurrentOpened } = this.props;
-    const { staffs, customers, domains, access_functions } = appData;
+    const { staffs, customers, domains, app } = appData;
+    const { access_functions } = app;
     return (
       <div className={styles.splitter}>
         <div className={styles.splitHeader}>

@@ -49,8 +49,8 @@ export default {
     updateStaffs(state, { payload: staffList }) {
       const staffs = listToDict(staffList, u => u.uid);
       let staff = state.staff;
-      if (staff && staff.uid in staffs) {
-        staff = staffs[staff.uid];
+      if (staff.uid in staffs) {
+        staff = { ...staff, ...staffs[staff.uid] };
       }
       return { ...state, staff, staffs: { ...state.staffs, ...staffs } };
     },
