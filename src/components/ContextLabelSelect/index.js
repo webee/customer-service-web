@@ -1,25 +1,7 @@
 import React, { Fragment } from "react";
 import { Cascader, Select } from "antd";
+import { LabelType, pathMatchContextLabels } from "../../utils/pathLabels";
 import styles from "./index.less";
-
-const LabelType = {
-  self: "self",
-  member: "self.",
-  self_plus: "self+"
-};
-
-function pathMatchTarget(path, target) {
-  return target !== null && target.startsWith(path);
-}
-
-function pathMatchContextLabels(path, context_labels) {
-  for (const [t, label] of context_labels) {
-    if (pathMatchTarget(path, label)) {
-      return true;
-    }
-  }
-  return false;
-}
 
 function getNodeInfo(tree, labels) {
   let curTree = tree;
@@ -97,7 +79,7 @@ function calcContextLabelTree(labelTree, contextLabels, user) {
   for (const [t, path] of contextLabels) {
     if (t === LabelType.self || t === LabelType.self_plus) {
       if (path === "") {
-        Object.assign(tree, labelTree);
+        Object.assign(tree, labelTree, { "": { name: "/" } });
         break;
       }
       const labels = path.split(".");
@@ -109,9 +91,9 @@ function calcContextLabelTree(labelTree, contextLabels, user) {
         mergeTree(tree, getFullSubTree(labelTree, labels, { exceed: true }));
       }
     } else if (t === LabelType.member) {
-      const children = { [`:${user.uid}`]: { name: `:${user.name}`, is_user: true, user } };
+      const children = { [user.uid]: { name: `:${user.name}`, is_user: true, user } };
       if (path === "") {
-        Object.assign(tree, children);
+        Object.assign(tree, { "": { name: "/", exceed: true, children } });
         continue;
       }
       const labels = path.split(".");
@@ -169,7 +151,7 @@ export default class extends React.Component {
   }
 
   calcOptions({ labelTree, contextLabels, user }) {
-    const contextLabelTree = calcContextLabelTree(labelTree, contextLabels, user);
+    const contextLabelTree = calcContextLabelTree(labelTree, [...contextLabels, ["self.", ""]], user);
     return treeToOptions(contextLabelTree);
   }
 
@@ -188,12 +170,20 @@ export default class extends React.Component {
   renderUserOptions() {
     const { path, user } = this.state;
     if (user) {
-      return <Select.Option key={user.uid}>{user.name}</Select.Option>;
+      return (
+        <Select.Option key={user.uid} title={user.name}>
+          {user.name}
+        </Select.Option>
+      );
     }
     const { users } = this.props;
     return users
-      .filter(user => path === undefined || pathMatchContextLabels(path, user.context_labels))
-      .map(user => <Select.Option key={user.uid}>{user.name}</Select.Option>);
+      .filter(user => path === undefined || pathMatchContextLabels(path, user.uid, user.context_labels))
+      .map(user => (
+        <Select.Option key={user.uid} title={user.name}>
+          {user.name}
+        </Select.Option>
+      ));
   }
 
   render() {
@@ -212,6 +202,7 @@ export default class extends React.Component {
         />
         <Select
           disabled={disableSelect}
+          optionFilterProp="title"
           value={uids}
           placeholder={userPlaceholder}
           mode="multiple"

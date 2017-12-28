@@ -52,7 +52,11 @@ export default {
       if (staff.uid in staffs) {
         staff = { ...staff, ...staffs[staff.uid] };
       }
-      return { ...state, staff, staffs: { ...state.staffs, ...staffs } };
+      const newStaffs = { ...state.staffs };
+      for (const uid in staffs) {
+        newStaffs[uid] = { ...newStaffs[uid], ...staffs[uid] };
+      }
+      return { ...state, staff, staffs: newStaffs };
     },
     updateCustomers(state, { payload: customerList }) {
       const customers = listToDict(customerList, u => u.uid);
@@ -90,9 +94,9 @@ export default {
       });
       yield all(projectDomainTypeActions);
 
-      const { staff } = staffAppInfo;
-      yield put({ type: "updateStaffs", payload: [staff] });
-      yield put({ type: "saveAppInfo", payload: { ...staffAppInfo, staff } });
+      const { staffs } = staffAppInfo;
+      yield put({ type: "updateStaffs", payload: staffs });
+      yield put({ type: "saveAppInfo", payload: staffAppInfo });
     },
     *fetchXFilesInfo(action, { call, put }) {
       const xfilesInfo = yield call(appService.getXFilesInfo);

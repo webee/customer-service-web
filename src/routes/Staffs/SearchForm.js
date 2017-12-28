@@ -1,6 +1,8 @@
 import React from "react";
 import { Form, Row, Col, Input, Button, Icon } from "antd";
+import { contextLabelsMatchContextLabels } from "../../utils/pathLabels";
 import ContextLabelSelect from "~/components/ContextLabelSelect";
+import UserSelect from "~/components/UserSelect";
 import styles from "./SearchForm.less";
 
 @Form.create()
@@ -22,6 +24,9 @@ export default class extends React.Component {
 
   render() {
     const { staff, staffs, staffLabelTree } = this.props;
+    const selectStaffs = staffs.filter(u =>
+      contextLabelsMatchContextLabels(staff.uid, staff.context_labels, u.uid, u.context_labels)
+    );
     const { getFieldDecorator } = this.props.form;
     const gutterSpecs = { xs: 8, sm: 16, md: 16, lg: 24, xl: 24 };
     const colSpanSpecs = { sm: 24, md: 12, lg: 8, xl: 6 };
@@ -30,16 +35,11 @@ export default class extends React.Component {
       <Form className={styles.main} onSubmit={this.handleSearch}>
         <Row gutter={gutterSpecs}>
           <Col {...colSpanSpecs}>
-            <Form.Item label="姓名" colon={false}>
-              {getFieldDecorator("name")(<Input placeholder="客服姓名" />)}
+            <Form.Item label="客服" colon={false}>
+              {getFieldDecorator("uid")(<UserSelect users={selectStaffs} />)}
             </Form.Item>
           </Col>
-          <Col {...{ sm: 12, md: 6, lg: 4, xl: 4 }}>
-            <Form.Item label="uid" colon={false}>
-              {getFieldDecorator("uid")(<Input placeholder="客服uid" />)}
-            </Form.Item>
-          </Col>
-          <Col sm={24} md={24} lg={24} xl={14}>
+          <Col sm={24} md={24} lg={24} xl={18}>
             <Form.Item label="定位标签" colon={false}>
               {getFieldDecorator("context_label")(
                 <ContextLabelSelect
@@ -48,7 +48,7 @@ export default class extends React.Component {
                   labelTree={staffLabelTree}
                   contextLabels={staff.context_labels}
                   user={staff}
-                  users={staffs}
+                  users={selectStaffs}
                 />
               )}
             </Form.Item>
