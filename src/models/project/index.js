@@ -1,20 +1,17 @@
 import config from "~/config";
 import { combineNSReducers, asNestedReducer, toPromiseEffects } from "../utils";
 import { reducer as myHandlingReducer, effectFunc as myHandlingEffectFunc } from "./myHandling";
+import { reducer as handlingReducer, effectFunc as handlingEffectFunc } from "./handling";
 import { reducer as _Reducer, effectFunc as _EffectFunc } from "./_";
 import * as msgCookService from "../../services/msgCook";
 import FileUploadCook from "../../services/FileUploadCook";
-
-function* domainTypeEffectFunc(action, effects) {
-  const { all, call } = effects;
-  yield all([call(_EffectFunc, action, effects), call(myHandlingEffectFunc, action, effects)]);
-}
 
 const ns = "project";
 export const reducer = asNestedReducer(
   combineNSReducers({
     _: _Reducer,
-    myHandling: myHandlingReducer
+    myHandling: myHandlingReducer,
+    handling: handlingReducer
   }),
   ["projectDomain", "projectType"]
 );
@@ -30,7 +27,11 @@ export default {
       if (config.env !== "prod") {
         yield put({ type: `/${ns}/${projectDomain}/${projectType}/${payload.type}@@START`, payload: payload.payload });
       }
-      yield all([call(_EffectFunc, payload, effects), call(myHandlingEffectFunc, payload, effects)]);
+      yield all([
+        call(_EffectFunc, payload, effects),
+        call(myHandlingEffectFunc, payload, effects),
+        call(handlingEffectFunc, payload, effects)
+      ]);
     }
   }),
   subscriptions: {

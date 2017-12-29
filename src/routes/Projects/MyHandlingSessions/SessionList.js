@@ -15,6 +15,13 @@ import { genCustomerMobileName } from "./utils";
 
 const Search = Input.Search;
 
+function get_session_last_msg_ts(s, def = 0) {
+  if (s.msg) {
+    return s.msg.ts;
+  }
+  return def;
+}
+
 export default class View extends Component {
   static contextTypes = {
     projectDomain: PropTypes.string,
@@ -122,10 +129,10 @@ export default class View extends Component {
     // sort
     switch (listSortBy) {
       case "latest_msg_ts":
-        sessionList.sort((s1, s2) => -(s1.msg_ts - s2.msg_ts));
+        sessionList.sort((s1, s2) => -(get_session_last_msg_ts(s1, 0) - get_session_last_msg_ts(s2, 0)));
         break;
       case "oldest_msg_ts":
-        sessionList.sort((s1, s2) => +(s1.msg_ts - s2.msg_ts));
+        sessionList.sort((s1, s2) => +(get_session_last_msg_ts(s1, 0) - get_session_last_msg_ts(s2, 0)));
         break;
     }
     return sessionList;
@@ -166,7 +173,7 @@ export default class View extends Component {
     const session = sessionList[index];
     const { msg } = session;
     const project = session.project;
-    const owner =  appData.customers[project.owner];
+    const owner = appData.customers[project.owner];
     // 当前打开并且不处在阅读状态则未读不显示
     const unread =
       session.isCurrentOpened && !currentOpenedSessionState.isInRead ? 0 : session.msg_id - session.sync_msg_id;
@@ -175,7 +182,7 @@ export default class View extends Component {
       name: genCustomerMobileName(owner),
       description: msgRendererService.describeMsg(msg),
       online: project.is_online,
-      ts: session.msg.ts,
+      ts: get_session_last_msg_ts(session),
       unread: unread,
       selected: session.isCurrentOpened
     };

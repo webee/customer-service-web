@@ -7,6 +7,7 @@ import styles from "./index.less";
 
 import TopRightButton from "../../components/TopRightButton";
 import MyHandlingSessionsView from "./MyHandlingSessions";
+import HandlingSessionsView from "./HandlingSessions";
 
 @connect((state, ownProps) => {
   const { projectDomain, projectType } = ownProps;
@@ -44,8 +45,8 @@ export default class View extends Component {
   }
 
   onTabChange = tab => {
-    const {dispatch} = this.props;
-    dispatch(routerRedux.push({pathname: `./${tab}`}));
+    const { dispatch } = this.props;
+    dispatch(routerRedux.push({ pathname: `./${tab}` }));
   };
 
   onToggleExpand = () => {
@@ -82,7 +83,7 @@ export default class View extends Component {
         <Tabs.TabPane tab="正在接待" key="handling">
           {this.getTabContent("handling")}
         </Tabs.TabPane>
-        <Tabs.TabPane tab="最近接待" key="handled">
+        <Tabs.TabPane tab="完成接待" key="handled">
           {this.getTabContent("handled")}
         </Tabs.TabPane>
       </Tabs>
@@ -99,38 +100,43 @@ const PureTabContentView = props => {
         <MyHandlingSessionsView dispatch={dispatch} appData={appData} data={data._} myHandlingData={data.myHandling} />
       );
     case "handling":
-      return (
-        <h1>
-          {projectDomain}/{projectType}: 接待中的会话
-        </h1>
-      );
+      return <HandlingSessionsView dispatch={dispatch} appData={appData} data={data._} handlingData={data.handling} />;
     case "handled":
       return (
-        <div style={{ flex: "1 0 auto" }}>
-          <h1>
-            {projectDomain}/{projectType}:
-            最近接待的会话叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉<br
-            />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-            最近接待的会话<br />
-          </h1>
+        <div style={{ display: "flex" }}>
+          <div style={{ flex: "1 0 auto" }}>
+            <h1>
+              {projectDomain}/{projectType}:
+              最近完成接待的会话叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉<br
+              />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+              最近接待的会话<br />
+            </h1>
+          </div>
         </div>
       );
   }
@@ -142,7 +148,7 @@ const TabContentView = ({ expanded, onToggleExpand, children }) => {
     <TopRightButton
       icon={icon}
       style={{ flex: "auto" }}
-      contentStyle={{ height: "100%", display: "flex" }}
+      contentStyle={{ backgroundColor: "white" }}
       onClick={onToggleExpand}
     >
       {children}

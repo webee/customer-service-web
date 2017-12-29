@@ -3,7 +3,6 @@ import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
-import { dispatchDomainTypeEffect } from "../../../services/project";
 import * as projectWorkers from "../../../services/projectWorkers";
 import { List, Avatar, Badge, Tag } from "antd";
 import SplitPane from "react-split-pane";

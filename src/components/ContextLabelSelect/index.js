@@ -138,7 +138,9 @@ export default class extends React.Component {
       // 是否超出范围
       exceed: true,
       // 选中的用户uids
-      uids: []
+      uids: [],
+      // 选中的标签
+      labels: []
     };
   }
 
@@ -147,6 +149,10 @@ export default class extends React.Component {
     if (nextProps.labelTree != labelTree || nextProps.contextLabels != contextLabels || nextProps.user != user) {
       const options = this.calcOptions(nextProps);
       this.setState({ options });
+    }
+    // form control
+    if (nextProps.value === null) {
+      this.setState({ path: undefined, user: undefined, uids: [], labels: [] });
     }
   }
 
@@ -188,11 +194,13 @@ export default class extends React.Component {
 
   render() {
     const { pathLabelPlaceholder = "选择路径", userPlaceholder = "选择用户", expandTrigger = "click" } = this.props;
-    const { options, user, exceed, uids } = this.state;
+    const { options, user, exceed, uids, labels } = this.state;
+    console.log("labels: ", labels);
     const disableSelect = !!(user || exceed);
     return (
       <Fragment>
         <Cascader
+          value={labels}
           changeOnSelect
           options={options}
           displayRender={this.displayRender}
@@ -220,6 +228,7 @@ export default class extends React.Component {
   };
 
   onCascaderChange = (labels, selectedOptions) => {
+    console.log("onCascaderChange:", labels);
     let path = undefined;
     let user = undefined;
     let exceed = true;
@@ -236,7 +245,7 @@ export default class extends React.Component {
     }
     const { path: prevPath, uids: prevUids } = this.state;
     const uids = user ? [user.uid] : exceed ? [] : path === prevPath ? prevUids : [];
-    this.setState({ path, user, exceed, uids }, this.triggerChange);
+    this.setState({ labels, path, user, exceed, uids }, this.triggerChange);
   };
 
   onSelectChange = uids => {

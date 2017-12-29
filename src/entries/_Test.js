@@ -104,6 +104,11 @@ export default class _Test extends React.Component {
         </Menu.Item>
         <Menu.Item key="setting:3">Option 1</Menu.Item>
         <Menu.Item key="setting:4">Option 2</Menu.Item>
+        <Menu.Item key="setting:5">
+          <a href="/projects/test/test/my_handling" target="cs_test">
+            cs_test
+          </a>
+        </Menu.Item>
       </Menu>
     );
 

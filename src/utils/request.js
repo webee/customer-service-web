@@ -1,11 +1,16 @@
-import axios from 'axios';
-import { axiosConfig } from '~/config';
-
+import qs from "qs";
+import axios from "axios";
+import { axiosConfig } from "~/config";
 
 /**
  * https://github.com/mzabriskie/axios
  */
-const axiosInst = axios.create(axiosConfig);
+const axiosInst = axios.create({
+  ...axiosConfig,
+  paramsSerializer: function(params) {
+    return qs.stringify(params, { arrayFormat: "repeat" });
+  }
+});
 
 export default axiosInst;
 

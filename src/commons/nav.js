@@ -24,7 +24,7 @@ export function getMenuDataFromNavData(root_path, navItems) {
     const path = pathname ? `${root_path}/${pathname}` : root_path || "/";
 
     const menuDataItems = [];
-    if (instance && !instance.noMenu && instance.items && instance.items.length > 0) {
+    if (instance && !instance.menuless && instance.items && instance.items.length > 0) {
       menuDataItems.push(...getMenuDataFromNavData(path, instance.items));
     }
     if (items && items.length > 0) {

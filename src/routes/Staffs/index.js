@@ -12,8 +12,8 @@ const renderBoolean = val => {
 const renderNotBoolean = val => renderBoolean(!val);
 const renderTs = (ts, def, format = "LLLL") => (ts ? moment.unix(ts).format(format) : def);
 
-function getSorterOrder(sorter, field) {
-  return sorter.field == field ? sorter.order : false;
+function getSorterOrder(sorter, key) {
+  return sorter.key == key ? sorter.order : false;
 }
 
 @connect((state, ownProps) => {
@@ -23,9 +23,9 @@ export default class extends React.Component {
   state = {
     params: {}
   };
+
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({ type: "staffs/fetchStaffs" });
+    this.fetchStaffs();
   }
 
   get columns() {
@@ -111,10 +111,10 @@ export default class extends React.Component {
     const { loading, pagination, appData } = this.props;
     const { staff, staffs } = appData;
     const staff_label_tree = appData.app.staff_label_tree;
-    const isFetchingStaffs = loading.effects["staffs/fetchStaffs"];
+    const isFetching = loading.effects["staffs/fetchStaffs"];
 
     return (
-      <Card title="客服" bordered={false}>
+      <div className={styles.main}>
         <SearchForm
           onSearch={this.onSearch}
           staff={staff}
@@ -122,7 +122,7 @@ export default class extends React.Component {
           staffLabelTree={staff_label_tree}
         />
         <Table
-          loading={isFetchingStaffs}
+          loading={isFetching}
           scroll={{ x: 1200 }}
           bordered={true}
           pagination={pagination}
@@ -130,7 +130,7 @@ export default class extends React.Component {
           dataSource={this.data}
           onChange={this.handleTableChange}
         />
-      </Card>
+      </div>
     );
   }
 

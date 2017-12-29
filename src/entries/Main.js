@@ -2,12 +2,13 @@ import React, { Component } from "react";
 import Loader from "~/components/Loader";
 import { connect } from "dva";
 import { Route, Link, Switch, Redirect } from "dva/router";
-import { Menu, Icon, Switch as SwitchComp, Modal, Form, Avatar, Dropdown } from "antd";
+import { Menu, Icon, Switch as SwitchComp, Modal, Form, Row, Col, Avatar, Dropdown } from "antd";
 import { getRootPath } from "../commons/router";
 const { SubMenu, ItemGroup } = Menu;
 import { env } from "../config";
 import MainLayout from "../components/layouts/MainLayout";
 import MainLayoutStyles from "../components/layouts/MainLayout.less";
+import styles from "./Main.less";
 
 // function getProjectDomainNavData(projectDomains) {
 //   return projectDomains.map(d => ({
@@ -36,7 +37,7 @@ const asProjectDomainType = (projectDomain, projectType) => {
   );
 };
 
-function getProjectDomainNavData(projectDomains) {
+function getProjectDomainNavData(projectDomains, settings = {}) {
   // NOTE: 这里也可以消除domain这一级，铺平pathname
   return projectDomains.map(d => {
     return {
@@ -50,19 +51,15 @@ function getProjectDomainNavData(projectDomains) {
         return {
           title: t.title,
           pathname: t.name,
-          fixed: true,
-          noHeader: true,
-          noBreadcrumb: true,
-          noFooter: true,
           defPath: "my_handling",
           instance: {
             pathname: ":tab",
             component: asProjectDomainType(d.name, t.name)(require("../routes/Projects")),
             fixed: true,
-            noHeader: true,
+            noHeader: !!settings.disable_session_header,
             noBreadcrumb: true,
             noFooter: true,
-            noMenu: true,
+            menuless: true,
             items: [
               {
                 title: `${t.title}/我的接待`,
@@ -70,11 +67,15 @@ function getProjectDomainNavData(projectDomains) {
               },
               {
                 title: `${t.title}/正在接待`,
-                pathname: "handling"
+                pathname: "handling",
+                fixed: true,
+                noFooter: true
               },
               {
                 title: `${t.title}/最近接待`,
-                pathname: "handled"
+                pathname: "handled",
+                fixed: true,
+                noFooter: true
               }
             ]
           }
@@ -84,8 +85,14 @@ function getProjectDomainNavData(projectDomains) {
   });
 }
 
-function getNavData(title, projectDomains) {
-  return {
+const _prevData = {};
+
+function getNavData(title, projectDomains, settings) {
+  if (_prevData.title == title && _prevData.projectDomains == projectDomains && _prevData.settings == settings) {
+    return _prevData.navData;
+  }
+  console.log("getNavData: ", title, projectDomains, settings);
+  const navData = {
     icon: "rocket",
     title: title,
     defPath: "",
@@ -97,7 +104,7 @@ function getNavData(title, projectDomains) {
         pathname: "",
         component: require("../routes/Home")
       },
-      ...getProjectDomainNavData(projectDomains),
+      ...getProjectDomainNavData(projectDomains, settings),
       {
         icon: "team",
         title: "客服",
@@ -112,6 +119,8 @@ function getNavData(title, projectDomains) {
       }
     ]
   };
+  Object.assign(_prevData, { title, projectDomains, settings, navData });
+  return navData;
 }
 
 class Main extends React.Component {
@@ -119,34 +128,41 @@ class Main extends React.Component {
     showSettingModal: false
   };
 
-  toggleBreadcrumb = checked => {
+  updateUISettings = settings => {
     const { dispatch } = this.props;
     dispatch({
       type: "app/setUISettings",
-      payload: { disable_breadcrumb: !checked }
+      payload: settings
     });
+  };
+
+  toggleBreadcrumb = checked => {
+    this.updateUISettings({ disable_breadcrumb: !checked });
   };
 
   toggleFooter = checked => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: "app/setUISettings",
-      payload: { disable_footer: !checked }
-    });
+    this.updateUISettings({ disable_footer: !checked });
   };
 
+  toggleSessionHeader = checked => {
+    this.updateUISettings({ disable_session_header: !checked });
+  };
+
+  updateSettingModalState = show => {
+    this.setState({ showSettingModal: show }, () => {
+      this.forceUpdate();
+    });
+  };
   handleSettingUI = () => {
-    this.setState({ showSettingModal: true });
+    this.updateSettingModalState(true);
   };
 
   settingModalOnOk = e => {
-    console.debug(e);
-    this.setState({ showSettingModal: false });
+    this.updateSettingModalState(false);
   };
 
   settingModalOnCancel = e => {
-    console.debug(e);
-    this.setState({ showSettingModal: false });
+    this.updateSettingModalState(false);
   };
 
   componentDidMount() {
@@ -228,6 +244,8 @@ class Main extends React.Component {
   getBottom() {
     const { showSettingModal } = this.state;
     const { ui_settings } = this.props;
+    const gutterSpecs = { xs: 8, sm: 8, md: 8, lg: 12, xl: 12 };
+    const colSpanSpecs = { sm: 24, md: 16, lg: 12, xl: 8 };
     return showSettingModal ? (
       <Modal
         title="界面设置"
@@ -235,23 +253,39 @@ class Main extends React.Component {
         onOk={this.settingModalOnOk}
         onCancel={this.settingModalOnCancel}
       >
-        <Form>
-          <Form.Item label="面包屑" labelCol={{ span: 4 }}>
-            <SwitchComp
-              checkedChildren="显示"
-              unCheckedChildren="隐藏"
-              defaultChecked={!ui_settings.disable_breadcrumb}
-              onChange={this.toggleBreadcrumb}
-            />
-          </Form.Item>
-          <Form.Item label="脚标" labelCol={{ span: 4 }}>
-            <SwitchComp
-              checkedChildren="显示"
-              unCheckedChildren="隐藏"
-              defaultChecked={!ui_settings.disable_footer}
-              onChange={this.toggleFooter}
-            />
-          </Form.Item>
+        <Form className={styles.settingForm}>
+          <Row gutter={gutterSpecs}>
+            <Col {...colSpanSpecs}>
+              <Form.Item label="面包屑">
+                <SwitchComp
+                  checkedChildren="显示"
+                  unCheckedChildren="隐藏"
+                  defaultChecked={!ui_settings.disable_breadcrumb}
+                  onChange={this.toggleBreadcrumb}
+                />
+              </Form.Item>
+            </Col>
+            <Col>
+              <Form.Item label="脚标">
+                <SwitchComp
+                  checkedChildren="显示"
+                  unCheckedChildren="隐藏"
+                  defaultChecked={!ui_settings.disable_footer}
+                  onChange={this.toggleFooter}
+                />
+              </Form.Item>
+            </Col>
+            <Col>
+              <Form.Item label="会话时导航栏">
+                <SwitchComp
+                  checkedChildren="显示"
+                  unCheckedChildren="隐藏"
+                  defaultChecked={!ui_settings.disable_session_header}
+                  onChange={this.toggleSessionHeader}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     ) : (
@@ -268,7 +302,7 @@ class Main extends React.Component {
       return <Loader />;
     }
 
-    const navData = getNavData(app.title, projectDomains);
+    const navData = getNavData(app.title, projectDomains, ui_settings);
 
     return (
       <MainLayout

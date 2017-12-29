@@ -10,13 +10,9 @@ export default ({ name, description, ts, unread = 0, online, style, selected, on
   return (
     <div className={className} style={style} onClick={onClick}>
       <div className={styles.avatar}>
-        {unread > 0 ? (
-          <Badge count={unread} overflowCount={99}>
-            <Avatar className={avatarClassName} shape="square" size="large" icon="user" />
-          </Badge>
-        ) : (
+        <Badge count={unread} overflowCount={99}>
           <Avatar className={avatarClassName} shape="square" size="large" icon="user" />
-        )}
+        </Badge>
       </div>
       <div className={styles.description}>
         <div className={styles.top}>

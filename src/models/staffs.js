@@ -24,8 +24,8 @@ export default {
     sorter: {}
   },
   reducers: {
-    saveFetchStaffsResult(state, { payload: { staffs, pagination } }) {
-      return { ...state, staffs, pagination: { ...state.pagination, ...pagination } };
+    saveFetchResult(state, { payload: { items, pagination } }) {
+      return { ...state, staffs: items, pagination: { ...state.pagination, ...pagination } };
     },
     updateTableInfos(state, { payload: { pagination, filters, sorter } }) {
       const newState = { ...state };
@@ -36,7 +36,7 @@ export default {
         newState.filters = filters;
       }
       if (sorter) {
-        newState.sorter = { field: sorter.field, order: sorter.order };
+        newState.sorter = { field: sorter.field, key: sorter.columnKey, order: sorter.order };
       }
       return newState;
     }
@@ -48,14 +48,14 @@ export default {
         ...params,
         page: pagination.current,
         per_page: pagination.pageSize,
-        sorter: sorter.field,
+        sorter: sorter.key,
         order: sorter.order,
         is_deleted: extractFilter(filters, "is_deleted", false),
         is_online: extractFilter(filters, "is_online", false)
       });
-      const { page: current, per_page: pageSize, total, items: staffs } = res;
-      yield put({ type: "saveFetchStaffsResult", payload: { staffs, pagination: { current, pageSize, total } } });
-      yield put({ type: "app/updateStaffs", payload: staffs });
+      const { page: current, per_page: pageSize, total, items } = res;
+      yield put({ type: "saveFetchResult", payload: { items, pagination: { current, pageSize, total } } });
+      yield put({ type: "app/updateStaffs", payload: items });
     }
   }),
   subscriptions: {}

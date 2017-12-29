@@ -12,6 +12,13 @@ export function createProjectDomainTypeAction(projectDomain, projectType, type =
   };
 }
 
+export function domainTypeName({ projectDomain, projectType }, name, from_root = false) {
+  if (from_root) {
+    return `/project/${projectDomain}/${projectType}/${name}`;
+  }
+  return `project/${projectDomain}/${projectType}/${name}`;
+}
+
 export function createProjectDomainTypeEffectAction(projectDomain, projectType, type, payload) {
   return createDomainTypeWrapperAction(
     projectDomain,
@@ -49,6 +56,13 @@ export function dispatchDomainTypeEffect({ projectDomain, projectType }, { dispa
 // apis
 export async function fetchMyHandlingSessions(projectDomain, projectType) {
   const resp = await request.get(`/projects/${projectDomain}/${projectType}/my_handling_sessions`);
+  return resp.data;
+}
+
+export async function fetchHandlingSessions(projectDomain, projectType, params) {
+  const resp = await request.get(`/projects/${projectDomain}/${projectType}/handling_sessions`, {
+    params
+  });
   return resp.data;
 }
 
