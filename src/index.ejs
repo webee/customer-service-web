@@ -6,14 +6,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>客服系统</title>
   <link rel='stylesheet' href='https://cdn.bootcss.com/nprogress/0.2.0/nprogress.min.css'/>
+  <link href="https://cdn.bootcss.com/loaders.css/0.1.2/loaders.min.css" rel="stylesheet">
   <script src="https://cdn.bootcss.com/nprogress/0.2.0/nprogress.min.js"></script>
+  <style>
+  #loader {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #loader .loader-inner div {
+    background-color: #000;
+  }
+  </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <div id="loader">
+      <div class="loader-inner ball-spin-fade-loader">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
+  </div>
   <div id="modal-root"></div>
-  <!-- <div id="etc-root"></div> -->
   <script>
-    NProgress.start();
+  NProgress.start();
   </script>
   <script src="https://gw.alipayobjects.com/as/g/??datavis/g2/2.3.12/index.js,datavis/g-cloud/1.0.2/index.js,datavis/g2-plugin-slider/1.2.1/slider.js"></script>
 </body>

@@ -28,7 +28,7 @@ function get_session_unsynced_count(s) {
   } else if (s.sync_msg_id === 0) {
     return s.msg_id - s.start_msg_id;
   }
-  return s.msg_id - s.handler_msg_id;
+  return s.msg_id - s.sync_msg_id;
 }
 
 export default class View extends Component {

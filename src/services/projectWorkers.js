@@ -51,6 +51,7 @@ export function fetchProjectMsgs({ projectDomain, projectType }, { dispatch }, p
 
 
 export function syncSessionMsgID({ projectDomain, projectType }, { dispatch }, projectID, sessionID, sync_msg_id) {
+  console.log('xxxxxxxxxxxxx');
   const taskName = syncSessionMsgID.name;
   const worker = getWorker(taskName, [projectDomain, projectType, fetchProjectMsgs, projectID, sessionID], async (sync_msg_id) => {
     await delay(100);
