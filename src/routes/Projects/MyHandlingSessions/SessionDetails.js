@@ -57,7 +57,7 @@ export default class View extends Component {
     const session = sessions[id];
     const project = projects[session.project_id];
     const owner = appData.customers[project.owner];
-    return owner.name;
+    return owner.name || owner.mobile;
   }
 
   render() {

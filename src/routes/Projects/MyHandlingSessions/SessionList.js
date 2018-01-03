@@ -22,6 +22,15 @@ function get_session_last_msg_ts(s, def = 0) {
   return def;
 }
 
+function get_session_unsynced_count(s) {
+  if (s.msg_id === 0) {
+    return 0;
+  } else if (s.sync_msg_id === 0) {
+    return s.msg_id - s.start_msg_id;
+  }
+  return s.msg_id - s.handler_msg_id;
+}
+
 export default class View extends Component {
   static contextTypes = {
     projectDomain: PropTypes.string,
@@ -176,15 +185,15 @@ export default class View extends Component {
     const owner = appData.customers[project.owner];
     // 当前打开并且不处在阅读状态则未读不显示
     const unread =
-      session.isCurrentOpened && !currentOpenedSessionState.isInRead ? 0 : session.msg_id - session.sync_msg_id;
+      session.isCurrentOpened && !currentOpenedSessionState.isInRead ? 0 : get_session_unsynced_count(session);
     const item = {
       id: session.id,
       name: genCustomerMobileName(owner),
       description: msgRendererService.describeMsg(msg),
       online: project.is_online,
-      ts: get_session_last_msg_ts(session),
-      unread: unread,
-      selected: session.isCurrentOpened
+      ts: get_session_last_msg_ts(session, "-"),
+      selected: session.isCurrentOpened,
+      unread
     };
     return (
       <div key={key} className={styles.item} style={style}>

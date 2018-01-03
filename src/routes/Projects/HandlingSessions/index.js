@@ -18,7 +18,7 @@ const renderTsFromNow = (ts, def) => (ts ? moment.unix(ts).fromNow() : def);
 const renderStaff = staff => <Badge status={staff.is_online ? "success" : "default"} text={staff.name} />;
 const renderCustomer = user => {
   const { name } = user;
-  const text = <Badge status={user.is_online ? "success" : "default"} text={name} />;
+  const text = <Badge status={user.is_online ? "success" : "default"} text={name||'-'} />;
   return <EllipsisText text={text} tipText={name} width={150} />;
 };
 
@@ -177,7 +177,7 @@ export default class extends React.Component {
       },
       {
         title: "范围标签",
-        dataIndex: "xxx",
+        dataIndex: "yyy",
         width: 100,
         render: v => "#TODO"
       },
