@@ -64,7 +64,9 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       });
       const { page: current, per_page: pageSize, total, items } = res;
       items.forEach(item => {
-        item.msg = { ...item.msg, ...msgCodecService.decodeMsg(item.msg) };
+        if (item.msg) {
+          item.msg = { ...item.msg, ...msgCodecService.decodeMsg(item.msg) };
+        }
       });
       yield put(createAction("handling/saveFetchResult", { items, pagination: { current, pageSize, total } }));
     } finally {

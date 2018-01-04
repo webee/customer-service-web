@@ -7,18 +7,18 @@ import EllipsisText from "~/components/EllipsisText";
 import { Card, Table, Icon, Pagination, Divider, Button, Badge } from "antd";
 import SearchForm from "./SearchForm";
 import styles from "./index.css";
+import { renderTs, renderMsgTs, renderLastMsg } from "../commons";
 
 const renderBoolean = val => {
   return <Icon type={val ? "check-circle" : "close-circle"} style={{ color: val ? "green" : "black" }} />;
 };
 
 const renderNotBoolean = val => renderBoolean(!val);
-const renderTs = (ts, def, format = "LLLL") => (ts ? moment.unix(ts).format(format) : def);
 const renderTsFromNow = (ts, def) => (ts ? moment.unix(ts).fromNow() : def);
 const renderStaff = staff => <Badge status={staff.is_online ? "success" : "default"} text={staff.name} />;
 const renderCustomer = user => {
   const { name } = user;
-  const text = <Badge status={user.is_online ? "success" : "default"} text={name||'-'} />;
+  const text = <Badge status={user.is_online ? "success" : "default"} text={name || "-"} />;
   return <EllipsisText text={text} tipText={name} width={150} />;
 };
 
@@ -112,16 +112,7 @@ export default class extends React.Component {
         dataIndex: "msg",
         key: "msg",
         width: 300,
-        render: msg => {
-          const userType = msg.user_type === "customer" ? "客户" : "客服";
-          const msgDesc = msgRendererService.describeMsg(msg);
-          const text = (
-            <Fragment>
-              <span style={{ color: "grey" }}>{userType}:</span> {msgDesc}
-            </Fragment>
-          );
-          return <EllipsisText text={text} width={280} />;
-        }
+        render: msg => renderLastMsg(msg, "-")
       },
       {
         title: "最后消息时间",
@@ -130,7 +121,7 @@ export default class extends React.Component {
         sorter: true,
         sortOrder: getSorterOrder(sorter, "msg.ts"),
         width: 180,
-        render: msg => renderTs(msg.ts, "-", "YYYY-MM-DD hh:mm:ss")
+        render: msg => renderMsgTs(msg, "-", "YYYY-MM-DD hh:mm:ss")
       },
       {
         title: "未读",
