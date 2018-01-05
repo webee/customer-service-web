@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import Rx from "rxjs/Rx";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
 import { dispatchDomainType } from "~/services/project";
@@ -18,8 +17,6 @@ export default class View extends Component {
     projectDomain: PropTypes.string,
     projectType: PropTypes.string
   };
-  // onSend observable
-  onSendObservable = new Rx.Subject();
 
   componentDidMount() {
     const { session } = this.props;
@@ -65,6 +62,9 @@ export default class View extends Component {
               paneClassName={styles.main}
             >
               <MessageList
+                ref={r => {
+                  this.msg_list = r;
+                }}
                 dispatch={dispatch}
                 session={session}
                 staffs={staffs}
@@ -73,9 +73,8 @@ export default class View extends Component {
                 projTxMsgIDs={projTxMsgIDs}
                 txMsgs={txMsgs}
                 isCurrentOpened={isCurrentOpened}
-                onSendObservable={this.onSendObservable}
               />
-              <MessageSender dispatch={dispatch} session={session} onSend={() => this.onSendObservable.next()} />
+              <MessageSender dispatch={dispatch} session={session} onSend={() => this.msg_list._updateIsInReadState(false)} />
             </SplitPane>
             <SessionChatInfo
               dispatch={dispatch}

@@ -60,7 +60,6 @@
     "react-split-pane": "^0.1.71",
     "react-virtualized": "^9.13.0",
     "reflexbox": "^3.0.0-0",
-    "rxjs": "^5.5.2",
     "slate-react": "^0.10.20",
     "xchat-client": "git+ssh://git@gitlab.corp.qinqinxiaobao.com:js/xchat-client.git#master"
   },

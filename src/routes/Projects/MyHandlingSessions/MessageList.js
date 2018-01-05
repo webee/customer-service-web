@@ -457,13 +457,6 @@ export default class extends React.PureComponent {
     }
   }
 
-  componentDidMount() {
-    const { onSendObservable } = this.props;
-    this.onSend = onSendObservable.subscribe(() => {
-      this._updateIsInReadState(false);
-    });
-  }
-
   componentWillUnmount() {
     this.onSend.unsubscribe();
   }
