@@ -9,5 +9,5 @@ export const axiosConfig = {
 
 export const xfilesBaseURL = "https://xfiles.qinqinxiaobao.com/";
 export const xfilesAxiosConfig = {
-  baseURL: "https://xfiles.qinqinxiaobao.com/api/"
+  baseURL: xfilesBaseURL
 };

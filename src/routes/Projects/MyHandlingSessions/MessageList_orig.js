@@ -12,10 +12,6 @@ import EmptyContent from "./EmptyContent";
 import MessageItem from "./MessageItem";
 import styles from "./MessageList.less";
 
-const ROW_OFFSET = 1;
-const LOADING_MSG = { msg_id: -1, domain: "system", type: "notify", msg: "加载中..." };
-const NO_MORE_MSG = { msg_id: -2, domain: "system", type: "notify", msg: "没有更多消息了" };
-
 export default class extends React.PureComponent {
   static contextTypes = {
     projectDomain: PropTypes.string,
@@ -35,19 +31,19 @@ export default class extends React.PureComponent {
     this.scrollTop = 0;
     this.scrollHeight = 0;
     this.scrollDirection = 0;
-    this.start_msg_id = undefined;
-    this.msg_id = undefined;
-    this.msg_index = undefined;
     this.width = 0;
     this.cache = new CellMeasurerCache({
       defaultHeight: 50,
       fixedWidth: true,
       keyMapper: (rowIndex, columnIndex) => {
-        const message = this.getMessage(rowIndex);
-        if (message) {
-          return `msg:${message.msg_id}`;
+        const { projMsgs, projTxMsgIDs, txMsgs, isCurrentOpened } = this.props;
+        const messages = projMsgs.msgs;
+        const tx_messages = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
+        let message = messages[rowIndex];
+        if (rowIndex >= messages.length) {
+          message = tx_messages[rowIndex - messages.length];
         }
-        return rowIndex;
+        return message.msg_id;
       }
     });
     // list ref
@@ -89,57 +85,21 @@ export default class extends React.PureComponent {
         break;
       case "customer":
         const customer = customers[user_id];
-        userName = customer ? customer.name || customer.mobile : userName;
+        userName = customer ? customer.name : userName;
         break;
     }
     return userName;
   }
 
-  getRowCount = () => {
-    return ROW_OFFSET + this.getActualRowCount();
-  };
-
-  getActualRowCount = () => {
-    const { projMsgs, projTxMsgIDs, txMsgs } = this.props;
-    const messages = projMsgs.msgs || [];
-    const tx_messages = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
-    return messages.length + tx_messages.length;
-  };
-
-  getMessage = index => {
-    const { projMsgs, projTxMsgIDs, txMsgs } = this.props;
-    const messages = projMsgs.msgs || [];
-    const tx_messages = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
-    const actual_index = index - ROW_OFFSET;
-    if (actual_index >= messages.length) {
-      return tx_messages[actual_index - messages.length];
-    }
-    if (actual_index < 0) {
-      if (projMsgs.noMore) {
-        return NO_MORE_MSG;
-      }
-      return LOADING_MSG;
-    }
-    return messages[actual_index];
-  };
-
-  getMsgIndex = msg_id => {
-    if (!msg_id) {
-      return undefined;
-    }
-    const { projMsgs } = this.props;
-    const messages = projMsgs.msgs || [];
-    for (const i in messages) {
-      const msg = messages[i];
-      if (msg.msg_id === msg_id) {
-        return parseInt(i) + ROW_OFFSET;
-      }
-    }
-  };
-
   rowRenderer = ({ index, key, parent, style }) => {
     const { width } = parent.props;
-    let message = this.getMessage(index);
+    const { staffs, customers, projMsgs, projTxMsgIDs, txMsgs } = this.props;
+    const messages = projMsgs.msgs;
+    const tx_messages = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
+    let message = messages[index];
+    if (index >= messages.length) {
+      message = tx_messages[index - messages.length];
+    }
     const { user_type } = message;
     let userName = this.getUserName(message);
     let position = "mid";
@@ -178,14 +138,7 @@ export default class extends React.PureComponent {
   onScroll = ({ clientHeight, scrollHeight, scrollTop }) => {
     const { session, isCurrentOpened } = this.props;
 
-    if (clientHeight > 0 && scrollTop === 0) {
-      // console.debug("onScroll: ", clientHeight, scrollHeight, scrollTop);
-      // console.debug("loadProjectMsgs");
-      projectWorkers.loadProjectMsgs(this.context, this.props, session.project_id);
-    }
-
-    const { isInRead: prevIsInRead } = this.state;
-    const prevScrollTop = this.scrollTop;
+    const { scrollTop: prevScrollTop, isInRead: prevIsInRead } = this.state;
     const scrollDirection = scrollTop - prevScrollTop;
     this.clientHeight = clientHeight;
     this.scrollTop = scrollTop;
@@ -210,37 +163,11 @@ export default class extends React.PureComponent {
   };
 
   onRowsRendered = ({ overscanStartIndex, overscanStopIndex, startIndex, stopIndex }) => {
-    const { session, projMsgs, isCurrentOpened } = this.props;
+    const { session, isCurrentOpened } = this.props;
     if (!isCurrentOpened) {
       return;
     }
-
-    const scrollDirection = this.scrollDirection;
-    // console.debug("onRowsRendered: ", overscanStartIndex, overscanStopIndex, startIndex, stopIndex, scrollDirection);
-    if (scrollDirection < 0) {
-      if (startIndex === 0 && this.msg_id === undefined) {
-        this.start_msg_id = this.getMessage(1).msg_id;
-        this.msg_id = this.getMessage(stopIndex - 1 === 0 ? 1 : stopIndex - 1).msg_id;
-        this.msg_index = stopIndex;
-      }
-    }
-    const start_msg_index = this.getMsgIndex(this.start_msg_id);
-    const msg_index = this.getMsgIndex(this.msg_id);
-    // console.debug("yyyyyyyyyyyyyyyyyyyyyyy: ", this.msg_id, msg_index, this.msg_index);
-    if (start_msg_index !== undefined && msg_index !== undefined) {
-      if (
-        projMsgs.noMore ||
-        (start_msg_index > overscanStartIndex + 1 &&
-          msg_index > this.msg_index &&
-          msg_index >= startIndex &&
-          msg_index <= stopIndex)
-      ) {
-        this.start_msg_id = undefined;
-        this.msg_id = undefined;
-        this.msg_index = undefined;
-        this.forceUpdate();
-      }
-    }
+    // console.log("render: ", startIndex, stopIndex);
 
     const messages = this.props.projMsgs.msgs || [];
     // const { isInRead: prevIsInRead } = this.state;
@@ -301,13 +228,14 @@ export default class extends React.PureComponent {
   }
 
   render() {
-    const { session, projMsgs, projTxMsgIDs, isCurrentOpened } = this.props;
-    const { isInRead } = this.state;
-    const rowCount = this.getRowCount();
+    const { session, projMsgs, projTxMsgIDs, txMsgs, isCurrentOpened } = this.props;
+    const { rowCount: prevRowCount, isInRead } = this.state;
+    const messages = projMsgs.msgs || [];
+    const tx_messages = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
+    const rowCount = messages.length + tx_messages.length;
     const lastRowIndex = rowCount - 1;
     // 解决向上滑动的bug
-    const scrollToIndex = isInRead ? this.getMsgIndex(this.msg_id) : lastRowIndex;
-    // console.debug("xxxxxxxxxxxxxxx: ", isInRead, this.msg_id, scrollToIndex);
+    const scrollToIndex = isInRead ? undefined : lastRowIndex;
     return (
       <AutoSizer onResize={this.onResize}>
         {({ width, height }) => {
@@ -322,7 +250,7 @@ export default class extends React.PureComponent {
                 deferredMeasurementCache={this.cache}
                 width={width}
                 height={height}
-                rowCount={rowCount <= ROW_OFFSET ? 0 : rowCount}
+                rowCount={rowCount}
                 scrollToIndex={scrollToIndex}
                 scrollToAlignment="end"
                 onScroll={this.onScroll}
@@ -331,8 +259,7 @@ export default class extends React.PureComponent {
                 rowRenderer={this.rowRenderer}
                 noRowsRenderer={this.noRowsRenderer}
                 isCurrentOpened={isCurrentOpened}
-                projMsgs={projMsgs}
-                projTxMsgIDs={projTxMsgIDs}
+                tx_messages={tx_messages}
               />
               {height >= 64 &&
                 isInRead && (
@@ -428,8 +355,9 @@ export default class extends React.PureComponent {
   }
 
   _scrollToBottom() {
-    const rowCount = this.getRowCount();
-    const lastRowIndex = rowCount - 1;
+    const messages = this.props.projMsgs.msgs || [];
+    const txMsgIDs = this.props.projTxMsgIDs;
+    const lastRowIndex = messages.length + txMsgIDs.length - 1;
     this.list.scrollToRow(lastRowIndex);
   }
 

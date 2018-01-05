@@ -195,7 +195,6 @@ export default class extends React.Component {
   render() {
     const { pathLabelPlaceholder = "选择路径", userPlaceholder = "选择用户", expandTrigger = "click" } = this.props;
     const { options, user, exceed, uids, labels } = this.state;
-    console.log("labels: ", labels);
     const disableSelect = !!(user || exceed);
     return (
       <Fragment>

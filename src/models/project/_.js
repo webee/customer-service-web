@@ -66,7 +66,7 @@ export const reducer = collectTypeReducers(
     },
     appendProjectMsgs(state, { payload: { id, msgs } }) {
       const projectMsgs = { ...state.projectMsgs };
-      let { lid, rid, msgs: _msgs } = projectMsgs[id] || { msgs: [] };
+      let { lid, rid, msgs: _msgs, noMore } = projectMsgs[id] || { msgs: [] };
       let newMsgs = [..._msgs];
       msgs.forEach(msg => {
         if (!lid) {
@@ -80,7 +80,7 @@ export const reducer = collectTypeReducers(
           newMsgs.push({ ...msg, is_rx: true });
         }
       });
-      projectMsgs[id] = { lid, rid, msgs: newMsgs };
+      projectMsgs[id] = { lid, rid, msgs: newMsgs, noMore };
       return { ...state, projectMsgs };
     },
     insertProjectMsgs(state, { payload: { id, msgs, noMore } }) {
@@ -187,33 +187,41 @@ export const reducer = collectTypeReducers(
 // effects
 export const effectFunc = createNSSubEffectFunc(ns, {
   *loadProjectHistoryMsgs(
-    { projectDomain, projectType, createAction, payload: { projectID, limit } },
+    { projectDomain, projectType, createAction, payload: { projectID, limit = 256 } },
     { select, call, put }
   ) {
     const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
-    const { lid } = projectMsgs[projectID] || {};
-    const { msgs } = yield call(projectService.fetchProjectMsgs, projectID, {
+    const projectMsg = projectMsgs[projectID] || {};
+    if (projectMsg.noMore) {
+      return;
+    }
+
+    const { lid } = projectMsg;
+    const { msgs, no_more } = yield call(projectService.fetchProjectMsgs, projectID, {
       rid: lid,
       limit,
       desc: true
     });
-    const noMore = limit > 0 && msgs.length == 0;
+    const noMore = no_more || (limit > 0 && msgs.length == 0);
     const decodedMsgs = msgs.map(msg => ({ ...msg, ...msgCodecService.decodeMsg(msg) }));
     yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs: decodedMsgs, noMore }));
   },
-  *fetchProjectNewMsgs(
-    { projectDomain, projectType, createAction, payload: { projectID, limit } },
-    { select, call, put }
-  ) {
+  *fetchProjectNewMsgs({ projectDomain, projectType, createAction, payload: { projectID } }, { select, call, put }) {
     const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
-    const { rid } = projectMsgs[projectID] || {};
-    const { msgs } = yield call(projectService.fetchProjectMsgs, projectID, {
+    const projectMsg = projectMsgs[projectID] || {};
+    const { rid } = projectMsg;
+    let limit = undefined;
+    if (!rid) {
+      limit = 256;
+    }
+    const { msgs, no_more } = yield call(projectService.fetchProjectMsgs, projectID, {
       lid: rid,
       limit
     });
     const decodedMsgs = msgs.map(msg => ({ ...msg, ...msgCodecService.decodeMsg(msg) }));
     if (!rid) {
-      yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs: decodedMsgs }));
+      const noMore = no_more || (limit > 0 && msgs.length == 0);
+      yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs: decodedMsgs, noMore }));
     } else {
       yield put(createAction(`_/appendProjectMsgs`, { id: projectID, msgs: decodedMsgs }));
     }
@@ -347,6 +355,6 @@ function* handleRawMsg({ txMsg, createAction, createEffectAction }, { call, put 
     console.error(err);
     yield put(createAction(`_/updateTxMsg`, { tx_id, status: "failed", state: { ...state, p: undefined } }));
     const { msgType, status } = txMsg;
-    yield put(createEffectAction(`_/handleTxMsgs`, {msgType, status}));
+    yield put(createEffectAction(`_/handleTxMsgs`, { msgType, status }));
   }
 }

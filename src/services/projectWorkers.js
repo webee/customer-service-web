@@ -15,6 +15,10 @@ function getWorker(name, key, f, ...args) {
   return worker;
 }
 
+function clearExpiredWorkers() {
+  // TODO:
+}
+
 export function fetchMyHandlingSessions({ projectDomain, projectType }, { dispatch }) {
   const taskName = fetchMyHandlingSessions.name;
   const worker = getWorker(taskName, [projectDomain, projectType, fetchMyHandlingSessions], async () => {
@@ -38,6 +42,18 @@ export function fetchSessionItem({ projectDomain, projectType }, { dispatch }, s
   worker.start();
 }
 
+export function loadProjectMsgs({ projectDomain, projectType }, { dispatch }, projectID, limit = 100) {
+  const taskName = fetchProjectMsgs.name;
+  const worker = getWorker(taskName, [projectDomain, projectType, loadProjectMsgs, projectID], async limit => {
+    await delay(100);
+    await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "_/loadProjectHistoryMsgs", {
+      projectID,
+      limit
+    });
+  });
+  worker.start(limit);
+}
+
 export function fetchProjectMsgs({ projectDomain, projectType }, { dispatch }, projectID) {
   const taskName = fetchProjectMsgs.name;
   const worker = getWorker(taskName, [projectDomain, projectType, fetchProjectMsgs, projectID], async () => {
@@ -49,16 +65,21 @@ export function fetchProjectMsgs({ projectDomain, projectType }, { dispatch }, p
   worker.start();
 }
 
-
 export function syncSessionMsgID({ projectDomain, projectType }, { dispatch }, projectID, sessionID, sync_msg_id) {
-  console.log('xxxxxxxxxxxxx');
   const taskName = syncSessionMsgID.name;
-  const worker = getWorker(taskName, [projectDomain, projectType, fetchProjectMsgs, projectID, sessionID], async (sync_msg_id) => {
-    await delay(100);
-    await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "_/syncSessionMsgID", {
-      projectID, sessionID, sync_msg_id
-    });
-  }, sync_msg_id);
+  const worker = getWorker(
+    taskName,
+    [projectDomain, projectType, fetchProjectMsgs, projectID, sessionID],
+    async sync_msg_id => {
+      await delay(100);
+      await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "_/syncSessionMsgID", {
+        projectID,
+        sessionID,
+        sync_msg_id
+      });
+    },
+    sync_msg_id
+  );
   worker.start(sync_msg_id, (prevMsgID, msgID) => {
     return msgID > prevMsgID ? msgID : prevMsgID;
   });

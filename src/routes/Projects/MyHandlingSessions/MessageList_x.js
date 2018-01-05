@@ -1,11 +1,12 @@
-import React from "react";
+import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
+import { STRING_MSG_TYPE } from "~/libs/MsgCodecs/DefaultMsgCodec";
 import * as projectWorkers from "~/services/projectWorkers";
 import { Icon, Button, Badge } from "antd";
 import moment from "moment";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
-import List from "react-virtualized/dist/commonjs/List";
+import { InfiniteLoader, List } from "react-virtualized";
 import Lightbox from "react-image-lightbox";
 import CellMeasurer, { CellMeasurerCache } from "react-virtualized/dist/commonjs/CellMeasurer";
 import EmptyContent from "./EmptyContent";
@@ -13,8 +14,8 @@ import MessageItem from "./MessageItem";
 import styles from "./MessageList.less";
 
 const ROW_OFFSET = 1;
-const LOADING_MSG = { msg_id: -1, domain: "system", type: "notify", msg: "加载中..." };
-const NO_MORE_MSG = { msg_id: -2, domain: "system", type: "notify", msg: "没有更多消息了" };
+const LOADING_MSG = { msg_id: -1, type: STRING_MSG_TYPE, msg: "加载中..." };
+const NO_MORE_MSG = { msg_id: -2, type: STRING_MSG_TYPE, msg: "没有更多消息了" };
 
 export default class extends React.PureComponent {
   static contextTypes = {
@@ -35,7 +36,6 @@ export default class extends React.PureComponent {
     this.scrollTop = 0;
     this.scrollHeight = 0;
     this.scrollDirection = 0;
-    this.start_msg_id = undefined;
     this.msg_id = undefined;
     this.msg_index = undefined;
     this.width = 0;
@@ -139,7 +139,9 @@ export default class extends React.PureComponent {
 
   rowRenderer = ({ index, key, parent, style }) => {
     const { width } = parent.props;
-    let message = this.getMessage(index);
+    const { staffs, customers, projMsgs, projTxMsgIDs, txMsgs } = this.props;
+    const message = this.getMessage(index);
+
     const { user_type } = message;
     let userName = this.getUserName(message);
     let position = "mid";
@@ -176,13 +178,8 @@ export default class extends React.PureComponent {
   };
 
   onScroll = ({ clientHeight, scrollHeight, scrollTop }) => {
+    // console.debug("onScroll: ", clientHeight, scrollHeight, scrollTop);
     const { session, isCurrentOpened } = this.props;
-
-    if (clientHeight > 0 && scrollTop === 0) {
-      // console.debug("onScroll: ", clientHeight, scrollHeight, scrollTop);
-      // console.debug("loadProjectMsgs");
-      projectWorkers.loadProjectMsgs(this.context, this.props, session.project_id);
-    }
 
     const { isInRead: prevIsInRead } = this.state;
     const prevScrollTop = this.scrollTop;
@@ -210,39 +207,34 @@ export default class extends React.PureComponent {
   };
 
   onRowsRendered = ({ overscanStartIndex, overscanStopIndex, startIndex, stopIndex }) => {
-    const { session, projMsgs, isCurrentOpened } = this.props;
+    const { session, isCurrentOpened, projMsgs } = this.props;
     if (!isCurrentOpened) {
       return;
     }
-
     const scrollDirection = this.scrollDirection;
-    // console.debug("onRowsRendered: ", overscanStartIndex, overscanStopIndex, startIndex, stopIndex, scrollDirection);
-    if (scrollDirection < 0) {
-      if (startIndex === 0 && this.msg_id === undefined) {
-        this.start_msg_id = this.getMessage(1).msg_id;
-        this.msg_id = this.getMessage(stopIndex - 1 === 0 ? 1 : stopIndex - 1).msg_id;
-        this.msg_index = stopIndex;
+    console.debug("onRowsRendered: ", overscanStartIndex, overscanStopIndex, startIndex, stopIndex, scrollDirection);
+    if (scrollDirection <= 0) {
+      if (overscanStartIndex === 0 && this.msg_id === undefined) {
+        // console.debug("loadProjectMsgs");
+        // projectWorkers.loadProjectMsgs(this.context, this.props, session.project_id);
+        // const message = this.getMessage(startIndex > 0 ? startIndex : 1);
+        // if (message) {
+        //   this.msg_id = message.msg_id;
+        //   this.msg_index = startIndex;
+        // }
       }
     }
-    const start_msg_index = this.getMsgIndex(this.start_msg_id);
-    const msg_index = this.getMsgIndex(this.msg_id);
-    // console.debug("yyyyyyyyyyyyyyyyyyyyyyy: ", this.msg_id, msg_index, this.msg_index);
-    if (start_msg_index !== undefined && msg_index !== undefined) {
-      if (
-        projMsgs.noMore ||
-        (start_msg_index > overscanStartIndex + 1 &&
-          msg_index > this.msg_index &&
-          msg_index >= startIndex &&
-          msg_index <= stopIndex)
-      ) {
-        this.start_msg_id = undefined;
-        this.msg_id = undefined;
-        this.msg_index = undefined;
-        this.forceUpdate();
-      }
-    }
+    // const msg_index = this.getMsgIndex(this.msg_id);
+    // console.log("yyyyyyyyyyyyyyyyyyyyyyy: ", this.msg_id, msg_index, this.msg_index);
+    // if (
+    //   projMsgs.noMore ||
+    //   (msg_index !== undefined && msg_index > this.msg_index && msg_index >= startIndex && msg_index <= stopIndex)
+    // ) {
+    //   this.msg_id = undefined;
+    //   this.msg_index = undefined;
+    // }
 
-    const messages = this.props.projMsgs.msgs || [];
+    const messages = projMsgs.msgs || [];
     // const { isInRead: prevIsInRead } = this.state;
     // const scrollDirection = this.scrollDirection;
     // // isInRead以rx区的消息为准
@@ -264,7 +256,9 @@ export default class extends React.PureComponent {
 
     // 同步已读消息id
     const message = messages[stopIndex < messages.length ? stopIndex : messages.length - 1];
-    this._syncMsgID(message.msg_id);
+    if (message) {
+      this._syncMsgID(message.msg_id);
+    }
   };
 
   onDownClicked = () => {
@@ -300,14 +294,57 @@ export default class extends React.PureComponent {
     );
   }
 
-  render() {
+  renderList(rowCount, { width, height }) {
     const { session, projMsgs, projTxMsgIDs, isCurrentOpened } = this.props;
     const { isInRead } = this.state;
-    const rowCount = this.getRowCount();
     const lastRowIndex = rowCount - 1;
     // 解决向上滑动的bug
-    const scrollToIndex = isInRead ? this.getMsgIndex(this.msg_id) : lastRowIndex;
-    // console.debug("xxxxxxxxxxxxxxx: ", isInRead, this.msg_id, scrollToIndex);
+    const scrollToIndex = isInRead ? undefined : lastRowIndex;
+    // const scrollToIndex = isInRead ? this.getMsgIndex(this.msg_id) : lastRowIndex;
+    this.msg_id = scrollToIndex !== undefined ? this.getMessage(scrollToIndex).msg_id : undefined;
+    console.log("xxxxxxxxxxxxxxx: ", isInRead, this.msg_id, scrollToIndex);
+    return (
+      <Fragment>
+        {this.state.lightboxIsOpen && this.renderLightbox()}
+        <List
+          ref={i => {
+            this.list = i;
+          }}
+          className={styles.list}
+          deferredMeasurementCache={this.cache}
+          width={width}
+          height={height}
+          rowCount={rowCount}
+          scrollToIndex={scrollToIndex}
+          scrollToAlignment="end"
+          onScroll={this.onScroll}
+          onRowsRendered={this.onRowsRendered}
+          rowHeight={this.cache.rowHeight}
+          rowRenderer={this.rowRenderer}
+          noRowsRenderer={this.noRowsRenderer}
+          isCurrentOpened={isCurrentOpened}
+          projTxMsgIDs={projTxMsgIDs}
+          projMsgs={projMsgs}
+        />
+        {height >= 64 &&
+          isInRead && (
+            // <Badge className={styles.down} count={session.msg_id - session.sync_msg_id}>
+            <Button
+              className={styles.down}
+              ghost
+              type="primary"
+              shape="circle"
+              icon="down"
+              onClick={this.onDownClicked}
+            />
+            // </Badge>
+          )}
+      </Fragment>
+    );
+  }
+
+  render() {
+    const rowCount = this.getRowCount();
     return (
       <AutoSizer onResize={this.onResize}>
         {({ width, height }) => {
@@ -315,38 +352,7 @@ export default class extends React.PureComponent {
           // console.log({width, height});
           return (
             <div className={styles.main} style={{ width, height }}>
-              {this.state.lightboxIsOpen && this.renderLightbox()}
-              <List
-                ref={i => (this.list = i)}
-                className={styles.list}
-                deferredMeasurementCache={this.cache}
-                width={width}
-                height={height}
-                rowCount={rowCount <= ROW_OFFSET ? 0 : rowCount}
-                scrollToIndex={scrollToIndex}
-                scrollToAlignment="end"
-                onScroll={this.onScroll}
-                onRowsRendered={this.onRowsRendered}
-                rowHeight={this.cache.rowHeight}
-                rowRenderer={this.rowRenderer}
-                noRowsRenderer={this.noRowsRenderer}
-                isCurrentOpened={isCurrentOpened}
-                projMsgs={projMsgs}
-                projTxMsgIDs={projTxMsgIDs}
-              />
-              {height >= 64 &&
-                isInRead && (
-                  // <Badge className={styles.down} count={session.msg_id - session.sync_msg_id}>
-                  <Button
-                    className={styles.down}
-                    ghost
-                    type="primary"
-                    shape="circle"
-                    icon="down"
-                    onClick={this.onDownClicked}
-                  />
-                  // </Badge>
-                )}
+              {rowCount <= ROW_OFFSET ? this.noRowsRenderer() : this.renderList(rowCount, { width, height })}
             </div>
           );
         }}

@@ -1,15 +1,22 @@
 import { DefaultDomainMsgRendererFetcher, MsgComponentRenderer } from "~/components/Messages";
-import * as commonTypeComponents from "~/components/Messages/common";
+import * as commonTypeMsgs from "~/components/Messages/common";
+import * as systemTypeMsgs from "~/components/Messages/system";
 
 // domain msg renderer fetcher
 const domainMsgRendererFetcher = new DefaultDomainMsgRendererFetcher();
 domainMsgRendererFetcher.register(
   ["", "cs"],
   new MsgComponentRenderer({
-    text: commonTypeComponents.TextMsg,
-    file: commonTypeComponents.FileMsg,
-    image: commonTypeComponents.ImageMsg,
-    voice: commonTypeComponents.VoiceMsg
+    text: commonTypeMsgs.TextMsg,
+    file: commonTypeMsgs.FileMsg,
+    image: commonTypeMsgs.ImageMsg,
+    voice: commonTypeMsgs.VoiceMsg
+  })
+);
+domainMsgRendererFetcher.register(
+  ["system"],
+  new MsgComponentRenderer({
+    notify: systemTypeMsgs.NotifyMsg
   })
 );
 

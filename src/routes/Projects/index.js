@@ -53,13 +53,15 @@ export default class View extends Component {
     this.setState({ expanded: !this.state.expanded });
   };
 
-  getTabContent(key) {
-    const { expanded } = this.state;
-    return (
-      <TabContentView expanded={expanded} onToggleExpand={this.onToggleExpand}>
-        <PureTabContentView name={key} {...this.props} />
-      </TabContentView>
-    );
+  getTabContent(key, activeKey) {
+    if (activeKey === key) {
+      // FIXME: 导致切换tab重新渲染
+      return (
+        <TabContentView expanded={this.state.expanded} onToggleExpand={this.onToggleExpand}>
+          <PureTabContentView name={key} {...this.props} />
+        </TabContentView>
+      );
+    }
   }
 
   render() {
@@ -78,13 +80,13 @@ export default class View extends Component {
         animated={false}
       >
         <Tabs.TabPane tab="我的接待" key="my_handling">
-          {this.getTabContent("my_handling")}
+          {this.getTabContent("my_handling", tab)}
         </Tabs.TabPane>
         <Tabs.TabPane tab="正在接待" key="handling">
-          {this.getTabContent("handling")}
+          {this.getTabContent("handling", tab)}
         </Tabs.TabPane>
         <Tabs.TabPane tab="完成接待" key="handled">
-          {this.getTabContent("handled")}
+          {this.getTabContent("handled", tab)}
         </Tabs.TabPane>
       </Tabs>
     );
