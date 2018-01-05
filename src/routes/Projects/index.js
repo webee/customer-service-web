@@ -69,7 +69,7 @@ export default class View extends Component {
     const { match } = this.props;
     const { tab } = match.params;
     return expanded ? (
-      this.getTabContent(tab)
+      this.getTabContent(tab, tab)
     ) : (
       <Tabs
         className={styles.main}
