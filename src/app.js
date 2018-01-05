@@ -8,7 +8,7 @@ import Modal from "react-modal";
 import "react-virtualized/styles.css";
 import envConfig from "./config";
 import "./polyfill";
-import "./g2";
+// import "./g2";
 import "./index.less";
 import { collectReducers } from "./models/utils";
 import modelReducer from "./models/reducer";

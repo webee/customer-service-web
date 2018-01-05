@@ -139,20 +139,6 @@ export default class extends React.PureComponent {
     }
   };
 
-  getMsgFromIndex = msg_id => {
-    if (!msg_id) {
-      return undefined;
-    }
-    const { projMsgs } = this.props;
-    const messages = projMsgs.msgs || [];
-    for (const i in messages) {
-      const msg = messages[i];
-      if (msg.msg_id === msg_id) {
-        return msg;
-      }
-    }
-  };
-
   rowRenderer = ({ index, key, parent, style }) => {
     const { width } = parent.props;
     let message = this.getMessage(index);
@@ -207,8 +193,8 @@ export default class extends React.PureComponent {
 
     if (clientHeight > 0) {
       if (scrollTop === 0) {
-        // console.debug("onScroll: ", clientHeight, scrollHeight, scrollTop, scrollDirection);
-        // console.debug("loadProjectMsgs");
+        console.debug("onScroll: ", clientHeight, scrollHeight, scrollTop, scrollDirection);
+        console.debug("loadProjectMsgs");
         projectWorkers.loadProjectMsgs(this.context, this.props, session.project_id);
       }
 
@@ -217,7 +203,7 @@ export default class extends React.PureComponent {
         // 由阅读状态进入非阅读状态
         isInRead = !(clientHeight + scrollTop >= scrollHeight);
       } else {
-        // console.debug("onScroll: ", clientHeight, scrollHeight, scrollTop, scrollDirection);
+        console.debug("onScroll: ", clientHeight, scrollHeight, scrollTop, scrollDirection);
         // 由非阅读状态进入阅读状态
         isInRead = clientHeight + scrollTop + 10 < scrollHeight;
       }
@@ -231,16 +217,14 @@ export default class extends React.PureComponent {
       return;
     }
 
-    const scrollDirection = this.scrollDirection;
-    // console.debug("onRowsRendered: ", overscanStartIndex, overscanStopIndex, startIndex, stopIndex, scrollDirection);
     if (this.state.isInRead) {
-      this.stop_msg_id = this.getMessage(stopIndex <= 1 ? 1 : stopIndex).msg_id;
-      // console.debug("set stop_msg_id: ", stopIndex, this.stop_msg_id);
-    } else if (this.stop_msg_id !== undefined) {
-      // console.debug("reset stop_msg_id");
+      this.stop_msg_id = this.getMessage(stopIndex - 1 === 0 ? 1 : stopIndex - 1).msg_id;
+    } else {
       this.stop_msg_id = undefined;
     }
 
+    const scrollDirection = this.scrollDirection;
+    console.debug("onRowsRendered: ", overscanStartIndex, overscanStopIndex, startIndex, stopIndex, scrollDirection);
     if (scrollDirection < 0) {
       if (startIndex === 0 && this.msg_id === undefined) {
         this.start_msg_id = this.getMessage(1).msg_id;
@@ -250,7 +234,7 @@ export default class extends React.PureComponent {
     }
     const start_msg_index = this.getMsgIndex(this.start_msg_id);
     const msg_index = this.getMsgIndex(this.msg_id);
-    // console.debug("onRowsRendered yyy: ", this.msg_id, msg_index, this.msg_index);
+    console.debug("yyyyyyyyyyyyyyyyyyyyyyy: ", this.msg_id, msg_index, this.msg_index);
     if (start_msg_index !== undefined && msg_index !== undefined) {
       if (
         projMsgs.noMore ||
@@ -327,8 +311,7 @@ export default class extends React.PureComponent {
   render() {
     const { session, projMsgs, projTxMsgIDs, isCurrentOpened } = this.props;
     const { isInRead } = this.state;
-    if (!isInRead && this.stop_msg_id !== undefined) {
-      // console.debug("reset stop_msg_id");
+    if (!isInRead) {
       this.stop_msg_id = undefined;
     }
 
@@ -338,16 +321,9 @@ export default class extends React.PureComponent {
     const lastRowIndex = rowCount - 1;
     // 解决向上滑动的bug
     const scrollToIndex = isInRead
-      ? this.getMsgIndex(this.msg_id) || (prevRowCount !== rowCount ? this.getMsgIndex(this.stop_msg_id) : undefined)
+      ? this.getMsgIndex(this.msg_id) || (prevRowCount !== rowCount ? undefined : undefined)
       : lastRowIndex;
-    // console.debug(
-    //   "render: ",
-    //   isInRead,
-    //   this.msg_id,
-    //   this.stop_msg_id,
-    //   scrollToIndex,
-    //   this.getMsgFromIndex(this.stop_msg_id)
-    // );
+    console.debug("xxxxxxxxxxxxxxx: ", isInRead, this.msg_id, this.stop_msg_id, scrollToIndex);
     return (
       <AutoSizer onResize={this.onResize}>
         {({ width, height }) => {
@@ -360,12 +336,11 @@ export default class extends React.PureComponent {
                 ref={i => (this.list = i)}
                 className={styles.list}
                 deferredMeasurementCache={this.cache}
-                overscanRowCount={50}
                 width={width}
                 height={height}
                 rowCount={rowCount <= ROW_OFFSET ? 0 : rowCount}
                 scrollToIndex={scrollToIndex}
-                scrollToAlignment="auto"
+                scrollToAlignment="end"
                 onScroll={this.onScroll}
                 onRowsRendered={this.onRowsRendered}
                 rowHeight={this.cache.rowHeight}

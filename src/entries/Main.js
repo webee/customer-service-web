@@ -225,9 +225,13 @@ class Main extends React.Component {
 
     return (
       <div className={MainLayoutStyles.right}>
-        <Link to="/_" className={MainLayoutStyles.action}>
-          <Icon type="code" />Test
-        </Link>
+        {env !== "prod" ? (
+          <Link to="/_" className={MainLayoutStyles.action}>
+            <Icon type="code" />Test
+          </Link>
+        ) : (
+          undefined
+        )}
         <span className={MainLayoutStyles.action} onClick={this.handleSettingUI}>
           <Icon type="setting" />界面设置
         </span>

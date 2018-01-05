@@ -77,7 +77,13 @@ export default class View extends Component {
               />
               <MessageSender dispatch={dispatch} session={session} onSend={() => this.onSendObservable.next()} />
             </SplitPane>
-            <SessionChatInfo session={session} project={project} staffs={staffs} customers={customers} />
+            <SessionChatInfo
+              dispatch={dispatch}
+              session={session}
+              project={project}
+              staffs={staffs}
+              customers={customers}
+            />
           </SplitPane>
         </div>
       </div>

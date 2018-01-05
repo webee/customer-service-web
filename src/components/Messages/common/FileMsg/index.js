@@ -48,7 +48,7 @@ export default ({ msg, as_description }) => {
         <div className={styles.detail}>
           <div className={styles.info}>{prettySize}</div>
           <div className={styles.action}>
-            <a href={url} download={name} disabled={!url}>
+            <a href={url} download={name} disabled={!url} target="_blank">
               下载
             </a>
           </div>
