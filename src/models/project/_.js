@@ -18,7 +18,7 @@ export const reducer = collectTypeReducers(
     sessions: {},
     // 所有项目by id
     projects: {},
-    // 项目消息by project id: {lid, rid, [msgs], noMore}
+    // 项目消息by project id: {lid, rid, [msgs], noMore, isFetchingNew}
     projectMsgs: {},
     // tx_id, 每次自增1
     tx_id: 0,
@@ -64,9 +64,15 @@ export const reducer = collectTypeReducers(
       delete projectMsgs[id];
       return { ...state, projectMsgs };
     },
+    updateProjectMsgsIsFetching(state, { payload: { id, isFetchingNew } }) {
+      const projectMsgs = { ...state.projectMsgs };
+      projectMsgs[id] = { ...(projectMsgs[id] || {}), isFetchingNew };
+      return { ...state, projectMsgs };
+    },
     appendProjectMsgs(state, { payload: { id, msgs } }) {
       const projectMsgs = { ...state.projectMsgs };
-      let { lid, rid, msgs: _msgs, noMore } = projectMsgs[id] || { msgs: [] };
+      let { lid, rid, msgs: _msgs, noMore } = projectMsgs[id] || {};
+      _msgs = _msgs || [];
       let newMsgs = [..._msgs];
       msgs.forEach(msg => {
         if (!lid) {
@@ -85,7 +91,8 @@ export const reducer = collectTypeReducers(
     },
     insertProjectMsgs(state, { payload: { id, msgs, noMore } }) {
       const projectMsgs = { ...state.projectMsgs };
-      let { lid, rid, msgs: _msgs, noMore: _noMore } = projectMsgs[id] || { msgs: [] };
+      let { lid, rid, msgs: _msgs, noMore: _noMore } = projectMsgs[id] || {};
+      _msgs = _msgs || [];
       const newNoMore = noMore === undefined ? _noMore : noMore;
       let newMsgs = [..._msgs];
       msgs.forEach(msg => {
@@ -207,26 +214,31 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs: decodedMsgs, noMore }));
   },
   *fetchProjectNewMsgs({ projectDomain, projectType, createAction, payload: { projectID } }, { select, call, put }) {
-    const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
-    const projectMsg = projectMsgs[projectID] || {};
-    const { rid } = projectMsg;
-    let limit = undefined;
-    if (!rid) {
-      limit = 256;
+    try {
+      yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingNew: true }));
+      const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
+      const projectMsg = projectMsgs[projectID] || {};
+      const { rid } = projectMsg;
+      let limit = undefined;
+      if (!rid) {
+        limit = 256;
+      }
+      const { msgs, no_more } = yield call(projectService.fetchProjectMsgs, projectID, {
+        lid: rid,
+        limit
+      });
+      const decodedMsgs = msgs.map(msg => ({ ...msg, ...msgCodecService.decodeMsg(msg) }));
+      if (!rid) {
+        const noMore = no_more || (limit > 0 && msgs.length == 0);
+        yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs: decodedMsgs, noMore }));
+      } else {
+        yield put(createAction(`_/appendProjectMsgs`, { id: projectID, msgs: decodedMsgs }));
+      }
+      // 检查刚接收的消息是否为已发送状态的tx消息
+      yield put(createAction(`_/checkProjectTxMsgsRxKey`, { projectID, rid }));
+    } finally {
+      yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingNew: false }));
     }
-    const { msgs, no_more } = yield call(projectService.fetchProjectMsgs, projectID, {
-      lid: rid,
-      limit
-    });
-    const decodedMsgs = msgs.map(msg => ({ ...msg, ...msgCodecService.decodeMsg(msg) }));
-    if (!rid) {
-      const noMore = no_more || (limit > 0 && msgs.length == 0);
-      yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs: decodedMsgs, noMore }));
-    } else {
-      yield put(createAction(`_/appendProjectMsgs`, { id: projectID, msgs: decodedMsgs }));
-    }
-    // 检查刚接收的消息是否为已发送状态的tx消息
-    yield put(createAction(`_/checkProjectTxMsgsRxKey`, { projectID, rid }));
   },
   *syncSessionMsgID({ createAction, payload: { projectID, sessionID, sync_msg_id } }, { select, call, put }) {
     yield call(projectService.syncSessionMsgID, projectID, sessionID, sync_msg_id);

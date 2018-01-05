@@ -5,6 +5,7 @@ import * as projectWorkers from "~/services/projectWorkers";
 import { Icon, Button, Badge } from "antd";
 import moment from "moment";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
+import Loader from "~/components/Loader";
 import List from "react-virtualized/dist/commonjs/List";
 import Lightbox from "react-image-lightbox";
 import CellMeasurer, { CellMeasurerCache } from "react-virtualized/dist/commonjs/CellMeasurer";
@@ -182,7 +183,16 @@ export default class extends React.PureComponent {
     );
   };
 
-  noRowsRenderer = () => <EmptyContent />;
+  noRowsRenderer = () => {
+    const { projMsgs } = this.props;
+    const rowCount = this.getActualRowCount();
+    console.log("xxxxxxx:", rowCount, projMsgs);
+    return (
+      <Loader loaded={!(rowCount === 0 && projMsgs.isFetchingNew)} type="three-bounce" fadeIn="none">
+        <EmptyContent />
+      </Loader>
+    );
+  };
 
   onResize = ({ width }) => {
     if (this.width !== width) {
@@ -455,10 +465,6 @@ export default class extends React.PureComponent {
         this.forceUpdate();
       }
     }
-  }
-
-  componentWillUnmount() {
-    this.onSend.unsubscribe();
   }
 
   _scrollToBottom() {
