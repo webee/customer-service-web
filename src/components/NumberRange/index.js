@@ -39,8 +39,8 @@ export default class extends React.Component {
     const { start, end } = this.state;
     return (
       <div className={styles.main}>
-        <InputNumber className={styles.start} value={start} onChange={this.onStartChange} />
-        <InputNumber className={styles.end} value={end} onChange={this.onEndChange} />
+        <InputNumber className={styles.start} value={start} onChange={this.onStartChange} placeholder="最小值" />
+        <InputNumber className={styles.end} value={end} onChange={this.onEndChange} placeholder="最大值" />
       </div>
     );
   }

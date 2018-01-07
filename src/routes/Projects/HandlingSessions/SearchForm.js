@@ -62,7 +62,7 @@ export default class extends React.Component {
           </Col>
           <Col {...{ sm: 8, md: 8, lg: 4, xl: 4 }}>
             <Form.Item label="排除自己" colon={false}>
-              {getFieldDecorator("exclude_self")(<Switch />)}
+              {getFieldDecorator("exclude_self", { initialValue: false })(<Switch />)}
             </Form.Item>
           </Col>
           <Col {...colSpanSpecs}>

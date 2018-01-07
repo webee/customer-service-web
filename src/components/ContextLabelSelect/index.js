@@ -152,7 +152,7 @@ export default class extends React.Component {
     }
     // form control
     if (nextProps.value === null) {
-      this.setState({ path: undefined, user: undefined, uids: [], labels: [] });
+      this.setState({ path: undefined, user: undefined, exceed: true, uids: [], labels: [] });
     }
   }
 
@@ -168,7 +168,7 @@ export default class extends React.Component {
       if (exceed) {
         onChange(undefined);
       } else {
-        onChange({ path, uids });
+        onChange(`${path},${uids.join("|")}`);
       }
     }
   };
@@ -227,7 +227,7 @@ export default class extends React.Component {
   };
 
   onCascaderChange = (labels, selectedOptions) => {
-    console.log("onCascaderChange:", labels);
+    console.debug("onCascaderChange:", labels);
     let path = undefined;
     let user = undefined;
     let exceed = true;
