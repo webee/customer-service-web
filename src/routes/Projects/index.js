@@ -106,7 +106,8 @@ const PureTabContentView = props => {
     case "handled":
       return (
         <div style={{ display: "flex" }}>
-          <div style={{ flex: "1 0 auto" }}>
+          <div style={{ flex: "1 0 auto", whiteSpace: "nowrap" }}>
+            {/*<div style={{ backgroundColor: "red", width: 2000 }}>xxx</div>*/}
             <h1>
               {projectDomain}/{projectType}:
               最近完成接待的会话叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉<br
@@ -147,12 +148,7 @@ const PureTabContentView = props => {
 const TabContentView = ({ expanded, onToggleExpand, children }) => {
   const icon = expanded ? "shrink" : "arrows-alt";
   return (
-    <TopRightButton
-      icon={icon}
-      style={{ flex: "auto" }}
-      contentStyle={{ backgroundColor: "white" }}
-      onClick={onToggleExpand}
-    >
+    <TopRightButton icon={icon} style={{ backgroundColor: "white" }} onClick={onToggleExpand}>
       {children}
     </TopRightButton>
   );
