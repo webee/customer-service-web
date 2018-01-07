@@ -32,6 +32,7 @@ export default class extends React.Component {
     const { getFieldDecorator } = this.props.form;
     const gutterSpecs = { xs: 8, sm: 16, md: 16, lg: 24, xl: 24 };
     const colSpanSpecs = { sm: 24, md: 12, lg: 8, xl: 6 };
+    const colSpanSpecs2 = { sm: 24, md: 12, lg: 12, xl: 8 };
 
     return (
       <Form className={styles.main} onSubmit={this.handleSearch}>
@@ -70,14 +71,14 @@ export default class extends React.Component {
               {getFieldDecorator("unhandled_msg_count_range")(<NumberRange min={0} transformer={Math.floor} />)}
             </Form.Item>
           </Col>
-          <Col {...{ sm: 24, md: 12, lg: 8, xl: 8 }}>
-            <Form.Item label="消息时间" colon={false}>
-              {getFieldDecorator("msg_ts_range")(<DateTimeRange />)}
-            </Form.Item>
-          </Col>
-          <Col {...colSpanSpecs}>
+          <Col {...colSpanSpecs2}>
             <Form.Item label="项目标签" colon={false}>
               {getFieldDecorator("tag")(<Input />)}
+            </Form.Item>
+          </Col>
+          <Col {...colSpanSpecs2}>
+            <Form.Item label="消息时间" colon={false}>
+              {getFieldDecorator("msg_ts_range")(<DateTimeRange />)}
             </Form.Item>
           </Col>
         </Row>
