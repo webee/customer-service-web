@@ -18,7 +18,7 @@ export const reducer = collectTypeReducers(
     sessions: {},
     // 所有项目by id
     projects: {},
-    // 项目消息by project id: {lid, rid, [msgs], noMore, isFetchingNew}
+    // 项目消息by project id: {lid, rid, [msgs], noMore, isFetchingNew, isFetchingHistory}
     projectMsgs: {},
     // tx_id, 每次自增1
     tx_id: 0,
@@ -64,9 +64,15 @@ export const reducer = collectTypeReducers(
       delete projectMsgs[id];
       return { ...state, projectMsgs };
     },
-    updateProjectMsgsIsFetching(state, { payload: { id, isFetchingNew } }) {
+    updateProjectMsgsIsFetching(state, { payload: { id, isFetchingNew, isFetchingHistory } }) {
       const projectMsgs = { ...state.projectMsgs };
-      projectMsgs[id] = { ...(projectMsgs[id] || {}), isFetchingNew };
+      projectMsgs[id] = { ...(projectMsgs[id] || {}) };
+      if (isFetchingNew !== undefined) {
+        projectMsgs[id].isFetchingNew = isFetchingNew;
+      }
+      if (isFetchingHistory !== undefined) {
+        projectMsgs[id].isFetchingHistory = isFetchingHistory;
+      }
       return { ...state, projectMsgs };
     },
     appendProjectMsgs(state, { payload: { id, msgs } }) {
@@ -197,21 +203,26 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     { projectDomain, projectType, createAction, payload: { projectID, limit = 256 } },
     { select, call, put }
   ) {
-    const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
-    const projectMsg = projectMsgs[projectID] || {};
-    if (projectMsg.noMore) {
-      return;
-    }
+    try {
+      yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingHistory: true }));
+      const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
+      const projectMsg = projectMsgs[projectID] || {};
+      if (projectMsg.noMore) {
+        return;
+      }
 
-    const { lid } = projectMsg;
-    const { msgs, no_more } = yield call(projectService.fetchProjectMsgs, projectID, {
-      rid: lid,
-      limit,
-      desc: true
-    });
-    const noMore = no_more || (limit > 0 && msgs.length == 0);
-    const decodedMsgs = msgs.map(msg => ({ ...msg, ...msgCodecService.decodeMsg(msg) }));
-    yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs: decodedMsgs, noMore }));
+      const { lid } = projectMsg;
+      const { msgs, no_more } = yield call(projectService.fetchProjectMsgs, projectID, {
+        rid: lid,
+        limit,
+        desc: true
+      });
+      const noMore = no_more || (limit > 0 && msgs.length == 0);
+      const decodedMsgs = msgs.map(msg => ({ ...msg, ...msgCodecService.decodeMsg(msg) }));
+      yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs: decodedMsgs, noMore }));
+    } finally {
+      yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingHistory: false }));
+    }
   },
   *fetchProjectNewMsgs({ projectDomain, projectType, createAction, payload: { projectID } }, { select, call, put }) {
     try {
