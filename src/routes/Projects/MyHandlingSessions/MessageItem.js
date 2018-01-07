@@ -2,6 +2,7 @@ import React from "react";
 import cs from "classnames";
 import { Icon } from "antd";
 import Spinner from "react-spinkit";
+import moment from "moment";
 import * as msgRendererService from "~/services/msgRenderer";
 import styles from "./MessageItem.less";
 
@@ -36,13 +37,7 @@ export default class extends React.PureComponent {
   renderFailed(message, is_failed) {
     const { handleFailedMsg } = this.props;
     if (is_failed) {
-      return (
-        <Icon
-          type="close-circle"
-          style={{ fontSize: 24, color: "red", margin: 8 }}
-          onClick={handleFailedMsg}
-        />
-      );
+      return <Icon type="close-circle" style={{ fontSize: 24, color: "red", margin: 8 }} onClick={handleFailedMsg} />;
     }
   }
 
@@ -63,7 +58,10 @@ export default class extends React.PureComponent {
       <div className={itemClassNames}>
         <div className={styles.info}>{this.renderStatus(status)}</div>
         <div className={styles.content}>
-          <div className={styles.head}>{userName}</div>
+          <div className={styles.head}>
+            {userName}
+            <span className={styles.ts}>{moment.unix(ts).format("YYYY-MM-DD hh:mm:ss")}</span>
+          </div>
           <div className={styles.decorate}>
             <div className={bodyClassNames} onClick={onClickMsg}>
               {msgRendererService.renderMsg({ domain, type, msg }, ctx)}
