@@ -2,6 +2,7 @@ import config from "~/config";
 import { combineNSReducers, asNestedReducer, toPromiseEffects } from "../utils";
 import { reducer as myHandlingReducer, effectFunc as myHandlingEffectFunc } from "./myHandling";
 import { reducer as handlingReducer, effectFunc as handlingEffectFunc } from "./handling";
+import { reducer as handledReducer, effectFunc as handledEffectFunc } from "./handled";
 import { reducer as _Reducer, effectFunc as _EffectFunc } from "./_";
 import * as msgCookService from "../../services/msgCook";
 import FileUploadCook from "../../services/FileUploadCook";
@@ -11,7 +12,8 @@ export const reducer = asNestedReducer(
   combineNSReducers({
     _: _Reducer,
     myHandling: myHandlingReducer,
-    handling: handlingReducer
+    handling: handlingReducer,
+    handled: handledReducer
   }),
   ["projectDomain", "projectType"]
 );
@@ -30,7 +32,8 @@ export default {
       yield all([
         call(_EffectFunc, payload, effects),
         call(myHandlingEffectFunc, payload, effects),
-        call(handlingEffectFunc, payload, effects)
+        call(handlingEffectFunc, payload, effects),
+        call(handledEffectFunc, payload, effects)
       ]);
     }
   }),

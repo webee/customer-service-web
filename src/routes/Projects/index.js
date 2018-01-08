@@ -8,6 +8,7 @@ import styles from "./index.less";
 import TopRightButton from "../../components/TopRightButton";
 import MyHandlingSessionsView from "./MyHandlingSessions";
 import HandlingSessionsView from "./HandlingSessions";
+import HandledSessionsView from "./HandledSessions";
 
 @connect((state, ownProps) => {
   const { projectDomain, projectType } = ownProps;
@@ -104,44 +105,7 @@ const PureTabContentView = props => {
     case "handling":
       return <HandlingSessionsView dispatch={dispatch} appData={appData} data={data._} handlingData={data.handling} />;
     case "handled":
-      return (
-        <div style={{ display: "flex" }}>
-          <div style={{ flex: "1 0 auto", whiteSpace: "nowrap" }}>
-            {/*<div style={{ backgroundColor: "red", width: 2000 }}>xxx</div>*/}
-            <h1>
-              {projectDomain}/{projectType}:
-              最近完成接待的会话叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉叉<br
-              />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-              最近接待的会话<br />
-            </h1>
-          </div>
-        </div>
-      );
+      return <HandledSessionsView dispatch={dispatch} appData={appData} data={data._} handledData={data.handled} />;
   }
 };
 

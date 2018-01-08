@@ -1,9 +1,8 @@
 import React from "react";
-import { Form, Row, Col, Input, Button, Icon, Switch, Select } from "antd";
+import { Form, Row, Col, Input, Button, Icon, Switch, Radio, Select } from "antd";
 import { contextLabelsMatchContextLabels } from "~/utils/pathLabels";
 import ContextLabelSelect from "~/components/ContextLabelSelect";
 import DateTimeRange from "~/components/DateTimeRange";
-import NumberRange from "~/components/NumberRange";
 import UserSelect from "~/components/UserSelect";
 import styles from "./SearchForm.less";
 
@@ -71,19 +70,14 @@ export default class extends React.Component {
               )}
             </Form.Item>
           </Col>
-          <Col {...colSpanSpecs}>
-            <Form.Item label="未回复数" colon={false}>
-              {getFieldDecorator("unhandled_msg_count_range")(<NumberRange min={0} transformer={Math.floor} />)}
-            </Form.Item>
-          </Col>
           <Col {...colSpanSpecs2}>
             <Form.Item label="项目标签" colon={false}>
               {getFieldDecorator("tag")(<Input />)}
             </Form.Item>
           </Col>
           <Col {...colSpanSpecs2}>
-            <Form.Item label="消息时间" colon={false}>
-              {getFieldDecorator("msg_ts_range")(<DateTimeRange />)}
+            <Form.Item label="结束时间" colon={false}>
+              {getFieldDecorator("closed_ts_range")(<DateTimeRange />)}
             </Form.Item>
           </Col>
         </Row>

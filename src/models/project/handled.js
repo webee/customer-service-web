@@ -1,168 +1,76 @@
 import { collectTypeReducers, createNSSubEffectFunc } from "../utils";
-import * as projectService from "../../services/project";
+import * as service from "../../services/project";
 import * as msgCodecService from "../../services/msgCodec";
+import { extractFilter } from "../../utils/filters";
 
-const DEFAULT_SESSION_STATE = { isInRead: false };
-const ns = "myHandling";
+const ns = "handled";
 // reducers
 export const reducer = collectTypeReducers(
   {
-    // TODO: 使用version来控制列表及列表内容的修改
-    version: 0,
-    // 接待中的会话
-    listSessions: [],
-    listFilters: {
-      isOnline: false,
-      hasUnread: false
+    isFetching: false,
+    sessions: [],
+    pagination: {
+      defaultPageSize: 10,
+      current: 1,
+      pageSize: 10,
+      total: 0,
+      showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
+      showSizeChanger: true,
+      pageSizeOptions: ["10", "20", "30", "40", "50"]
     },
-    // latest_msg_ts|oldest_msg_ts
-    listSortBy: "latest_msg_ts",
-    // 打开的接待中的会话id
-    openedSessions: [],
-    // 当前正在处理的打开的接待中的会话
-    currentOpenedSession: null,
-    // by session id: {isInRead}
-    openedSessionsState: {}
+    filters: {},
+    sorter: {}
   },
   {
-    addToListSessions(state, { payload: id }) {
-      if (state.listSessions.indexOf(id) >= 0) {
-        return state;
-      }
-      const listSessions = [...state.listSessions, id];
-      return { ...state, listSessions };
+    saveFetchResult(state, { payload: { items, pagination } }) {
+      return { ...state, sessions: items, pagination: { ...state.pagination, ...pagination } };
     },
-    removeFromListSessions(state, { payload: id }) {
-      if (state.listSessions.indexOf(id) < 0) {
-        return state;
+    updateTableInfos(state, { payload: { isFetching, pagination, filters, sorter } }) {
+      const newState = { ...state };
+      if (isFetching !== undefined) {
+        newState.isFetching = isFetching;
       }
-      const listSessions = state.listSessions.filter(i => i != id);
-      return { ...state, listSessions };
-    },
-    saveListSessions(state, { payload: listSessions }) {
-      return { ...state, listSessions };
-    },
-    changeListSortBy(state, { payload: listSortBy }) {
-      return { ...state, listSortBy };
-    },
-    updateListFilters(state, { payload }) {
-      const listFilters = { ...state.listFilters, ...payload };
-      return { ...state, listFilters };
-    },
-    openSession(state, { payload: id }) {
-      if (state.listSessions.indexOf(id) < 0) {
-        return state;
+      if (pagination !== undefined) {
+        newState.pagination = pagination;
       }
-      if (state.currentOpenedSession === id) {
-        return state;
+      if (filters !== undefined) {
+        newState.filters = filters;
       }
-
-      const currentOpenedSession = id;
-      const openedSessions = [...state.openedSessions];
-      if (openedSessions.indexOf(id) < 0) {
-        openedSessions.push(id);
+      if (sorter != undefined) {
+        newState.sorter = { field: sorter.field, key: sorter.columnKey, order: sorter.order };
       }
-      const curSessionState = state.openedSessionsState[id] || DEFAULT_SESSION_STATE;
-      const openedSessionsState = { ...state.openedSessionsState, [id]: curSessionState };
-      return { ...state, openedSessions, currentOpenedSession, openedSessionsState };
-    },
-    updateOpenedSessionState(state, { payload: { id, sessionState } }) {
-      const curSessionState = state.openedSessionsState[id] || DEFAULT_SESSION_STATE;
-      const openedSessionsState = { ...state.openedSessionsState, [id]: { ...curSessionState, ...sessionState } };
-      return { ...state, openedSessionsState };
-    },
-    activateOpenedSession(state, { payload: id }) {
-      if (state.openedSessions.indexOf(id) < 0) {
-        return state;
-      }
-      if (state.currentOpenedSession === id) {
-        return state;
-      }
-      return { ...state, currentOpenedSession: id };
-    },
-    closeOpenedSession(state, { payload: id }) {
-      if (state.openedSessions.indexOf(id) < 0) {
-        return state;
-      }
-      const openedSessions = state.openedSessions.filter(i => i != id);
-      const openedSessionsState = { ...state.openedSessionsState };
-      delete openedSessionsState[id];
-      let currentOpenedSession = state.currentOpenedSession;
-      if (currentOpenedSession === id) {
-        currentOpenedSession = openedSessions[0];
-        return { ...state, openedSessions, currentOpenedSession, openedSessionsState };
-      }
-      return { ...state, openedSessions };
+      return newState;
     }
   }
 );
 
 // effects
 export const effectFunc = createNSSubEffectFunc(ns, {
-  *fetchSessions({ projectDomain, projectType, createAction, createEffectAction, payload }, { call, put }) {
-    const sessionList = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
-    sessionList.forEach(s => {
-      if (s.msg) {
-        s.msg = { ...s.msg, ...msgCodecService.decodeMsg(s.msg) };
-      }
-    });
-    yield updateSessionList({ createAction, payload: sessionList }, { call, put });
-    yield put(createAction(`${ns}/saveListSessions`, sessionList.map(s => s.id)));
-  },
-  *fetchSessionItem({ projectDomain, projectType, createAction, payload: sessionID }, { call, put }) {
-    const s = yield call(projectService.fetchSessionItem, projectDomain, projectType, sessionID);
-    if (s.msg) {
-      s.msg = { ...s.msg, ...msgCodecService.decodeMsg(s.msg) };
-    }
+  *fetchSessions(
+    { projectDomain, projectType, createAction, createEffectAction, payload: params = {} },
+    { select, call, put }
+  ) {
+    try {
+      yield put(createAction("handled/updateTableInfos", { isFetching: true }));
 
-    yield updateSessionList({ createAction, payload: [s] }, { call, put });
-    yield put(createAction(`${ns}/addToListSessions`, s.id));
-  },
-  *finishHandlingSession({ createEffectAction, payload: { projectID, sessionID } }, { call, put }) {
-    yield call(projectService.finishHandlingSession, projectID, sessionID);
-    yield put(createEffectAction(`${ns}/removeHandlingSession`, { sessionID }));
-  },
-  *removeHandlingSession({ createAction, payload: { sessionID } }, { call, put }) {
-    yield put(createAction(`${ns}/closeOpenedSession`, sessionID));
-    yield put(createAction(`${ns}/removeFromListSessions`, sessionID));
-    yield put(createAction(`_/removeSession`, sessionID));
+      const { pagination, filters, sorter } = yield select(state => state.project[projectDomain][projectType].handled);
+      const res = yield call(service.fetchHandledSessions, projectDomain, projectType, {
+        ...params,
+        page: pagination.current,
+        per_page: pagination.pageSize,
+        sorter: sorter.key,
+        order: sorter.order,
+        is_online: extractFilter(filters, "is_online", false)
+      });
+      const { page: current, per_page: pageSize, total, items } = res;
+      items.forEach(item => {
+        if (item.msg) {
+          item.msg = { ...item.msg, ...msgCodecService.decodeMsg(item.msg) };
+        }
+      });
+      yield put(createAction("handled/saveFetchResult", { items, pagination: { current, pageSize, total } }));
+    } finally {
+      yield put(createAction("handled/updateTableInfos", { isFetching: false }));
+    }
   }
 });
-
-function* updateSessionList({ createAction, payload: sessionList }, { call, put }) {
-  yield put(
-    createAction(
-      `_/updateSessions`,
-      sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined, handler: s.handler.uid }))
-    )
-  );
-  // TODO: 修改staffs和customers, 使用id引用
-  const projectList = sessionList.map(s => s.project);
-  yield put(
-    createAction(
-      `_/updateProjects`,
-      projectList.map(p => ({
-        ...p,
-        owner: p.owner.uid,
-        leader: p.leader.uid,
-        customers: p.customers.map(c => c.uid)
-      }))
-    )
-  );
-
-  const staffs = [];
-  const customers = [];
-  sessionList.forEach(s => {
-    // staffs
-    staffs.push(s.handler);
-  });
-  projectList.forEach(p => {
-    // staffs
-    staffs.push(p.leader);
-    // customers
-    customers.push(p.owner);
-    customers.push(...p.customers);
-  });
-  yield put({ type: "app/updateStaffs", payload: staffs });
-  yield put({ type: "app/updateCustomers", payload: customers });
-}

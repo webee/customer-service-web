@@ -66,6 +66,13 @@ export async function fetchHandlingSessions(projectDomain, projectType, params) 
   return resp.data;
 }
 
+export async function fetchHandledSessions(projectDomain, projectType, params) {
+  const resp = await request.get(`/projects/${projectDomain}/${projectType}/handled_sessions`, {
+    params
+  });
+  return resp.data;
+}
+
 export async function fetchSessionItem(sessionID) {
   const resp = await request.get(`/sessions/${sessionID}`);
   return resp.data;
