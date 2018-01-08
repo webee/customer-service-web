@@ -4,6 +4,10 @@ const domainTypeWorkers = {};
 // handle notify
 export function handle(dispatch, type, details) {
   switch (type) {
+    case "my_handling.project":
+      // 更新项目信息
+      projectWorkers.fetchProjectItem(details, { dispatch }, details.projectID);
+      break;
     case "my_handling.sessions":
       // 更新会话信息
       if (details.sessionID) {

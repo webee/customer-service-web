@@ -251,7 +251,10 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingNew: false }));
     }
   },
-  *syncSessionMsgID({ createAction, payload: { projectID, sessionID, sync_msg_id } }, { select, call, put }) {
+  *fetchProjectExtData({ createAction, payload: projectID }, { call }) {
+    yield call(projectService.fetchProjectExtData, projectID);
+  },
+  *syncSessionMsgID({ createAction, payload: { projectID, sessionID, sync_msg_id } }, { call }) {
     yield call(projectService.syncSessionMsgID, projectID, sessionID, sync_msg_id);
   },
   *sendMsg(

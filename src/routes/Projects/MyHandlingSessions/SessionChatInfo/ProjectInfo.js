@@ -1,11 +1,18 @@
 import React, { Fragment } from "react";
+import PropTypes from "prop-types";
 import { Tabs, Icon, Tag, Button } from "antd";
+import { dispatchDomainTypeEffect } from "~/services/project";
 import CompactCard from "~/components/CompactCard";
 import LabelList from "~/components/LabelList";
 import styles from "./ProjectInfo.less";
 import { accessFunction } from "../accessFunctions";
 
 export default class extends React.Component {
+  static contextTypes = {
+    projectDomain: PropTypes.string,
+    projectType: PropTypes.string
+  };
+
   state = {
     loadingProjectInfo: false,
     accessCustomerDetailsLoading: {}
@@ -68,7 +75,7 @@ export default class extends React.Component {
           </CompactCard>
         )}
         <CompactCard title="参与用户" bordered={false}>
-        {/*显示出用户和相关客服的在线状态*/}
+          {/*显示出用户和相关客服的在线状态*/}
           {project.customers.map(this.renderCustomerDetailsButton)}
         </CompactCard>
         <CompactCard title="相关客服" bordered={false}>
@@ -80,9 +87,10 @@ export default class extends React.Component {
         </CompactCard>
         <CompactCard title="会话信息" bordered={false}>
           {/*开始时间*/}
-          {session.closed && (
-          {/*结束时间*/}
-          )}
+          {session.closed &&
+            {
+              /*结束时间*/
+            }}
         </CompactCard>
       </Fragment>
     );
@@ -106,7 +114,14 @@ export default class extends React.Component {
 
   renderBizInfoExtra() {
     const { loadingProjectInfo } = this.state;
-    return <Icon spin={loadingProjectInfo} type="sync" className={styles.projectInfoExtra} />;
+    return (
+      <Icon
+        spin={loadingProjectInfo}
+        type="sync"
+        className={styles.projectInfoExtra}
+        onClick={this.fetchProjectExtData}
+      />
+    );
   }
 
   renderCustomerDetailsButton = (uid, i) => {
@@ -133,5 +148,15 @@ export default class extends React.Component {
         {tag}
       </Tag>
     );
+  };
+
+  fetchProjectExtData = async () => {
+    const { project } = this.props;
+    try {
+      this.setState({ loadingProjectInfo: true });
+      await dispatchDomainTypeEffect(this.context, this.props, "_/fetchProjectExtData", project.id);
+    } finally {
+      this.setState({ loadingProjectInfo: false });
+    }
   };
 }

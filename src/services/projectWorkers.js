@@ -42,6 +42,19 @@ export function fetchSessionItem({ projectDomain, projectType }, { dispatch }, s
   worker.start();
 }
 
+export function fetchProjectItem({ projectDomain, projectType }, { dispatch }, projectID) {
+  const taskName = fetchProjectItem.name;
+  const worker = getWorker(taskName, [projectDomain, projectType, fetchProjectItem, projectID], async () => {
+    await dispatchDomainTypeEffect(
+      { projectDomain, projectType },
+      { dispatch },
+      "myHandling/fetchProjectItem",
+      projectID
+    );
+  });
+  worker.start();
+}
+
 export function loadProjectMsgs({ projectDomain, projectType }, { dispatch }, projectID, limit = 100) {
   const taskName = fetchProjectMsgs.name;
   const worker = getWorker(taskName, [projectDomain, projectType, loadProjectMsgs, projectID], async limit => {

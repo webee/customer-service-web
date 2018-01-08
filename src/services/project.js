@@ -66,8 +66,13 @@ export async function fetchHandlingSessions(projectDomain, projectType, params) 
   return resp.data;
 }
 
-export async function fetchSessionItem(projectDomain, projectType, sessionID) {
-  const resp = await request.get(`/projects/${projectDomain}/${projectType}/${sessionID}`);
+export async function fetchSessionItem(sessionID) {
+  const resp = await request.get(`/sessions/${sessionID}`);
+  return resp.data;
+}
+
+export async function fetchProjectItem(projectID) {
+  const resp = await request.get(`/projects/${projectID}`);
   return resp.data;
 }
 
@@ -88,6 +93,10 @@ export async function getProjectAccessFuncionURL(id, name, uid) {
     params: { uid }
   });
   return resp.data;
+}
+
+export async function fetchProjectExtData(projectID) {
+  return await request.get(`/projects/${projectID}/fetch_ext_data`);
 }
 
 export async function sendSessionMsg(projectID, sessionID, { domain = "", type = "", content }) {

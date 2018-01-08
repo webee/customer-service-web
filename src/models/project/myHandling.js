@@ -109,14 +109,19 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     yield updateSessionList({ createAction, payload: sessionList }, { call, put });
     yield put(createAction(`${ns}/saveListSessions`, sessionList.map(s => s.id)));
   },
-  *fetchSessionItem({ projectDomain, projectType, createAction, payload: sessionID }, { call, put }) {
-    const s = yield call(projectService.fetchSessionItem, projectDomain, projectType, sessionID);
+  *fetchSessionItem({ createAction, payload: sessionID }, { call, put }) {
+    const s = yield call(projectService.fetchSessionItem, sessionID);
     if (s.msg) {
       s.msg = { ...s.msg, ...msgCodecService.decodeMsg(s.msg) };
     }
 
     yield updateSessionList({ createAction, payload: [s] }, { call, put });
     yield put(createAction(`${ns}/addToListSessions`, s.id));
+  },
+  *fetchProjectItem({ createAction, payload: projectID }, { call, put }) {
+    const p = yield call(projectService.fetchProjectItem, projectID);
+
+    yield updateProjectList({ createAction, payload: [p] }, { call, put });
   },
   *finishHandlingSession({ createEffectAction, payload: { projectID, sessionID } }, { call, put }) {
     yield call(projectService.finishHandlingSession, projectID, sessionID);
@@ -129,15 +134,7 @@ export const effectFunc = createNSSubEffectFunc(ns, {
   }
 });
 
-function* updateSessionList({ createAction, payload: sessionList }, { call, put }) {
-  yield put(
-    createAction(
-      `_/updateSessions`,
-      sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined, handler: s.handler.uid }))
-    )
-  );
-  // TODO: 修改staffs和customers, 使用id引用
-  const projectList = sessionList.map(s => s.project);
+function* updateProjectList({ createAction, payload: projectList }, { call, put }) {
   yield put(
     createAction(
       `_/updateProjects`,
@@ -152,10 +149,6 @@ function* updateSessionList({ createAction, payload: sessionList }, { call, put 
 
   const staffs = [];
   const customers = [];
-  sessionList.forEach(s => {
-    // staffs
-    staffs.push(s.handler);
-  });
   projectList.forEach(p => {
     // staffs
     staffs.push(p.leader);
@@ -165,4 +158,21 @@ function* updateSessionList({ createAction, payload: sessionList }, { call, put 
   });
   yield put({ type: "app/updateStaffs", payload: staffs });
   yield put({ type: "app/updateCustomers", payload: customers });
+}
+
+function* updateSessionList({ createAction, payload: sessionList }, { call, put }) {
+  yield put(
+    createAction(
+      `_/updateSessions`,
+      sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined, handler: s.handler.uid }))
+    )
+  );
+  const projectList = sessionList.map(s => s.project);
+  yield updateProjectList({ createAction, payload: projectList }, { call, put });
+  const staffs = [];
+  sessionList.forEach(s => {
+    // staffs
+    staffs.push(s.handler);
+  });
+  yield put({ type: "app/updateStaffs", payload: staffs });
 }
