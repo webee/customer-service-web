@@ -121,7 +121,7 @@ export default class extends React.Component {
         sorter: true,
         sortOrder: getSorterOrder(sorter, "created"),
         width: 180,
-        render: ts => renderTs(ts, "", "YYYY-MM-DD hh:mm:ss")
+        render: ts => renderTs(ts, "", "YYYY-MM-DD HH:mm:ss")
       },
       {
         title: "会话结束时间",
@@ -130,7 +130,7 @@ export default class extends React.Component {
         sorter: true,
         sortOrder: getSorterOrder(sorter, "closed"),
         width: 180,
-        render: ts => renderTs(ts, "", "YYYY-MM-DD hh:mm:ss")
+        render: ts => renderTs(ts, "", "YYYY-MM-DD HH:mm:ss")
       },
       {
         title: "项目Tags",

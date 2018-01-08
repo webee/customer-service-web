@@ -60,7 +60,7 @@ export default class extends React.PureComponent {
         <div className={styles.content}>
           <div className={styles.head}>
             {userName}
-            <span className={styles.ts}>{moment.unix(ts).format("YYYY-MM-DD hh:mm:ss")}</span>
+            <span className={styles.ts}>{moment.unix(ts).format("YYYY-MM-DD HH:mm:ss")}</span>
           </div>
           <div className={styles.decorate}>
             <div className={bodyClassNames} onClick={onClickMsg}>
