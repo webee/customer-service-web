@@ -96,6 +96,10 @@ export default class extends React.Component {
     );
   }
 
+  componentDidMount() {
+    this.fetchProjectExtData();
+  }
+
   accessCustomerDetails = (project_id, uid) => {
     this.setState(
       s => ({ accessCustomerDetailsLoading: { ...s.accessCustomerDetailsLoading, [uid]: true } }),
