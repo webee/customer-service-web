@@ -119,7 +119,7 @@ export default class extends React.Component {
         spin={loadingProjectInfo}
         type="sync"
         className={styles.projectInfoExtra}
-        onClick={this.fetchProjectExtData}
+        onClick={loadingProjectInfo ? undefined : this.fetchProjectExtData}
       />
     );
   }

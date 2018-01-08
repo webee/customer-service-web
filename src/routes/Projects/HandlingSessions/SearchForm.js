@@ -25,7 +25,7 @@ export default class extends React.Component {
   };
 
   render() {
-    const { staff, staffs, staffLabelTree } = this.props;
+    const { loading, staff, staffs, staffLabelTree } = this.props;
     const selectStaffs = staffs.filter(u =>
       contextLabelsMatchContextLabels(staff.uid, staff.context_labels, u.uid, u.context_labels)
     );
@@ -84,7 +84,7 @@ export default class extends React.Component {
         </Row>
         <Row>
           <Col span={24} style={{ textAlign: "right" }}>
-            <Button type="primary" htmlType="submit">
+            <Button loading={loading} type="primary" htmlType="submit">
               查询
             </Button>
             <Button style={{ marginLeft: 8 }} onClick={this.handleReset}>

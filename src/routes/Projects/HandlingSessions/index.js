@@ -197,6 +197,7 @@ export default class extends React.Component {
     return (
       <div className={styles.main}>
         <SearchForm
+          loading={isFetching}
           onSearch={this.onSearch}
           staff={staff}
           staffs={Object.values(staffs)}
