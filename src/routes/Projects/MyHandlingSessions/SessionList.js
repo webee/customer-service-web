@@ -90,7 +90,7 @@ export default class View extends Component {
     return (
       <div className={styles.header}>
         <Search
-          placeholder="uid/名字/手机"
+          placeholder="用户名/手机号/用户ID"
           style={{ width: "100%" }}
           value={listSearch}
           onChange={this.onSearchChange}

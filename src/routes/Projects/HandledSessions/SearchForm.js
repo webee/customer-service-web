@@ -57,7 +57,7 @@ export default class extends React.Component {
           </Col>
           <Col {...colSpanSpecs}>
             <Form.Item label="所属用户" colon={false}>
-              {getFieldDecorator("owner")(<Input placeholder="uid/姓名/手机" />)}
+              {getFieldDecorator("owner")(<Input placeholder="用户名/手机号/用户ID" />)}
             </Form.Item>
           </Col>
           <Col {...{ sm: 8, md: 8, lg: 4, xl: 4 }}>
