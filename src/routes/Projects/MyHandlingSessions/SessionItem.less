@@ -56,13 +56,18 @@
         text-overflow: ellipsis;
       }
     }
-    &.selected {
-      background-color: #40a0f0;
+
+    &.opened {
+      background-color: rgba(64, 160, 240, 0.75);
       color: white;
       .description {
         .bottom {
           color: white;
         }
+      }
+
+      &.selected {
+        background-color: #40a0f0;
       }
     }
   }

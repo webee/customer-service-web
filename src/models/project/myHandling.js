@@ -14,7 +14,8 @@ export const reducer = collectTypeReducers(
     listSearch: undefined,
     listFilters: {
       isOnline: false,
-      hasUnread: false
+      hasUnread: false,
+      isOpend: false
     },
     // latest_msg_ts|oldest_msg_ts
     listSortBy: "latest_msg_ts",

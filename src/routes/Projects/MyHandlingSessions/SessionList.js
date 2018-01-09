@@ -107,9 +107,16 @@ export default class View extends Component {
           <Switch
             size="small"
             checked={listFilters.hasUnread}
-            checkedChildren="待回"
-            unCheckedChildren="待回"
+            checkedChildren="未读"
+            unCheckedChildren="未读"
             onChange={this.getFilterSwitchOnChange("hasUnread")}
+          />
+          <Switch
+            size="small"
+            checked={listFilters.isOpened}
+            checkedChildren="打开"
+            unCheckedChildren="打开"
+            onChange={this.getFilterSwitchOnChange("isOpened")}
           />
           <Dropdown overlay={this.renderSortByMenu()}>
             <Button size="small">
@@ -124,7 +131,14 @@ export default class View extends Component {
   getSessionList() {
     const { appData, data, myHandlingData } = this.props;
     const { sessions, projects } = data;
-    const { listSessions, listSearch, listFilters, listSortBy, currentOpenedSession } = myHandlingData;
+    const {
+      listSessions,
+      listSearch,
+      listFilters,
+      listSortBy,
+      currentOpenedSession,
+      openedSessionsState
+    } = myHandlingData;
     const sessionList = [];
     for (let id of listSessions) {
       const session = sessions[id];
@@ -155,6 +169,12 @@ export default class View extends Component {
         //// has_unread
         if (listFilters.hasUnread) {
           if (session.sync_msg_id >= session.msg_id) {
+            continue;
+          }
+        }
+        //// is_opened
+        if (listFilters.isOpened) {
+          if (!(session.id in openedSessionsState)) {
             continue;
           }
         }
@@ -195,6 +215,7 @@ export default class View extends Component {
                 noRowsRenderer={this.noRowsRenderer}
                 sessionList={sessionList}
                 currentOpenedSessionState={currentOpenedSessionState}
+                openedSessionsState={openedSessionsState}
               />
             )}
           </AutoSizer>
@@ -205,7 +226,7 @@ export default class View extends Component {
 
   rowRenderer = ({ index, key, style, parent }) => {
     const { appData } = this.props;
-    const { sessionList, currentOpenedSessionState } = parent.props;
+    const { sessionList, currentOpenedSessionState, openedSessionsState } = parent.props;
     const session = sessionList[index];
     const { msg } = session;
     const project = session.project;
@@ -220,11 +241,13 @@ export default class View extends Component {
       online: project.is_online,
       ts: get_session_last_msg_ts(session, "-"),
       selected: session.isCurrentOpened,
+      opened: session.id in openedSessionsState,
       unread
     };
     return (
       <div key={key} className={styles.item} style={style}>
         <SessionItem
+          opened={item.opened}
           selected={item.selected}
           onClick={() => this.onClick(session.id)}
           name={item.name}
@@ -244,6 +267,7 @@ export default class View extends Component {
     if (id !== currentOpenedSession) {
       // 加入到打开的会话中
       dispatchDomainType(this.context, this.props, "myHandling/openSession", id);
+      console.debug("select: ", id);
     }
   };
 }

@@ -103,8 +103,8 @@ export default class extends React.PureComponent {
     return ROW_OFFSET + this.getActualRowCount();
   };
 
-  getActualRowCount = () => {
-    const { projMsgs, projTxMsgIDs, txMsgs } = this.props;
+  getActualRowCount = props => {
+    const { projMsgs, projTxMsgIDs, txMsgs } = props || this.props;
     const messages = projMsgs.msgs || [];
     const tx_messages = projTxMsgIDs.map(tx_id => txMsgs[tx_id]);
     return messages.length + tx_messages.length;
@@ -216,8 +216,8 @@ export default class extends React.PureComponent {
     }
 
     if (clientHeight > 0) {
+      // console.debug("onScroll: ", clientHeight, scrollHeight, scrollTop, scrollDirection);
       if (scrollTop === 0) {
-        // console.debug("onScroll: ", clientHeight, scrollHeight, scrollTop, scrollDirection);
         // console.debug("loadProjectMsgs");
         projectWorkers.loadProjectMsgs(this.context, this.props, session.project_id);
       }
@@ -347,7 +347,7 @@ export default class extends React.PureComponent {
     this.rowCount = rowCount;
     const lastRowIndex = rowCount - 1;
     // 解决向上滑动的bug
-    const scrollToIndex = isInRead
+    let scrollToIndex = isInRead
       ? this.getMsgIndex(this.msg_id) || (prevRowCount !== rowCount ? this.getMsgIndex(this.stop_msg_id) : undefined)
       : lastRowIndex;
     // console.debug(
@@ -414,6 +414,12 @@ export default class extends React.PureComponent {
         if (this.clientHeight + this.scrollTop >= this.scrollHeight) {
           this._updateIsInReadState(false);
         }
+      }
+
+      if (this.getActualRowCount() > 0) {
+        console.debug("invisible to visible: remeasure");
+        this.cache.clearAll();
+        this.forceUpdate();
       }
     }
     const nextMsgs = nextProps.projMsgs.msgs || [];
