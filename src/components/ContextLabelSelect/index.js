@@ -157,7 +157,7 @@ export default class extends React.Component {
   }
 
   calcOptions({ labelTree, contextLabels, user }) {
-    const contextLabelTree = calcContextLabelTree(labelTree, [...contextLabels, ["self.", ""]], user);
+    const contextLabelTree = calcContextLabelTree(labelTree, contextLabels, user);
     return treeToOptions(contextLabelTree);
   }
 

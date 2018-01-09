@@ -11,6 +11,7 @@ export const reducer = collectTypeReducers(
     version: 0,
     // 接待中的会话
     listSessions: [],
+    listSearch: undefined,
     listFilters: {
       isOnline: false,
       hasUnread: false
@@ -41,6 +42,9 @@ export const reducer = collectTypeReducers(
     },
     saveListSessions(state, { payload: listSessions }) {
       return { ...state, listSessions };
+    },
+    changeListSearch(state, { payload: listSearch }) {
+      return { ...state, listSearch };
     },
     changeListSortBy(state, { payload: listSortBy }) {
       return { ...state, listSortBy };

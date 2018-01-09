@@ -11,7 +11,7 @@ export function setupToken(token) {
 export async function upload(file, onUploadProgress) {
   const data = new FormData();
   data.append("file", file);
-  const resp = await request.put("/upload", data, {
+  const resp = await request.put("/api/upload", data, {
     onUploadProgress
   });
   return resp.data;

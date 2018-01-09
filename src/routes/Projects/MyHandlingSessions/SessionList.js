@@ -37,6 +37,14 @@ export default class View extends Component {
     projectType: PropTypes.string
   };
 
+  onSearchChange = e => {
+    dispatchDomainType(this.context, this.props, "myHandling/changeListSearch", e.target.value);
+  };
+
+  onSearch = q => {
+    dispatchDomainType(this.context, this.props, "myHandling/changeListSearch", q);
+  };
+
   onFilterChange = (filter, checked) => {
     dispatchDomainType(this.context, this.props, "myHandling/updateListFilters", { [filter]: checked });
   };
@@ -78,10 +86,16 @@ export default class View extends Component {
 
   renderHeader() {
     const { myHandlingData } = this.props;
-    const { listSessions, listFilters } = myHandlingData;
+    const { listSearch, listSessions, listFilters } = myHandlingData;
     return (
       <div className={styles.header}>
-        <Search placeholder="uid/name" style={{ width: "100%" }} onSearch={value => console.log(value)} />
+        <Search
+          placeholder="uid/名字/手机"
+          style={{ width: "100%" }}
+          value={listSearch}
+          onChange={this.onSearchChange}
+          onSearch={this.onSearch}
+        />
         <div className={styles.options}>
           <Switch
             size="small"
@@ -110,15 +124,28 @@ export default class View extends Component {
   getSessionList() {
     const { appData, data, myHandlingData } = this.props;
     const { sessions, projects } = data;
-    const { listSessions, listFilters, listSortBy, currentOpenedSession } = myHandlingData;
+    const { listSessions, listSearch, listFilters, listSortBy, currentOpenedSession } = myHandlingData;
     const sessionList = [];
     for (let id of listSessions) {
       const session = sessions[id];
       const project = projects[session.project_id];
+      const owner = appData.customers[project.owner];
       const isCurrentOpened = currentOpenedSession === session.id;
       if (!isCurrentOpened) {
         // filters
-        //// TODO: search text
+        //// search
+        if (!!listSearch) {
+          if (
+            !(
+              owner.uid.indexOf(listSearch) !== -1 ||
+              owner.name.indexOf(listSearch) !== -1 ||
+              owner.mobile.indexOf(listSearch) !== -1
+            )
+          ) {
+            continue;
+          }
+        }
+
         //// is_online
         if (listFilters.isOnline) {
           if (!project.is_online) {
