@@ -1,3 +1,4 @@
+import { notification } from "antd";
 import * as projectWorkers from "./projectWorkers";
 const domainTypeWorkers = {};
 
@@ -5,8 +6,17 @@ const domainTypeWorkers = {};
 export function handle(dispatch, type, details) {
   switch (type) {
     case "my_handling.project":
-      // 更新项目信息
-      projectWorkers.fetchProjectItem(details, { dispatch }, details.projectID);
+      if (details.isFailed) {
+        // 获取扩展信息失败了
+        notification.error({
+          placement: "bottomRight",
+          message: "获取扩展信息失败",
+          description: <pre>{JSON.stringify(details, undefined, 2)}</pre>
+        });
+      } else {
+        // 更新项目信息
+        projectWorkers.fetchProjectItem(details, { dispatch }, details.projectID);
+      }
       break;
     case "my_handling.sessions":
       // 更新会话信息
@@ -16,6 +26,12 @@ export function handle(dispatch, type, details) {
         projectWorkers.fetchMyHandlingSessions(details, { dispatch });
       }
       break;
+    case "my_handling.session.transferred":
+      notification.info({
+        placement: "bottomRight",
+        message: "会话被转接",
+        description: <pre>JSON.stringify(details, undefined, 2)}</pre>
+      });
     case "my_handling.session.finished":
       projectWorkers.dispatchDomainTypeEffect(details, { dispatch }, "myHandling/removeHandlingSession", {
         sessionID: details.sessionID
