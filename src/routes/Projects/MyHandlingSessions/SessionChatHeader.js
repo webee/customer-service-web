@@ -2,7 +2,7 @@ import React from "react";
 import { dispatchDomainTypeEffect } from "../../../services/project";
 import * as projectService from "~/services/project";
 import { delay } from "~/utils/commons";
-import { Menu, Dropdown, Button, Icon, message } from "antd";
+import { Menu, Dropdown, Button, Icon, message, Modal } from "antd";
 import styles from "./SessionChatHeader.less";
 import { genCustomerMobileName } from "./utils";
 import { accessFunction } from "./accessFunctions";
@@ -11,19 +11,27 @@ const MAX_ACCESS_FUNCTIONS = 3;
 
 export default class extends React.PureComponent {
   state = {
-    accessFunctionsLoading: {}
+    accessFunctionsLoading: {},
+    showCloseSession: false,
+    closeSessionConfirmLoading: false
   };
 
   onToolbarClick = t => {
     message.info(`${t} clicked!`);
   };
 
-  finishHandling = () => {
-    const { session } = this.props;
-    dispatchDomainTypeEffect(this.props, this.props, "myHandling/finishHandlingSession", {
-      projectID: session.project_id,
-      sessionID: session.id
-    });
+  finishHandling = async () => {
+    try {
+      this.setState({ confirmLoading: true });
+      const { session } = this.props;
+      dispatchDomainTypeEffect(this.props, this.props, "myHandling/finishHandlingSession", {
+        projectID: session.project_id,
+        sessionID: session.id
+      });
+    } finally {
+      // already unmounted
+      // this.setState({ confirmLoading: false });
+    }
   };
 
   accessFunction = name => {
@@ -58,15 +66,18 @@ export default class extends React.PureComponent {
         <div className={styles.toobar}>
           {access_functions.slice(0, MAX_ACCESS_FUNCTIONS).map(this.renderAcctionFunctionButton)}
           {this.renderMoreAccessFunctions(access_functions.slice(MAX_ACCESS_FUNCTIONS))}
-          <Button
-            type="danger"
-            ghost
-            onClick={() => {
-              confirm("确定结束会话?") && this.finishHandling();
-            }}
-          >
+          <Button type="danger" ghost onClick={() => this.setState({ showCloseSession: true })}>
             结束接待
           </Button>
+          <Modal
+            title="结束接待"
+            visible={this.state.showCloseSession}
+            confirmLoading={this.state.closeSessionConfirmLoading}
+            onOk={this.finishHandling}
+            onCancel={() => this.setState({ showCloseSession: false })}
+          >
+            <p>确定完成接待了?</p>
+          </Modal>
         </div>
       </div>
     );
