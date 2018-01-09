@@ -201,31 +201,17 @@ class Main extends React.Component {
     const { staff, location } = this.props;
     const menu = (
       <Menu className={MainLayoutStyles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
-        <Menu.Item disabled>
-          <Icon type="user/home" />个人中心
-        </Menu.Item>
-        <Menu.Item disabled>
-          <Icon type="user/setting" />设置
-        </Menu.Item>
         <Menu.Item key="user/logout">
           <Link to={{ pathname: "/auth/logout", state: { from: location } }}>
             <Icon type="logout" />退出登录
           </Link>
         </Menu.Item>
-        <Menu.Divider />
-        <ItemGroup title="常用位置">
-          <Menu.Item key="user/common/baidu">
-            <a href="https://baidu.com" target="_blank">
-              百度
-            </a>
-          </Menu.Item>
-        </ItemGroup>
       </Menu>
     );
 
     return (
       <div className={MainLayoutStyles.right}>
-        {env !== "prod" ? (
+        {env === "develepment" ? (
           <Link to="/_" className={MainLayoutStyles.action}>
             <Icon type="code" />Test
           </Link>
