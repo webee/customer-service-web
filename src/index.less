@@ -7,7 +7,12 @@ html, body, :global(#root) {
 }
 
 body {
+  // zoom
   zoom: @zoom-scale;
+  // 不能保持内容大小
+  // -moz-transform: scale(@zoom-scale);
+  // -moz-transform-origin: 0 0;
+
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
