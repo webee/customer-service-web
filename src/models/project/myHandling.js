@@ -97,7 +97,7 @@ export const reducer = collectTypeReducers(
         currentOpenedSession = openedSessions[0];
         return { ...state, openedSessions, currentOpenedSession, openedSessionsState };
       }
-      return { ...state, openedSessions };
+      return { ...state, openedSessions, openedSessionsState };
     }
   }
 );
