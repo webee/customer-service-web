@@ -211,7 +211,7 @@ class Main extends React.Component {
 
     return (
       <div className={MainLayoutStyles.right}>
-        {env === "develepment" ? (
+        {env === "dev" ? (
           <Link to="/_" className={MainLayoutStyles.action}>
             <Icon type="code" />Test
           </Link>

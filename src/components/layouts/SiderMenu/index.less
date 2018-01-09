@@ -1,15 +1,16 @@
 @import "~antd/lib/style/themes/default.less";
+@import "../../../settings.less";
 
 .sider {
   box-shadow: 2px 0 6px rgba(0, 21, 41, .35);
   z-index: 1000;
-  min-height: 100vh;
+  min-height: "@{full-viewport}vh";
   position: relative;
 
   user-select: none;
 
   .menu {
-    height: calc(~"100vh - 64px");
+    height: calc(~"@{full-viewport}vh - 64px");
     // FIXME: 解决collapsed时弹出菜单hidden的问题
     // overflow-x: visible;
     // overflow-y: auto;

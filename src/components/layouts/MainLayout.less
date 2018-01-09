@@ -1,4 +1,5 @@
 @import "~antd/lib/style/themes/default.less";
+@import "../../settings.less";
 
 .layout {
   .main {
@@ -54,7 +55,7 @@
       }
     }
 
-    height: 100vh;
+    height: "@{full-viewport}vh";
     overflow: auto;
     .content {
       margin: 8px 8px 0;

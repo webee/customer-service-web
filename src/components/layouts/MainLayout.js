@@ -8,6 +8,7 @@ import { Layout, Menu, Icon, Avatar, Dropdown, BackTop } from "antd";
 import Breadcrumb from "./Breadcrumb";
 import SiderMenu from "./SiderMenu";
 import styles from "./MainLayout.less";
+import { fullViewport } from "../../settings";
 const { Header, Content, Footer } = Layout;
 
 @withRouter
@@ -54,7 +55,7 @@ export default class extends React.PureComponent {
     });
     const contentStyle = {};
     if (fixed) {
-      contentStyle["height"] = disableFooter ? "calc(100vh - 64px)" : "calc(100vh - 64px - 48px)";
+      contentStyle["height"] = disableFooter ? `calc(${fullViewport}vh - 64px)` : `calc(${fullViewport}vh - 64px - 48px)`;
     }
 
     const layout = (
