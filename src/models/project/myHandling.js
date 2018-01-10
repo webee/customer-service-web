@@ -104,7 +104,10 @@ export const reducer = collectTypeReducers(
 
 // effects
 export const effectFunc = createNSSubEffectFunc(ns, {
-  *fetchSessions({ projectDomain, projectType, createAction, createEffectAction, payload }, { call, put }) {
+  *fetchSessions(
+    { projectDomain, projectType, createAction, createEffectAction, payload: { session_id } },
+    { call, put }
+  ) {
     const sessionList = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
     sessionList.forEach(s => {
       if (s.msg) {
@@ -113,6 +116,10 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     });
     yield updateSessionList({ createAction, payload: sessionList }, { call, put });
     yield put(createAction(`${ns}/saveListSessions`, sessionList.map(s => s.id)));
+    if (session_id) {
+      // open it
+      yield put(createAction(`${ns}/openSession`, session_id));
+    }
   },
   *fetchSessionItem({ createAction, payload: sessionID }, { call, put }) {
     const s = yield call(projectService.fetchSessionItem, sessionID);

@@ -19,11 +19,11 @@ function clearExpiredWorkers() {
   // TODO:
 }
 
-export function fetchMyHandlingSessions({ projectDomain, projectType }, { dispatch }) {
+export function fetchMyHandlingSessions({ projectDomain, projectType }, { dispatch }, params = {}) {
   const taskName = fetchMyHandlingSessions.name;
   const worker = getWorker(taskName, [projectDomain, projectType, fetchMyHandlingSessions], async () => {
     await delay(100);
-    await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "myHandling/fetchSessions");
+    await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "myHandling/fetchSessions", params);
   });
   worker.start();
 }

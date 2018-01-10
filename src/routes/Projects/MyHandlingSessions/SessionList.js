@@ -267,7 +267,6 @@ export default class View extends Component {
     if (id !== currentOpenedSession) {
       // 加入到打开的会话中
       dispatchDomainType(this.context, this.props, "myHandling/openSession", id);
-      console.debug("select: ", id);
     }
   };
 }
