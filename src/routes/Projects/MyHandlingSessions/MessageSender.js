@@ -90,7 +90,12 @@ export default class extends React.Component {
           </div>
         </div>
         <div className={styles.input}>
-          <TextArea value={this.state.text} onChange={this.onChange} onKeyPress={this.onKeyPress} />
+          <TextArea
+            value={this.state.text}
+            onChange={this.onChange}
+            onKeyPress={this.onKeyPress}
+            autoFocus={true}
+          />
         </div>
       </div>
     );

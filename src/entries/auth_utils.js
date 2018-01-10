@@ -9,7 +9,6 @@ class AuthRoute extends React.PureComponent {
   render() {
     const { dispatch, Component, authPath, ...props } = this.props;
     const { location } = this.props;
-    console.debug("location: ", location);
     const query = parseQueryFromSearch(location.search);
     if (!query.jwt) {
       // 没有带jwt，则检查当前jwt
