@@ -153,7 +153,6 @@ export default class extends React.Component {
 
   renderTag = (tag, i) => {
     const { size } = this.props;
-    console.debug("size:", size);
     return (
       <Tag key={i} color="#2db7f5" style={{ fontSize: 14, margin: 4 }}>
         <EllipsisText text={tag} maxWidth={size - 60} />
