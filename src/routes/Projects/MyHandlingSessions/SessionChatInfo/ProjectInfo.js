@@ -1,12 +1,13 @@
 import React, { Fragment } from "react";
 import PropTypes from "prop-types";
-import { Tabs, Icon, Tag, Button } from "antd";
+import { Tabs, Icon, Tag, Button, Badge } from "antd";
 import { dispatchDomainTypeEffect } from "~/services/project";
 import CompactCard from "~/components/CompactCard";
 import LabelList from "~/components/LabelList";
 import EllipsisText from "~/components/EllipsisText";
 import styles from "./ProjectInfo.less";
 import { accessFunction } from "../accessFunctions";
+import { renderStaff } from "../../commons";
 
 export default class extends React.Component {
   static contextTypes = {
@@ -53,8 +54,8 @@ export default class extends React.Component {
   getStaffsLabelValues() {
     const { session, project, staffs } = this.props;
     return [
-      { label: "接待人", value: staffs[session.handler].name },
-      { label: "负责人", value: staffs[project.leader].name }
+      { label: "接待人", value: renderStaff(staffs[session.handler]) },
+      { label: "负责人", value: renderStaff(staffs[project.leader]) }
     ];
   }
 

@@ -7,20 +7,7 @@ import EllipsisText from "~/components/EllipsisText";
 import { Card, Table, Icon, Pagination, Divider, Button, Badge } from "antd";
 import SearchForm from "./SearchForm";
 import styles from "./index.css";
-import { renderTs, renderMsgTs, renderLastMsg } from "../commons";
-
-const renderBoolean = val => {
-  return <Icon type={val ? "check-circle" : "close-circle"} style={{ color: val ? "green" : "black" }} />;
-};
-
-const renderNotBoolean = val => renderBoolean(!val);
-const renderTsFromNow = (ts, def) => (ts ? moment.unix(ts).fromNow() : def);
-const renderStaff = staff => <Badge status={staff.is_online ? "success" : "default"} text={staff.name} />;
-const renderCustomer = user => {
-  const { name } = user;
-  const text = <Badge status={user.is_online ? "success" : "default"} text={name || "-"} />;
-  return <EllipsisText text={text} tipText={name} maxWidth={150} />;
-};
+import { renderBoolean, renderNotBoolean, renderTsFromNow, renderTs, renderStaff, renderCustomer } from "../commons";
 
 function getSorterOrder(sorter, key) {
   return sorter.key == key ? sorter.order : false;
@@ -58,20 +45,12 @@ export default class extends React.Component {
     const { filters, sorter } = handledData;
     return [
       {
-        title: "名字",
+        title: "所有者",
         dataIndex: "project.owner",
-        key: "owner.name",
-        width: 170,
+        key: "owner",
+        width: 230,
         fixed: "left",
         render: renderCustomer
-      },
-      {
-        title: "手机号",
-        dataIndex: "project.owner",
-        key: "owner.mobile",
-        width: 140,
-        fixed: "left",
-        render: owner => owner.mobile
       },
       {
         title: "在线",
@@ -178,7 +157,7 @@ export default class extends React.Component {
         />
         <Table
           loading={isFetching}
-          scroll={{ x: 1600 }}
+          scroll={{ x: 1520 }}
           bordered={true}
           pagination={pagination}
           columns={this.columns}
