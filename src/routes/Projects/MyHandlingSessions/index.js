@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
-import qs from "qs";
 import { withRouter } from "dva/router";
 import { connect } from "dva";
+import { parseQueryFromSearch } from "~/utils/url";
 import * as projectWorkers from "../../../services/projectWorkers";
 import { List, Avatar, Badge, Tag } from "antd";
 import SplitPane from "react-split-pane";
@@ -28,7 +28,7 @@ export default class View extends React.Component {
 
   componentDidMount() {
     const { location } = this.props;
-    const query = qs.parse(location.search.replace(/^(\?|\ )+/, ""));
+    const query = parseQueryFromSearch(location.search);
     const session_id = parseInt(query.session_id) || undefined;
     projectWorkers.fetchMyHandlingSessions(this.context, this.props, { session_id });
   }

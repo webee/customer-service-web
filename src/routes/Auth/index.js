@@ -4,7 +4,7 @@ import { connect } from "dva";
 import { Card } from "antd";
 import { Form, Input, Button } from "antd";
 import { Route, Redirect } from "dva/router";
-import qs from "qs";
+import { parseQueryFromSearch } from "~/utils/url";
 import { asValidator } from "../../commons/form";
 import * as authService from "../../services/auth";
 import styles from "./index.less";
@@ -48,7 +48,7 @@ export default class Auth extends React.Component {
     this.props.form.validateFields();
 
     const { dispatch, location } = this.props;
-    const query = qs.parse(location.search.replace(/^(\?|\ )+/, ""));
+    const query = parseQueryFromSearch(location.search);
     const jwt = query.jwt;
     if (jwt) {
       // 提供了jwt, 则尝试登录
@@ -81,8 +81,6 @@ export default class Auth extends React.Component {
       return <Redirect to={from} />;
     }
 
-    const query = qs.parse(location.search);
-    const jwt = query.jwt;
     const jwtError = form.isFieldTouched("jwt") && form.getFieldError("jwt");
     return (
       <div className={styles.main}>

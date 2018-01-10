@@ -202,7 +202,7 @@ class Main extends React.Component {
     const menu = (
       <Menu className={MainLayoutStyles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
         <Menu.Item key="user/logout">
-          <Link to={{ pathname: "/auth/logout", state: { from: location } }}>
+          <Link to={{ pathname: "/auth/logout", state: { state: { from: location } } }}>
             <Icon type="logout" />退出登录
           </Link>
         </Menu.Item>

@@ -1,5 +1,5 @@
 import { routerRedux } from "dva/router";
-import { toPromiseEffects } from './utils';
+import { toPromiseEffects } from "./utils";
 import request from "~/utils/request";
 import envConfig from "~/config";
 import { STAFF_JWT_HEADER } from "~/constants";
@@ -30,15 +30,15 @@ export default {
       yield call(authService.clearJWT);
       yield put({ type: "/RESET", payload: "*" });
     },
-    *logout({ payload: state }, { call, put }) {
-      yield put(routerRedux.push({ pathname: authPath, state }));
+    *logout({ payload: { pathname, search, state } }, { call, put }) {
+      yield put(routerRedux.push({ pathname: pathname || authPath, search, state }));
       yield put({ type: "resetState" });
     }
   }),
   subscriptions: {
     init({ dispatch, history }, done) {
       const do_logout = () => {
-          dispatch({ type: "logout", payload: { from: history.location } });
+        dispatch({ type: "logout", payload: { state: { from: history.location } } });
       };
 
       // request
@@ -53,7 +53,7 @@ export default {
         if (!(jwt && jwt_exp)) {
           do_logout();
         } else if (!(jwt_exp - new Date() > envConfig.jwtRefreshTime)) {
-          dispatch({ type: "refreshJWT", payload: jwt }).catch((err) => {
+          dispatch({ type: "refreshJWT", payload: jwt }).catch(err => {
             console.error(err);
             do_logout();
           });
