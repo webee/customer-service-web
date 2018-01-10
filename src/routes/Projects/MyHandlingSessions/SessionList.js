@@ -5,6 +5,7 @@ import { connect } from "dva";
 import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
 import * as msgRendererService from "~/services/msgRenderer";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
+import CellMeasurer, { CellMeasurerCache } from "react-virtualized/dist/commonjs/CellMeasurer";
 import List from "react-virtualized/dist/commonjs/List";
 import SessionItem from "./SessionItem";
 import EmptyContent from "./EmptyContent";
@@ -12,6 +13,7 @@ import { Input, Checkbox, Button, Icon, Switch, Dropdown, Menu } from "antd";
 import Moment from "react-moment";
 import styles from "./SessionList.less";
 import { genCustomerMobileName } from "./utils";
+import { anyIs } from "~/utils/func";
 
 const Search = Input.Search;
 
@@ -36,6 +38,18 @@ export default class View extends Component {
     projectDomain: PropTypes.string,
     projectType: PropTypes.string
   };
+  constructor(props) {
+    super(props);
+    this.cache = new CellMeasurerCache({
+      defaultHeight: 60,
+      fixedWidth: true,
+      keyMapper: (rowIndex, columnIndex) => {
+        const sessionList = this.getSessionList();
+        const session = sessionList[rowIndex];
+        return session.id;
+      }
+    });
+  }
 
   onSearchChange = e => {
     dispatchDomainType(this.context, this.props, "myHandling/changeListSearch", e.target.value);
@@ -90,7 +104,7 @@ export default class View extends Component {
     return (
       <div className={styles.header}>
         <Search
-          placeholder="用户名/手机号/用户ID"
+          placeholder="用户名/手机号/用户ID/标签"
           style={{ width: "100%" }}
           value={listSearch}
           onChange={this.onSearchChange}
@@ -149,13 +163,7 @@ export default class View extends Component {
         // filters
         //// search
         if (!!listSearch) {
-          if (
-            !(
-              owner.uid.indexOf(listSearch) !== -1 ||
-              owner.name.indexOf(listSearch) !== -1 ||
-              owner.mobile.indexOf(listSearch) !== -1
-            )
-          ) {
+          if (!anyIs([owner.uid, owner.name, owner.mobile, ...project.tags], v => v.indexOf(listSearch) !== -1)) {
             continue;
           }
         }
@@ -194,6 +202,10 @@ export default class View extends Component {
     return sessionList;
   }
 
+  onResize = ({ width, height }) => {
+    console.debug(`width: ${width}, height: ${height}`);
+  };
+
   render() {
     const { myHandlingData } = this.props;
     const { currentOpenedSession, openedSessionsState } = myHandlingData;
@@ -203,14 +215,15 @@ export default class View extends Component {
       <div className={styles.main}>
         {this.renderHeader()}
         <div className={styles.body}>
-          <AutoSizer>
+          <AutoSizer nonce="MsgItemList" onResize={this.onResize}>
             {({ width, height }) => (
               <List
                 className={styles.list}
+                deferredMeasurementCache={this.cache}
                 width={width}
                 height={height}
                 rowCount={sessionList.length}
-                rowHeight={60}
+                rowHeight={this.cache.rowHeight}
                 rowRenderer={this.rowRenderer}
                 noRowsRenderer={this.noRowsRenderer}
                 sessionList={sessionList}
@@ -225,6 +238,8 @@ export default class View extends Component {
   }
 
   rowRenderer = ({ index, key, style, parent }) => {
+    const { width } = parent.props;
+    console.debug("parent width: ", width);
     const { appData } = this.props;
     const { sessionList, currentOpenedSessionState, openedSessionsState } = parent.props;
     const session = sessionList[index];
@@ -245,18 +260,24 @@ export default class View extends Component {
       unread
     };
     return (
-      <div key={key} className={styles.item} style={style}>
-        <SessionItem
-          opened={item.opened}
-          selected={item.selected}
-          onClick={() => this.onClick(session.id)}
-          name={item.name}
-          description={item.description}
-          ts={item.ts}
-          unread={item.unread}
-          online={item.online}
-        />
-      </div>
+      <CellMeasurer cache={this.cache} columnIndex={0} key={key} parent={parent} rowIndex={index}>
+        {({ measure }) => (
+          <div style={style}>
+            <SessionItem
+              ctx={{ width }}
+              opened={item.opened}
+              selected={item.selected}
+              onClick={() => this.onClick(session.id)}
+              name={item.name}
+              description={item.description}
+              ts={item.ts}
+              unread={item.unread}
+              online={item.online}
+              tags={project.tags}
+            />
+          </div>
+        )}
+      </CellMeasurer>
     );
   };
 

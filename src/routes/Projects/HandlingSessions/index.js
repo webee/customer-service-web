@@ -19,7 +19,7 @@ const renderStaff = staff => <Badge status={staff.is_online ? "success" : "defau
 const renderCustomer = user => {
   const { name } = user;
   const text = <Badge status={user.is_online ? "success" : "default"} text={name || "-"} />;
-  return <EllipsisText text={text} tipText={name} width={150} />;
+  return <EllipsisText text={text} tipText={name} maxWidth={150} />;
 };
 
 function getSorterOrder(sorter, key) {

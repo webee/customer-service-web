@@ -416,7 +416,7 @@ export default class extends React.PureComponent {
         }
       }
 
-      if (this.getActualRowCount() > 0) {
+      if (this.scrollHeight === 0 && this.getActualRowCount() > 0) {
         console.debug("invisible to visible: remeasure");
         this.cache.clearAll();
         this.forceUpdate();

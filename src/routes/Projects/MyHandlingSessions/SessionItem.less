@@ -1,73 +1,84 @@
 .main {
-    height: 60px;
-    display: flex;
-
-    cursor: pointer;
-
-    .avatar {
-      flex: 0 0 60px;
-
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid grey;
+  .item {
+      margin-top: 5px;
+      height: 50px;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      .online {
-        background-color: #87d068;
-      }
-    }
 
-    .description {
-      flex: auto;
-      overflow: hidden;
+      cursor: pointer;
 
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-
-      .top {
-        flex: auto;
-
-        margin-right: 10px;
+      .avatar {
+        flex: 0 0 60px;
 
         display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        .title {
-          flex: auto;
-          line-height: 1.5em;
-          font-size: 14px;
-          overflow: hidden;
-          white-space: nowrap;
-          text-overflow: ellipsis;
-        }
-        .ts {
-          flex: 0 0 auto;
-          line-height: 1.5em;
-          font-size: 12px;
+        justify-content: center;
+        align-items: center;
+        .online {
+          background-color: #87d068;
         }
       }
-      .bottom {
-        flex: auto;
-        font-size: 12px;
-        line-height: 1.5em;
-        color: Grey;
 
+      .description {
+        flex: auto;
         overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        .top {
+          flex: auto;
+
+          margin-right: 10px;
+
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          .title {
+            flex: auto;
+            line-height: 1.5em;
+            font-size: 14px;
+
+            overflow: hidden;
+          }
+          .ts {
+            flex: 0 0 auto;
+            line-height: 1.5em;
+            font-size: 12px;
+          }
+        }
+        .bottom {
+          flex: auto;
+          font-size: 12px;
+          line-height: 1.5em;
+          color: Grey;
+
+          overflow: hidden;
+        }
+      }
+  }
+  .tag {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    margin-left: 24px;
+    margin-right: 10px;
+    margin-bottom: 4px;
+    overflow: hidden;
+  }
+
+  &.opened {
+    background-color: darken(LightSkyBlue, 50%);
+    color: white;
+    .description {
+      .bottom {
+        color: darken(white, 10%);
       }
     }
 
-    &.opened {
-      background-color: darken(LightSkyBlue, 50%);
-      color: white;
-      .description {
-        .bottom {
-          color: white;
-        }
-      }
-
-      &.selected {
-        background-color: #40a0f0;
-      }
+    &.selected {
+      background-color: #40a0f0;
     }
   }
+}

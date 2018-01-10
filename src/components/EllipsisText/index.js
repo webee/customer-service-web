@@ -1,4 +1,5 @@
 import React from "react";
+import classNames from "classnames";
 import { Tooltip } from "antd";
 import styles from "./index.less";
 
@@ -11,15 +12,15 @@ export default class extends React.PureComponent {
   get tip() {
     const { text, tipText } = this.props;
     const { scrollWidth, clientWidth } = this.state;
-    console.debug(`EllipsisText: ${scrollWidth}/${clientWidth}`);
     return scrollWidth > clientWidth ? (tipText ? tipText : text) : undefined;
   }
 
   render() {
-    const { text, width, ...props } = this.props;
+    const { text, maxWidth, className, ...props } = this.props;
+    const finalClassName = classNames(styles.main, className)
     return (
       <Tooltip title={this.tip} {...{ mouseLeaveDelay: 0, ...props }}>
-        <div ref={content => (this.content = content)} className={styles.main} style={{ width }}>
+        <div ref={content => (this.content = content)} className={finalClassName} style={{ maxWidth }}>
           {text}
         </div>
       </Tooltip>
