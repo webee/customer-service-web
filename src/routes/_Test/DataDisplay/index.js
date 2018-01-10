@@ -4,7 +4,7 @@ import styles from "./index.less";
 
 export default () => {
   return (
-    <div className={styles.main} bordered={false}>
+    <div className={styles.main}>
       <Card title="消息气泡">
       </Card>
       <Card title="徽标" bordered={false}>
