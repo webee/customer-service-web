@@ -4,6 +4,7 @@ import { Tabs, Icon, Tag, Button } from "antd";
 import { dispatchDomainTypeEffect } from "~/services/project";
 import CompactCard from "~/components/CompactCard";
 import LabelList from "~/components/LabelList";
+import EllipsisText from "~/components/EllipsisText";
 import styles from "./ProjectInfo.less";
 import { accessFunction } from "../accessFunctions";
 
@@ -147,9 +148,11 @@ export default class extends React.Component {
   };
 
   renderTag = (tag, i) => {
+    const { size } = this.props;
+    console.debug("size:", size);
     return (
       <Tag key={i} color="#2db7f5" style={{ fontSize: 14, margin: 4 }}>
-        {tag}
+        <EllipsisText text={tag} maxWidth={size - 60} />
       </Tag>
     );
   };

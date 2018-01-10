@@ -202,10 +202,6 @@ export default class View extends Component {
     return sessionList;
   }
 
-  onResize = ({ width, height }) => {
-    console.debug(`width: ${width}, height: ${height}`);
-  };
-
   render() {
     const { myHandlingData } = this.props;
     const { currentOpenedSession, openedSessionsState } = myHandlingData;
@@ -215,7 +211,7 @@ export default class View extends Component {
       <div className={styles.main}>
         {this.renderHeader()}
         <div className={styles.body}>
-          <AutoSizer nonce="MsgItemList" onResize={this.onResize}>
+          <AutoSizer nonce="MsgItemList">
             {({ width, height }) => (
               <List
                 className={styles.list}
@@ -239,7 +235,6 @@ export default class View extends Component {
 
   rowRenderer = ({ index, key, style, parent }) => {
     const { width } = parent.props;
-    console.debug("parent width: ", width);
     const { appData } = this.props;
     const { sessionList, currentOpenedSessionState, openedSessionsState } = parent.props;
     const session = sessionList[index];

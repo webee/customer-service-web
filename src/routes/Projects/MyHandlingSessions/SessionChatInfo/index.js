@@ -17,11 +17,18 @@ export default class extends React.Component {
   };
 
   render() {
-    const { session, project, staffs, customers, dispatch } = this.props;
+    const { session, project, staffs, customers, dispatch, size } = this.props;
     return (
       <Tabs className={styles.main} defaultActiveKey="info" type="card">
         <Tabs.TabPane tab="信息" key="info">
-          <ProjectInfo dispatch={dispatch} session={session} project={project} staffs={staffs} customers={customers} />
+          <ProjectInfo
+            dispatch={dispatch}
+            size={size}
+            session={session}
+            project={project}
+            staffs={staffs}
+            customers={customers}
+          />
         </Tabs.TabPane>
         <Tabs.TabPane tab="历史" key="history">
           <div onClick={this.xxx}>这里是项目历史消息</div>

@@ -10,8 +10,8 @@ export default ({ ctx, name, description, ts, unread = 0, online, tags, selected
   const className = classNames(styles.main, { [styles.opened]: opened, [styles.selected]: selected });
   const avatarClassName = classNames({ [styles.online]: online });
   return (
-    <div className={className}>
-      <div className={styles.item} onClick={onClick}>
+    <div className={className} onClick={onClick}>
+      <div className={styles.item}>
         <div className={styles.avatar}>
           <Badge count={unread} overflowCount={99}>
             <Avatar className={avatarClassName} shape="square" size="large" icon="user" />

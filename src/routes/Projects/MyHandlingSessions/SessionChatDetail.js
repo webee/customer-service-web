@@ -18,6 +18,10 @@ export default class View extends Component {
     projectType: PropTypes.string
   };
 
+  state = {
+    sessionChatInfoSize: 320
+  };
+
   componentDidMount() {
     const { session } = this.props;
     projectWorkers.fetchProjectMsgs(this.context, this.props, session.project_id);
@@ -47,10 +51,11 @@ export default class View extends Component {
             className={styles.splitPane}
             primary="second"
             split="vertical"
-            defaultSize={320}
+            defaultSize={this.state.sessionChatInfoSize}
             minSize={320}
             maxSize={360}
             paneClassName={styles.main}
+            onChange={size => this.setState({ sessionChatInfoSize: size })}
           >
             <SplitPane
               className={styles.splitPane}
@@ -74,7 +79,11 @@ export default class View extends Component {
                 txMsgs={txMsgs}
                 isCurrentOpened={isCurrentOpened}
               />
-              <MessageSender dispatch={dispatch} session={session} onSend={() => this.msg_list._updateIsInReadState(false)} />
+              <MessageSender
+                dispatch={dispatch}
+                session={session}
+                onSend={() => this.msg_list._updateIsInReadState(false)}
+              />
             </SplitPane>
             <SessionChatInfo
               dispatch={dispatch}
@@ -82,6 +91,7 @@ export default class View extends Component {
               project={project}
               staffs={staffs}
               customers={customers}
+              size={this.state.sessionChatInfoSize}
             />
           </SplitPane>
         </div>
