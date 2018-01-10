@@ -70,6 +70,7 @@ export default class extends React.Component {
         dataIndex: "project.owner",
         key: "owner.mobile",
         width: 140,
+        fixed: "left",
         render: owner => owner.mobile
       },
       {
