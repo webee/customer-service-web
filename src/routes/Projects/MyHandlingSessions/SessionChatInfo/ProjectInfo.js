@@ -7,7 +7,12 @@ import LabelList from "~/components/LabelList";
 import EllipsisText from "~/components/EllipsisText";
 import styles from "./ProjectInfo.less";
 import { accessFunction } from "../accessFunctions";
-import { renderStaff } from "../../commons";
+import { renderTs, renderStaff } from "../../commons";
+
+const labelListDefaultStyle = {
+  labelStyle: { color: "gray" },
+  valueStyle: { color: "black" }
+};
 
 export default class extends React.Component {
   static contextTypes = {
@@ -59,17 +64,23 @@ export default class extends React.Component {
     ];
   }
 
+  getSessionLabelValues() {
+    const { session, project } = this.props;
+    return [
+      { label: "项目id", value: project.id },
+      { label: "会话id", value: session.id },
+      { label: "开始时间", value: renderTs(session.created, "", "YYYY-MM-DD HH:mm:ss") },
+      session.closed ? { label: "结束时间", value: renderTs(session.closed, "", "YYYY-MM-DD HH:mm:ss") } : undefined
+    ];
+  }
+
   render() {
     const { session, project, staffs, customers } = this.props;
     const { tags } = project;
     return (
       <Fragment>
         <CompactCard title="业务信息" bordered={false} extra={this.renderBizInfoExtra()}>
-          <LabelList
-            items={this.getBizInfoLabelValues()}
-            labelStyle={{ color: "gray" }}
-            valueStyle={{ color: "black" }}
-          />
+          <LabelList items={this.getBizInfoLabelValues()} {...labelListDefaultStyle} />
         </CompactCard>
         {tags.length > 0 && (
           <CompactCard title="标签" bordered={false}>
@@ -81,18 +92,10 @@ export default class extends React.Component {
           {project.customers.map(this.renderCustomerDetailsButton)}
         </CompactCard>
         <CompactCard title="相关客服" bordered={false}>
-          <LabelList
-            items={this.getStaffsLabelValues()}
-            labelStyle={{ color: "gray" }}
-            valueStyle={{ color: "black" }}
-          />
+          <LabelList items={this.getStaffsLabelValues()} {...labelListDefaultStyle} />
         </CompactCard>
         <CompactCard title="会话信息" bordered={false}>
-          {/*开始时间*/}
-          {session.closed &&
-            {
-              /*结束时间*/
-            }}
+          <LabelList items={this.getSessionLabelValues()} {...labelListDefaultStyle} />
         </CompactCard>
       </Fragment>
     );
