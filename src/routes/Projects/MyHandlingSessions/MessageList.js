@@ -44,11 +44,11 @@ export default class extends React.PureComponent {
     this.msg_index = undefined;
     this.width = 0;
     this.cache = new CellMeasurerCache({
-      defaultHeight: 50,
+      defaultHeight: 80,
       fixedWidth: true,
       keyMapper: (rowIndex, columnIndex) => {
         const message = this.getMessage(rowIndex);
-        if (message) {
+        if (message && message.msg_id) {
           return `msg:${message.msg_id}`;
         }
         return rowIndex;
@@ -335,7 +335,7 @@ export default class extends React.PureComponent {
   }
 
   render() {
-    const { session, projMsgs, projTxMsgIDs, isCurrentOpened } = this.props;
+    const { session, projMsgs, projTxMsgIDs, txMsgs, isCurrentOpened } = this.props;
     const { isInRead } = this.state;
     if (!isInRead && this.stop_msg_id !== undefined) {
       // console.debug("reset stop_msg_id");
@@ -384,6 +384,7 @@ export default class extends React.PureComponent {
                 isCurrentOpened={isCurrentOpened}
                 projMsgs={projMsgs}
                 projTxMsgIDs={projTxMsgIDs}
+                txMsgs={txMsgs}
               />
               {height >= 64 &&
                 isInRead && (

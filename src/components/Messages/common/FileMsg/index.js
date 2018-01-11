@@ -1,3 +1,4 @@
+import React from "react";
 import { Icon } from "antd";
 import * as unitUtil from "~/utils/unit";
 import * as pathUtil from "~/utils/path";
@@ -24,36 +25,55 @@ const extToIcon = {
 };
 const DEFAULT_ICON_TYPE = { type: "file" };
 
-export default ({ msg, as_description }) => {
-  if (as_description) {
-    return `[文件] ${msg.name}`;
+export default class extends React.PureComponent {
+  componentDidMount() {
+    this._remeasure();
   }
 
-  const { name, url, size } = msg;
-  const prettySize = typeof size === "number" ? unitUtil.prettyByteSize(size) : "未知大小";
-  const [namePart, extPart, ext] = pathUtil.splitFileNameAndExt(name || "-");
-  const { type, color } = extToIcon[ext] || DEFAULT_ICON_TYPE;
+  componentDidUpdate() {
+    this._remeasure();
+  }
 
-  return (
-    <div className={styles.main}>
-      <div className={styles.icon}>
-        <Icon type={type} style={{ fontSize: 40, color }} />
-      </div>
-      <div className={styles.description}>
-        <div className={styles.title}>
-          <div className={styles.name}>{namePart}</div>
-          <div className={styles.ext}>{extPart}</div>
+  _remeasure() {
+    // re measure
+    const { measure } = this.props;
+    if (measure) {
+      measure();
+    }
+  }
+
+  render() {
+    const { msg, as_description } = this.props;
+    if (as_description) {
+      return `[文件] ${msg.name}`;
+    }
+
+    const { name, url, size } = msg;
+    const prettySize = typeof size === "number" ? unitUtil.prettyByteSize(size) : "未知大小";
+    const [namePart, extPart, ext] = pathUtil.splitFileNameAndExt(name || "-");
+    const { type, color } = extToIcon[ext] || DEFAULT_ICON_TYPE;
+
+    return (
+      <div className={styles.main}>
+        <div className={styles.icon}>
+          <Icon type={type} style={{ fontSize: 40, color }} />
         </div>
-        <div className={styles.divider} />
-        <div className={styles.detail}>
-          <div className={styles.info}>{prettySize}</div>
-          <div className={styles.action}>
-            <a href={url} download={name} disabled={!url} target="_blank">
-              下载
-            </a>
+        <div className={styles.description}>
+          <div className={styles.title}>
+            <div className={styles.name}>{namePart}</div>
+            <div className={styles.ext}>{extPart}</div>
+          </div>
+          <div className={styles.divider} />
+          <div className={styles.detail}>
+            <div className={styles.info}>{prettySize}</div>
+            <div className={styles.action}>
+              <a href={url} download={name} disabled={!url} target="_blank">
+                下载
+              </a>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+}
