@@ -34,7 +34,7 @@ export default class extends React.Component {
         </Button>
         <Divider type="vertical" />
         <Button ghost type="primary">
-          详情
+          接待
         </Button>
       </span>
     );

@@ -1,12 +1,18 @@
-import { Card, Badge, Icon } from "antd";
-import SessionItem from '../Chat/MyHandlingSessions/SessionItem';
+import { Dropdown, Menu, Card, Button, Badge, Icon } from "antd";
+import SessionItem from "../Chat/MyHandlingSessions/SessionItem";
 import styles from "./index.less";
+
+const sendMenu = (
+  <Menu>
+    <Menu.Item key="1">enter发送</Menu.Item>
+    <Menu.Item key="2">shift+enter发送</Menu.Item>
+  </Menu>
+);
 
 export default () => {
   return (
     <div className={styles.main}>
-      <Card title="消息气泡">
-      </Card>
+      <Card title="消息气泡" />
       <Card title="徽标" bordered={false}>
         <Badge count={13}>
           <Icon type="code" className={styles.icon} />
@@ -58,8 +64,13 @@ export default () => {
         </Badge>
       </Card>
       <Card>
-        <SessionItem name="测试" description="你妹的，好麻烦。。。" ts="刚刚"/>
-        <SessionItem name="测试" description="你妹的，好麻烦。。。" ts="刚刚"/>
+        <SessionItem name="测试" description="你妹的，好麻烦。。。" ts="刚刚" />
+        <SessionItem name="测试" description="你妹的，好麻烦。。。" ts="刚刚" />
+      </Card>
+      <Card>
+        <Dropdown.Button type="primary" overlay={sendMenu}>
+          发送
+        </Dropdown.Button>
       </Card>
     </div>
   );
