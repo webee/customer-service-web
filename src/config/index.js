@@ -1,11 +1,11 @@
 let config = undefined;
 
 if (!config) {
-  if (CONFIG_ENV === "production") {
+  if (process.env.ENV === "production") {
     config = { ...require("./default"), ...require("./production") };
-  } else if (CONFIG_ENV === "beta") {
+  } else if (process.env.ENV === "beta") {
     config = { ...require("./default"), ...require("./beta") };
-  } else if (CONFIG_ENV === "development") {
+  } else if (process.env.ENV === "development") {
     config = { ...require("./default"), ...require("./development") };
   } else {
     config = require("./default");
