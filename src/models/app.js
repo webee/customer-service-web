@@ -8,7 +8,7 @@ import * as projectNotify from "../services/projectNotify";
 import { createProjectDomainTypeAction } from "../services/project";
 import { env } from "../config";
 
-wampDebug(evn !== "production");
+wampDebug(env !== "production");
 // xchat client
 const xchatClient = new XChatClient();
 
