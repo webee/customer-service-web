@@ -35,7 +35,8 @@ export default class extends React.PureComponent {
     this.state = {
       // 图片原始尺寸
       w,
-      h
+      h,
+      error: false
     };
   }
 
@@ -46,12 +47,24 @@ export default class extends React.PureComponent {
     });
   };
 
+  onError = () => {
+    this.setState({ error: true });
+  };
+
   componentDidUpdate() {
     // re measure
     const { measure } = this.props;
     if (measure) {
       measure();
     }
+  }
+
+  get alt() {
+    if (this.state.error) {
+      return "图像加载失败!!";
+    }
+    const { name, url } = this.props.msg;
+    return name || url;
   }
 
   render() {
@@ -68,7 +81,7 @@ export default class extends React.PureComponent {
     const [xw, xh] = resize(w, h, sizeSpecs);
     return (
       <div className={styles.main} style={sizeSpecs}>
-        <img onLoad={this.onLoad} src={url} alt={name || url} style={{ width: xw, height: xh }} />
+        <img onLoad={this.onLoad} onError={this.onError} src={url} alt={this.alt} style={{ width: xw, height: xh }} />
       </div>
     );
   }
