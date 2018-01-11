@@ -1,7 +1,7 @@
 import * as xfilesService from "./xfiles";
 
 export default class FileUploadCook {
-  constructor(updateTxMsgCookingProgress, types: Set = new Set([])) {
+  constructor(updateTxMsgCookingProgress, types = new Set([])) {
     this.updateTxMsgCookingProgress = updateTxMsgCookingProgress;
     this.types = types;
   }

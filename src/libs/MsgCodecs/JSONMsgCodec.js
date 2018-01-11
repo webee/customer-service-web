@@ -1,5 +1,5 @@
 export default class JSONMsgCodec {
-  constructor(types: Set) {
+  constructor(types) {
     this.types = types;
   }
 

@@ -19,15 +19,15 @@ import styles from "./Main.less";
 //
 // function getNavData(projectDomains) {
 //   return [
-// 		{icon: 'home', title: '首页', pathname: '', component: require('../routes/Home')},
+// 		{icon: 'home', title: '首页', pathname: '', component: require('../routes/Home').default},
 // 		{icon: 'message', title: '项目', pathname: 'projects', noLink: true,
 //       instance: {
 //         pathname: ':projectDomain/:projectType',
-//         component: require('../routes/Projects'),
+//         component: require('../routes/Projects').default,
 //         items: getProjectDomainNavData(projectDomains),
 //       },
 //     },
-// 		{icon: 'setting', title: '设置', pathname: 'setting', component: require('../routes/Setting')},
+// 		{icon: 'setting', title: '设置', pathname: 'setting', component: require('../routes/Setting').default},
 //   ];
 // }
 
@@ -54,7 +54,7 @@ function getProjectDomainNavData(projectDomains, settings = {}) {
           defPath: "my_handling",
           instance: {
             pathname: ":tab",
-            component: asProjectDomainType(d.name, t.name)(require("../routes/Projects")),
+            component: asProjectDomainType(d.name, t.name)(require("../routes/Projects").default),
             fixed: true,
             noHeader: !!settings.disable_session_header,
             noBreadcrumb: true,
@@ -102,20 +102,20 @@ function getNavData(title, projectDomains, settings) {
         icon: "home",
         title: "首页",
         pathname: "",
-        component: require("../routes/Home")
+        component: require("../routes/Home").default
       },
       ...getProjectDomainNavData(projectDomains, settings),
       {
         icon: "team",
         title: "客服",
         pathname: "staffs",
-        component: require("../routes/Staffs")
+        component: require("../routes/Staffs").default
       },
       {
         icon: "setting",
         title: "设置",
         pathname: "setting",
-        component: require("../routes/Setting")
+        component: require("../routes/Setting").default
       }
     ]
   };

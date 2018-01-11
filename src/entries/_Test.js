@@ -10,7 +10,7 @@ const navData = {
   defPath: "",
   noMatch: undefined,
   items: [
-    { icon: "home", title: "首页", pathname: "", component: require("../routes/_Test/Home") },
+    { icon: "home", title: "首页", pathname: "", component: require("../routes/_Test/Home").default },
     {
       icon: "message",
       title: "会话",
@@ -19,7 +19,7 @@ const navData = {
       noHeader: true,
       noBreadcrumb: true,
       noFooter: true,
-      component: require("../routes/_Test/Chat")
+      component: require("../routes/_Test/Chat").default
     },
     {
       icon: "star",
@@ -33,14 +33,14 @@ const navData = {
           title: "按钮",
           pathname: "button",
           noBreadcrumb: true,
-          component: require("../routes/_Test/General/Button")
+          component: require("../routes/_Test/General/Button").default
         },
         {
           icon: "gift",
           title: "图标",
           pathname: "icon",
           fixed: true,
-          component: require("../routes/_Test/General/Icon")
+          component: require("../routes/_Test/General/Icon").default
         }
       ]
     },
@@ -51,20 +51,20 @@ const navData = {
       defPath: "grid",
       noLink: true,
       items: [
-        { icon: "gift", title: "栅格", pathname: "grid", component: require("../routes/_Test/Layout/Grid") },
+        { icon: "gift", title: "栅格", pathname: "grid", component: require("../routes/_Test/Layout/Grid").default },
         {
           icon: "gift",
           title: "区块",
           pathname: "blocks",
           fixed: true,
-          component: require("../routes/_Test/Layout/Blocks")
+          component: require("../routes/_Test/Layout/Blocks").default
         },
         {
           icon: "gift",
           title: "测试",
           pathname: "test",
           fixed: true,
-          component: require("../routes/_Test/Layout/Test")
+          component: require("../routes/_Test/Layout/Test").default
         }
       ]
     },
@@ -80,11 +80,11 @@ const navData = {
           pathname: "etc",
           fixed: true,
           noFooter: true,
-          component: require("../routes/_Test/DataDisplay")
+          component: require("../routes/_Test/DataDisplay").default
         }
       ]
     },
-    { icon: "heart", title: "列表", pathname: "list", component: require("../routes/_Test/List") }
+    { icon: "heart", title: "列表", pathname: "list", component: require("../routes/_Test/List").default }
   ]
 };
 

@@ -1,3 +1,5 @@
+import React from "react";
+
 export default class MsgComponentRenderer {
   constructor(typeComponents) {
     this.typeComponents = typeComponents;
@@ -8,7 +10,7 @@ export default class MsgComponentRenderer {
   }
 
   render({ type, msg }, ctx = {}) {
-    if (this.typeComponents.hasOwnProperty(type)) {
+    if (this.typeComponents[type] !== undefined) {
       const MsgComp = this.typeComponents[type];
       return <MsgComp msg={msg} {...ctx} />;
     }

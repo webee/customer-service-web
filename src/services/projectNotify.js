@@ -1,4 +1,5 @@
 import { notification } from "antd";
+import { dispatchDomainTypeEffect } from "./project";
 import * as projectWorkers from "./projectWorkers";
 const domainTypeWorkers = {};
 
@@ -33,7 +34,7 @@ export function handle(dispatch, type, details) {
         description: <pre>JSON.stringify(details, undefined, 2)}</pre>
       });
     case "my_handling.session.finished":
-      projectWorkers.dispatchDomainTypeEffect(details, { dispatch }, "myHandling/removeHandlingSession", {
+      dispatchDomainTypeEffect(details, { dispatch }, "myHandling/removeHandlingSession", {
         sessionID: details.sessionID
       });
       break;
