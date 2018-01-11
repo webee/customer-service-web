@@ -6,7 +6,9 @@ import * as appService from "../services/app";
 import * as xfilesService from "../services/xfiles";
 import * as projectNotify from "../services/projectNotify";
 import { createProjectDomainTypeAction } from "../services/project";
+import { env } from "../config";
 
+wampDebug(evn !== "production");
 // xchat client
 const xchatClient = new XChatClient();
 
@@ -36,7 +38,7 @@ export default {
       return { ...state, ui_settings: { ...state.ui_settings, ...payload } };
     },
     saveAppInfo(state, { payload: { app, staff, project_domains: projectDomains } }) {
-      console.log('saveAppInfo');
+      console.log("saveAppInfo");
       const domains = {};
       projectDomains.forEach(pd => {
         const types = {};
