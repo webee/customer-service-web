@@ -29,9 +29,9 @@ export default ({ msg, as_description }) => {
     return `[文件] ${msg.name}`;
   }
 
-  const { name = "", url, size } = msg;
+  const { name, url, size } = msg;
   const prettySize = typeof size === "number" ? unitUtil.prettyByteSize(size) : "未知大小";
-  const [namePart, extPart, ext] = pathUtil.splitFileNameAndExt(name);
+  const [namePart, extPart, ext] = pathUtil.splitFileNameAndExt(name || "-");
   const { type, color } = extToIcon[ext] || DEFAULT_ICON_TYPE;
 
   return (

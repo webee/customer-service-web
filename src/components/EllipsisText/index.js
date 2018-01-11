@@ -17,9 +17,9 @@ export default class extends React.PureComponent {
 
   render() {
     const { text, maxWidth, className, ...props } = this.props;
-    const finalClassName = classNames(styles.main, className)
+    const finalClassName = classNames(styles.main, className);
     return (
-      <Tooltip title={this.tip} {...{ mouseLeaveDelay: 0, ...props }}>
+      <Tooltip title={this.tip} overlayClassName={styles.overlay} {...{ mouseLeaveDelay: 0.1, ...props }}>
         <div ref={content => (this.content = content)} className={finalClassName} style={{ maxWidth }}>
           {text}
         </div>
