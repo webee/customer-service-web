@@ -95,6 +95,11 @@ export async function fetchProjectMsgs(projectID, { lid, rid, limit, desc }) {
   return resp.data;
 }
 
+export async function tryHandleProject(projectID) {
+  const resp = await request.get(`/projects/${projectID}/try_handle`);
+  return resp.data;
+}
+
 export async function getProjectAccessFuncionURL(id, name, uid) {
   const resp = await request.get(`/projects/${id}/access_functions/${name}/url`, {
     params: { uid }

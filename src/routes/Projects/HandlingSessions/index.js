@@ -4,6 +4,7 @@ import moment from "moment";
 import { dispatchDomainTypeEffect, dispatchDomainType, domainTypeName } from "../../../services/project";
 import * as msgRendererService from "~/services/msgRenderer";
 import EllipsisText from "~/components/EllipsisText";
+import TryHandleModal from "../TryHandleModal";
 import { Card, Table, Icon, Pagination, Divider, Button, Badge } from "antd";
 import SearchForm from "./SearchForm";
 import styles from "./index.css";
@@ -38,11 +39,11 @@ export default class extends React.Component {
   renderActions(item) {
     return (
       <span>
-        <Button ghost type="primary">
+        <Button ghost type="primary" disabled>
           查看
         </Button>
         <Divider type="vertical" />
-        <Button ghost type="primary">
+        <Button ghost type="primary" onClick={() => this.tryHandleModal.activate(item.project.id)}>
           接待
         </Button>
       </span>
@@ -184,7 +185,7 @@ export default class extends React.Component {
   }
 
   render() {
-    const { appData, handlingData } = this.props;
+    const { appData, handlingData, dispatch } = this.props;
     const { staff, staffs, app } = appData;
     const staff_label_tree = app.staff_label_tree;
     const { isFetching, pagination } = handlingData;
@@ -207,6 +208,7 @@ export default class extends React.Component {
           dataSource={this.data}
           onChange={this.handleTableChange}
         />
+        <TryHandleModal ref={i => (this.tryHandleModal = i)} dispatch={dispatch} />
       </div>
     );
   }

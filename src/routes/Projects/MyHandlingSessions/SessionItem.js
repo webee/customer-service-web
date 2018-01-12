@@ -32,7 +32,7 @@ export default class extends React.PureComponent {
           </div>
         </div>
         {tags.map((t, i) => (
-          <Tag key={i} className={styles.tag} color="#2db7f5">
+          <Tag key={i} className={styles.tag} color="geekblue">
             <EllipsisText text={t} maxWidth={width - 50} onUpdate={() => measure()} />
           </Tag>
         ))}

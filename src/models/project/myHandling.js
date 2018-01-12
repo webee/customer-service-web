@@ -108,6 +108,10 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     { projectDomain, projectType, createAction, createEffectAction, payload: { session_id } },
     { call, put }
   ) {
+    if (session_id) {
+      yield put(createAction(`${ns}/openSession`, session_id));
+    }
+
     const sessionList = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
     sessionList.forEach(s => {
       if (s.msg) {

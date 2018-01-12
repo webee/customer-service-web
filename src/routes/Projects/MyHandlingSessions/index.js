@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
-import { withRouter } from "dva/router";
+import { withRouter, routerRedux } from "dva/router";
 import { connect } from "dva";
 import { parseQueryFromSearch } from "~/utils/url";
 import * as projectWorkers from "../../../services/projectWorkers";
@@ -27,10 +27,12 @@ export default class View extends React.Component {
   }
 
   componentDidMount() {
-    const { location } = this.props;
+    const { location, dispatch } = this.props;
     const query = parseQueryFromSearch(location.search);
     const session_id = parseInt(query.session_id) || undefined;
     projectWorkers.fetchMyHandlingSessions(this.context, this.props, { session_id });
+    // remove query
+    dispatch(routerRedux.replace({ ...location, search: "" }));
   }
 
   render() {

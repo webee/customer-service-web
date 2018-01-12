@@ -31,7 +31,7 @@ export function handle(dispatch, type, details) {
       notification.info({
         placement: "bottomRight",
         message: "会话被转接",
-        description: <pre>JSON.stringify(details, undefined, 2)}</pre>
+        description: <pre>{JSON.stringify(details, undefined, 2)}}</pre>
       });
     case "my_handling.session.finished":
       dispatchDomainTypeEffect(details, { dispatch }, "myHandling/removeHandlingSession", {

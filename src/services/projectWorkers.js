@@ -21,23 +21,23 @@ function clearExpiredWorkers() {
 
 export function fetchMyHandlingSessions({ projectDomain, projectType }, { dispatch }, params = {}) {
   const taskName = fetchMyHandlingSessions.name;
-  const worker = getWorker(taskName, [projectDomain, projectType, fetchMyHandlingSessions], async () => {
-    await delay(100);
+  const worker = getWorker(taskName, [projectDomain, projectType, fetchMyHandlingSessions], async (params) => {
     await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "myHandling/fetchSessions", params);
+    await delay(100);
   });
-  worker.start();
+  worker.start(params);
 }
 
 export function fetchSessionItem({ projectDomain, projectType }, { dispatch }, sessionID) {
   const taskName = fetchSessionItem.name;
   const worker = getWorker(taskName, [projectDomain, projectType, fetchSessionItem, sessionID], async () => {
-    await delay(100);
     await dispatchDomainTypeEffect(
       { projectDomain, projectType },
       { dispatch },
       "myHandling/fetchSessionItem",
       sessionID
     );
+    await delay(100);
   });
   worker.start();
 }
@@ -58,11 +58,11 @@ export function fetchProjectItem({ projectDomain, projectType }, { dispatch }, p
 export function loadProjectMsgs({ projectDomain, projectType }, { dispatch }, projectID, limit = 100) {
   const taskName = fetchProjectMsgs.name;
   const worker = getWorker(taskName, [projectDomain, projectType, loadProjectMsgs, projectID], async limit => {
-    await delay(100);
     await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "_/loadProjectHistoryMsgs", {
       projectID,
       limit
     });
+    await delay(100);
   });
   worker.start(limit);
 }
@@ -70,10 +70,10 @@ export function loadProjectMsgs({ projectDomain, projectType }, { dispatch }, pr
 export function fetchProjectMsgs({ projectDomain, projectType }, { dispatch }, projectID) {
   const taskName = fetchProjectMsgs.name;
   const worker = getWorker(taskName, [projectDomain, projectType, fetchProjectMsgs, projectID], async () => {
-    await delay(100);
     await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "_/fetchProjectNewMsgs", {
       projectID
     });
+    await delay(100);
   });
   worker.start();
 }
@@ -84,12 +84,12 @@ export function syncSessionMsgID({ projectDomain, projectType }, { dispatch }, p
     taskName,
     [projectDomain, projectType, fetchProjectMsgs, projectID, sessionID],
     async sync_msg_id => {
-      await delay(100);
       await dispatchDomainTypeEffect({ projectDomain, projectType }, { dispatch }, "_/syncSessionMsgID", {
         projectID,
         sessionID,
         sync_msg_id
       });
+      await delay(100);
     },
     sync_msg_id
   );

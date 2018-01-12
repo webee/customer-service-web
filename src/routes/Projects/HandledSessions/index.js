@@ -5,6 +5,7 @@ import { dispatchDomainTypeEffect, dispatchDomainType, domainTypeName } from "..
 import * as msgRendererService from "~/services/msgRenderer";
 import EllipsisText from "~/components/EllipsisText";
 import { Card, Table, Icon, Pagination, Divider, Button, Badge } from "antd";
+import TryHandleModal from "../TryHandleModal";
 import SearchForm from "./SearchForm";
 import styles from "./index.css";
 import { renderBoolean, renderNotBoolean, renderTsFromNow, renderTs, renderStaff, renderCustomer } from "../commons";
@@ -29,11 +30,11 @@ export default class extends React.Component {
   renderActions(item) {
     return (
       <span>
-        <Button ghost type="primary">
+        <Button ghost type="primary" disabled>
           查看
         </Button>
         <Divider type="vertical" />
-        <Button ghost type="primary">
+        <Button ghost type="primary" onClick={() => this.tryHandleModal.activate(item.project.id)}>
           接待
         </Button>
       </span>
@@ -161,7 +162,7 @@ export default class extends React.Component {
   }
 
   render() {
-    const { appData, handledData } = this.props;
+    const { appData, handledData, dispatch } = this.props;
     const { staff, staffs, app } = appData;
     const staff_label_tree = app.staff_label_tree;
     const { isFetching, pagination } = handledData;
@@ -184,6 +185,7 @@ export default class extends React.Component {
           dataSource={this.data}
           onChange={this.handleTableChange}
         />
+        <TryHandleModal ref={i => (this.tryHandleModal = i)} dispatch={dispatch} />
       </div>
     );
   }

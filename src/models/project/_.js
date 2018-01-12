@@ -1,3 +1,4 @@
+import { routerRedux } from "dva/router";
 import { collectTypeReducers, createNSSubEffectFunc, listToDict } from "../utils";
 import * as projectService from "../../services/project";
 import * as msgCodecService from "../../services/msgCodec";
@@ -262,6 +263,10 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     } finally {
       yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingNew: false }));
     }
+  },
+  *tryHandleProject({ payload: projectID }, { call, put }) {
+    const { domain, type, current_session_id } = yield call(projectService.tryHandleProject, projectID);
+    yield put(routerRedux.push(`/projects/${domain}/${type}/my_handling?session_id=${current_session_id}`));
   },
   *fetchProjectExtData({ createAction, payload: projectID }, { call }) {
     yield call(projectService.fetchProjectExtData, projectID);
