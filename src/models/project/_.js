@@ -11,6 +11,8 @@ const msgTypeInitialStatus = {
   ripe: "ready"
 };
 
+const CURRENT_SESSION_START_MSG = { domain: "system", type: "notify", msg: "~当前会话开始~" };
+
 // reducers
 export const reducer = collectTypeReducers(
   {
@@ -96,6 +98,8 @@ export const reducer = collectTypeReducers(
       return { ...state, projectMsgs };
     },
     insertProjectMsgs(state, { payload: { id, msgs, noMore } }) {
+      const project = state.projects[id];
+      const session = state.sessions[project.current_session_id] || {};
       const projectMsgs = { ...state.projectMsgs };
       let { lid, rid, msgs: _msgs, noMore: _noMore } = projectMsgs[id] || {};
       _msgs = _msgs || [];
@@ -104,6 +108,9 @@ export const reducer = collectTypeReducers(
       msgs.forEach(msg => {
         if (!lid || msg.msg_id < lid) {
           lid = msg.msg_id;
+          if (lid === session.start_msg_id) {
+            newMsgs.unshift(CURRENT_SESSION_START_MSG);
+          }
           newMsgs.unshift({ ...msg, is_rx: true });
         }
 
@@ -112,6 +119,11 @@ export const reducer = collectTypeReducers(
         }
       });
       projectMsgs[id] = { lid, rid, msgs: newMsgs, noMore: newNoMore };
+      return { ...state, projectMsgs };
+    },
+    removeProjMsgs(state, { payload: id }) {
+      const projectMsgs = { ...state.projectMsgs };
+      delete projectMsgs[id];
       return { ...state, projectMsgs };
     },
     removeProjectMsg(state, { payload: { id, msg_id } }) {

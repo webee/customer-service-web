@@ -48,7 +48,7 @@ export default class extends React.PureComponent {
       fixedWidth: true,
       keyMapper: (rowIndex, columnIndex) => {
         const message = this.getMessage(rowIndex);
-        if (message && message.msg_id) {
+        if (message && message.msg_id && message.msg_id > 0) {
           return `msg:${message.msg_id}`;
         }
         return rowIndex;
@@ -229,7 +229,7 @@ export default class extends React.PureComponent {
       } else {
         // console.debug("onScroll: ", clientHeight, scrollHeight, scrollTop, scrollDirection);
         // 由非阅读状态进入阅读状态
-        isInRead = clientHeight + scrollTop + 10 < scrollHeight;
+        isInRead = clientHeight + scrollTop + 3 < scrollHeight;
       }
       this._updateIsInReadState(isInRead);
     }

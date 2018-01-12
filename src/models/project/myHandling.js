@@ -137,12 +137,13 @@ export const effectFunc = createNSSubEffectFunc(ns, {
   },
   *finishHandlingSession({ createEffectAction, payload: { projectID, sessionID } }, { call, put }) {
     yield call(projectService.finishHandlingSession, projectID, sessionID);
-    yield put(createEffectAction(`${ns}/removeHandlingSession`, { sessionID }));
+    yield put(createEffectAction(`${ns}/removeHandlingSession`, { projectID, sessionID }));
   },
-  *removeHandlingSession({ createAction, payload: { sessionID } }, { call, put }) {
+  *removeHandlingSession({ createAction, payload: { projectID, sessionID } }, { call, put }) {
     yield put(createAction(`${ns}/closeOpenedSession`, sessionID));
     yield put(createAction(`${ns}/removeFromListSessions`, sessionID));
     yield put(createAction(`_/removeSession`, sessionID));
+    yield put(createAction(`_/removeProjMsgs`, projectID));
   }
 });
 
