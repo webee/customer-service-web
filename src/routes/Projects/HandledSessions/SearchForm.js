@@ -61,11 +61,11 @@ export default class extends React.Component {
             </Form.Item>
           </Col>
           <Col {...{ sm: 8, md: 8, lg: 4, xl: 4 }}>
-            <Form.Item label="自己" colon={false}>
+            <Form.Item label="我" colon={false}>
               {getFieldDecorator("filter_self")(
                 <Select allowClear>
-                  <Select.Option value="only">仅仅自己</Select.Option>
-                  <Select.Option value="exclude">排除自己</Select.Option>
+                  <Select.Option value="only">仅我接待</Select.Option>
+                  <Select.Option value="exclude">除我接待</Select.Option>
                 </Select>
               )}
             </Form.Item>

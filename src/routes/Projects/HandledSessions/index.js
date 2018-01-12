@@ -53,6 +53,12 @@ export default class extends React.Component {
         render: renderCustomer
       },
       {
+        title: "用户ID",
+        dataIndex: "project.owner.uid",
+        key: "owner.uid",
+        width: 150
+      },
+      {
         title: "在线",
         dataIndex: "project.is_online",
         key: "is_online",
@@ -113,6 +119,20 @@ export default class extends React.Component {
         render: ts => renderTs(ts, "", "YYYY-MM-DD HH:mm:ss")
       },
       {
+        title: "起始id",
+        dataIndex: "start_msg_id",
+        sorter: true,
+        width: 120,
+        sortOrder: getSorterOrder(sorter, "start_msg_id")
+      },
+      {
+        title: "全部",
+        dataIndex: "msg_count",
+        sorter: true,
+        width: 110,
+        sortOrder: getSorterOrder(sorter, "msg_count")
+      },
+      {
         title: "项目Tags",
         dataIndex: "xxx",
         width: 100,
@@ -157,7 +177,7 @@ export default class extends React.Component {
         />
         <Table
           loading={isFetching}
-          scroll={{ x: 1520 }}
+          scroll={{ x: 1900 }}
           bordered={true}
           pagination={pagination}
           columns={this.columns}

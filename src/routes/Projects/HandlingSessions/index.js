@@ -62,6 +62,12 @@ export default class extends React.Component {
         render: renderCustomer
       },
       {
+        title: "用户ID",
+        dataIndex: "project.owner.uid",
+        key: "owner.uid",
+        width: 150
+      },
+      {
         title: "在线",
         dataIndex: "project.is_online",
         key: "is_online",
@@ -194,7 +200,7 @@ export default class extends React.Component {
         />
         <Table
           loading={isFetching}
-          scroll={{ x: 2050 }}
+          scroll={{ x: 2200 }}
           bordered={true}
           pagination={pagination}
           columns={this.columns}
