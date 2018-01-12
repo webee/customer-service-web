@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import cs from "classnames";
 import { Button, Icon, Input } from "antd";
 import Upload from "~/components/Upload";
-import { dispatchDomainTypeEffect } from "../../../services/project";
-import { getImageFileDimension } from "../../../utils/file";
+import { dispatchDomainTypeEffect } from "~/services/project";
+import { getImageFileDimension } from "~/utils/file";
 import styles from "./MessageSender.less";
 
 const { TextArea } = Input;

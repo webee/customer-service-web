@@ -6,10 +6,10 @@ import { Icon, Button, Badge } from "antd";
 import moment from "moment";
 import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
 import Loader from "~/components/Loader";
+import EmptyContent from "~/components/EmptyContent";
 import List from "react-virtualized/dist/commonjs/List";
 import Lightbox from "react-image-lightbox";
 import CellMeasurer, { CellMeasurerCache } from "react-virtualized/dist/commonjs/CellMeasurer";
-import EmptyContent from "./EmptyContent";
 import MessageItem from "./MessageItem";
 import styles from "./MessageList.less";
 

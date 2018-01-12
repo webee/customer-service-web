@@ -3,14 +3,14 @@ import PropTypes from "prop-types";
 import { reduxRouter } from "dva/router";
 import { connect } from "dva";
 import { dispatchDomainType } from "~/services/project";
-import * as projectWorkers from "../../../services/projectWorkers";
+import * as projectWorkers from "~/services/projectWorkers";
 import SplitPane from "react-split-pane";
 import List from "react-virtualized/dist/commonjs/List";
 import SessionChatHeader from "./SessionChatHeader";
 import SessionChatInfo from "./SessionChatInfo";
 import MessageList from "./MessageList";
 import MessageSender from "./MessageSender";
-import styles from "./SessionChatDetail.less";
+import styles from "./index.less";
 
 export default class View extends Component {
   static contextTypes = {

@@ -1,10 +1,10 @@
 import React from "react";
-import { dispatchDomainTypeEffect } from "../../../services/project";
-import * as projectService from "~/services/project";
 import { delay } from "~/utils/commons";
+import { dispatchDomainTypeEffect } from "~/services/project";
+import * as projectService from "~/services/project";
 import { Menu, Dropdown, Button, Icon, message, Modal } from "antd";
 import styles from "./SessionChatHeader.less";
-import { genCustomerMobileName } from "./utils";
+import { genCustomerMobileName } from "../utils";
 import { accessFunction } from "./accessFunctions";
 
 const MAX_ACCESS_FUNCTIONS = 3;

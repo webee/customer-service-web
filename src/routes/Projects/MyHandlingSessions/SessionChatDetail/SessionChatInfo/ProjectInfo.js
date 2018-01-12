@@ -7,7 +7,7 @@ import LabelList from "~/components/LabelList";
 import EllipsisText from "~/components/EllipsisText";
 import styles from "./ProjectInfo.less";
 import { accessFunction } from "../accessFunctions";
-import { renderTs, renderStaff } from "../../commons";
+import { renderTs, renderStaff } from "../../../commons";
 
 const labelListDefaultStyle = {
   labelStyle: { color: "gray" },

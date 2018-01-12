@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import { connect } from "dva";
 import { Tabs } from "antd";
 import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
+import EmptyContent from "~/components/EmptyContent";
 import SessionChatDetail from "./SessionChatDetail";
-import EmptyContent from "./EmptyContent";
 import styles from "./SessionDetails.less";
 
 export default class View extends Component {
