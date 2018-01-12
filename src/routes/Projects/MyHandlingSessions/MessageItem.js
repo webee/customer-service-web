@@ -43,7 +43,7 @@ export default class extends React.PureComponent {
 
   render() {
     const { position, userName, message, ctx, onClickMsg } = this.props;
-    const { domain, type, msg_id, msg, state, status, ts, msgType, is_failed } = message;
+    const { channel, domain, type, msg_id, msg, state, status, ts, msgType, is_failed } = message;
     const position_right = position === "right";
     const itemClassNames = cs(styles.item, {
       [styles.left]: position === "left",
@@ -54,11 +54,13 @@ export default class extends React.PureComponent {
     const bodyClassNames = cs(styles.body, {
       [styles.raw]: isRaw
     });
+    // TODO: add channel to icon type mapping.
     return (
       <div className={itemClassNames}>
         <div className={styles.info}>{this.renderStatus(status)}</div>
         <div className={styles.content}>
           <div className={styles.head}>
+            {channel ? <Icon type={channel} /> : undefined}
             {userName}
             <span className={styles.ts}>{moment.unix(ts).format("YYYY-MM-DD HH:mm:ss")}</span>
           </div>
