@@ -7,7 +7,7 @@ import LabelList from "~/components/LabelList";
 import EllipsisText from "~/components/EllipsisText";
 import styles from "./ProjectInfo.less";
 import { accessFunction } from "../accessFunctions";
-import { renderTs, renderStaff } from "../../../commons";
+import { renderTs, renderStaff, renderBoolean } from "../../../commons";
 
 const labelListDefaultStyle = {
   labelStyle: { color: "gray" },
@@ -30,7 +30,7 @@ export default class extends React.Component {
       case "string":
         return value;
       case "boolean":
-        return <Icon type={value ? "check-circle" : "close-circle"} />;
+        return renderBoolean(value);
       default:
         return JSON.stringify(value);
     }
