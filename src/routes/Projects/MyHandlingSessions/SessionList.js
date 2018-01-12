@@ -46,7 +46,7 @@ export default class View extends Component {
       keyMapper: (rowIndex, columnIndex) => {
         const sessionList = this.getSessionList();
         const session = sessionList[rowIndex];
-        return session.id;
+        return `s:${session.id}`;
       }
     });
   }
@@ -207,6 +207,8 @@ export default class View extends Component {
     const { currentOpenedSession, openedSessionsState } = myHandlingData;
     const currentOpenedSessionState = openedSessionsState[currentOpenedSession];
     const sessionList = this.getSessionList();
+    // FIXME: 解决高度获取问题, 注意性能问题
+    this.cache.clearAll();
     return (
       <div className={styles.main}>
         {this.renderHeader()}
@@ -259,7 +261,7 @@ export default class View extends Component {
         {({ measure }) => (
           <div style={style}>
             <SessionItem
-              ctx={{ width }}
+              ctx={{ width, measure }}
               opened={item.opened}
               selected={item.selected}
               onClick={() => this.onClick(session.id)}
