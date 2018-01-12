@@ -12,7 +12,7 @@ const msgTypeInitialStatus = {
   ripe: "ready"
 };
 
-const CURRENT_SESSION_START_MSG = { domain: "system", type: "notify", msg: "~当前会话开始~" };
+const CURRENT_SESSION_START_MSG = { domain: "system", type: "divider", msg: "当前会话开始" };
 
 // reducers
 export const reducer = collectTypeReducers(

@@ -16,7 +16,8 @@ domainMsgRendererFetcher.register(
 domainMsgRendererFetcher.register(
   ["system"],
   new MsgComponentRenderer({
-    notify: systemTypeMsgs.NotifyMsg
+    notify: systemTypeMsgs.NotifyMsg,
+    divider: systemTypeMsgs.DividerMsg
   })
 );
 
