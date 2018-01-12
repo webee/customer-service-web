@@ -76,10 +76,10 @@ export default class extends React.Component {
       <div className={styles.main}>
         <div className={styles.toolbar}>
           <div className={styles.left}>
-            <Upload multiple accept="image/*" onChange={this.onUploadImages}>
+            <Upload multiple accept="image/*" onUpload={this.onUploadImages}>
               <Icon type="picture" />
             </Upload>
-            <Upload multiple onChange={this.onUploadFiles}>
+            <Upload multiple onUpload={this.onUploadFiles}>
               <Icon type="folder" />
             </Upload>
           </div>
@@ -90,18 +90,13 @@ export default class extends React.Component {
           </div>
         </div>
         <div className={styles.input}>
-          <TextArea
-            value={this.state.text}
-            onChange={this.onChange}
-            onKeyPress={this.onKeyPress}
-            autoFocus={true}
-          />
+          <TextArea value={this.state.text} onChange={this.onChange} onKeyPress={this.onKeyPress} autoFocus={true} />
         </div>
       </div>
     );
   }
 
-  onUploadImages = async ({ target: { files } }) => {
+  onUploadImages = async (files, done) => {
     async function createImageMsgFromFile(file) {
       const { width: w, height: h } = await getImageFileDimension(file);
       return {
@@ -120,9 +115,10 @@ export default class extends React.Component {
 
     const msgs = await Promise.all(promises);
     this.sendMsgs(msgs);
+    done();
   };
 
-  onUploadFiles = ({ target: { files } }) => {
+  onUploadFiles = (files, done) => {
     const msgs = [];
     for (let f of files) {
       msgs.push({
@@ -134,5 +130,6 @@ export default class extends React.Component {
       });
     }
     this.sendMsgs(msgs);
+    done();
   };
 }
