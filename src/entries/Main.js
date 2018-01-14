@@ -137,6 +137,13 @@ class Main extends React.Component {
     showSettingModal: false
   };
 
+  onLayoutInfoUpdate = (name, values) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "ui/updateLayoutInfo",
+      payload: { name, values }
+    });
+  };
   updateUISettings = settings => {
     const { dispatch } = this.props;
     dispatch({
@@ -340,6 +347,8 @@ class Main extends React.Component {
         disableFooter={ui.settings.disable_footer}
         onLogoClick={this.onLogoClick}
         bottom={this.getBottom()}
+        layoutInfo={ui.layoutInfo}
+        onLayoutInfoUpdate={this.onLayoutInfoUpdate}
       />
     );
   }

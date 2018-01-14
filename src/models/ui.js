@@ -6,14 +6,15 @@ export default {
 
   state: {
     settings: {},
-    screen: {}
+    layoutInfo: { screen: {} }
   },
   reducers: {
     saveSettings(state, { payload }) {
       return { ...state, settings: { ...state.settings, ...payload } };
     },
-    updateScreen(state, { payload }) {
-      return { ...state, screen: { ...state.screen, ...payload } };
+    updateLayoutInfo(state, { payload: { name, values } }) {
+      const curValues = state.layoutInfo[name];
+      return { ...state, layoutInfo: { ...state.layoutInfo, [name]: { ...curValues, ...values } } };
     }
   },
   effects: toPromiseEffects({

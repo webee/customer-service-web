@@ -63,11 +63,14 @@ const isXsUnregister = enquireXs(v => {
 
 @withRouter
 export default class extends React.PureComponent {
-  state = {
-    collapsed: false,
-    isMobile: isMobile,
-    isXs: isXs
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      collapsed: false
+    };
+    props.onLayoutInfoUpdate("screen", { isMobile, isXs });
+  }
+
   onCollapse = (collapsed, type) => {
     this.setState({ collapsed });
   };
@@ -75,11 +78,11 @@ export default class extends React.PureComponent {
   componentDidMount() {
     isMobileUnregister();
     enquireMobile(v => {
-      this.setState({ isMobile: v });
+      this.props.onLayoutInfoUpdate("screen", { isMobile: v });
     });
     isXsUnregister();
     enquireXs(v => {
-      this.setState({ isXs: v });
+      this.props.onLayoutInfoUpdate("screen", { isXs: v });
     });
     this._handleDisableSiderAndCollapse(false, this.props.disableSider);
   }
@@ -97,10 +100,10 @@ export default class extends React.PureComponent {
   }
 
   render() {
-    const { match, location, headerMenu, navData, onLogoClick } = this.props;
+    const { match, location, headerMenu, navData, onLogoClick, layoutInfo } = this.props;
     const { title: name } = navData;
     const { bottom } = this.props;
-    const { isMobile } = this.state;
+    const { isMobile, isXs } = layoutInfo.screen;
     // 以navData为基础生成1. 导航菜单，2. 面包屑 3. routes
     console.debug("MainLayout, navData: ", navData);
     const root_path = getRootPath(match.path);
@@ -162,7 +165,7 @@ export default class extends React.PureComponent {
               onCollapse={this.onCollapse}
               onLogoClick={onLogoClick}
               headerMenu={headerMenu}
-              isXs={this.state.isXs}
+              isXs={isXs}
             />
           )}
           <Content className={contentClassName} style={contentStyle}>
