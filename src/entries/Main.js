@@ -8,7 +8,6 @@ import { getRootPath } from "../commons/router";
 const { SubMenu, ItemGroup } = Menu;
 import { env } from "../config";
 import MainLayout from "../components/layouts/MainLayout";
-import LayoutHeaderStyles from "../components/layouts/Header/index.less";
 import styles from "./Main.less";
 
 // function getProjectDomainNavData(projectDomains) {
@@ -211,47 +210,59 @@ class Main extends React.Component {
 
   getHeaderMenu() {
     const { staff, location, xchatStatusInfo } = this.props;
-    const menu = (
-      <Menu selectedKeys={[]} onClick={this.onMenuClick}>
-        <Menu.Item key="user/logout">
-          <Link to={{ pathname: "/auth/logout", state: { state: { from: location } } }}>
-            <Icon type="logout" />退出登录
-          </Link>
-        </Menu.Item>
-      </Menu>
-    );
+    function renderValue(isXs, val) {
+      return !isXs && val;
+    }
 
-    const xchatStatus = xchatStatuses[xchatStatusInfo.status];
-    return (
-      <Fragment>
-        <span className={LayoutHeaderStyles.action} onClick={this.handleXChatStatus}>
-          <Icon type="wifi" style={{ color: xchatStatus.color }} /> {xchatStatus.name}
-        </span>
-        {env === "dev" ? (
-          <Link to="/_" className={LayoutHeaderStyles.action}>
-            <Icon type="code" /> Test
-          </Link>
-        ) : (
-          undefined
-        )}
-        <span className={LayoutHeaderStyles.action} onClick={this.handleSettingUI}>
-          <Icon type="setting" /> 界面设置
-        </span>
-        <Dropdown overlay={menu}>
-          <span className={`${LayoutHeaderStyles.action} ${LayoutHeaderStyles.account}`}>
-            <Avatar size="small" className={LayoutHeaderStyles.avatar} icon="user" />
-            {staff.name}
+    return ({ styles, isXs } = {}) => {
+      const menu = (
+        <Menu selectedKeys={[]} onClick={this.onMenuClick}>
+          {isXs && (
+            <Menu.Item key="user">
+              <Icon type="user" /> {staff.name}
+            </Menu.Item>
+          )}
+          <Menu.Item key="user/logout">
+            <Link to={{ pathname: "/auth/logout", state: { state: { from: location } } }}>
+              <Icon type="logout" /> 退出登录
+            </Link>
+          </Menu.Item>
+        </Menu>
+      );
+
+      const xchatStatus = xchatStatuses[xchatStatusInfo.status];
+      return (
+        <Fragment>
+          <span className={styles.action} onClick={this.handleXChatStatus}>
+            <Icon type="wifi" style={{ color: xchatStatus.color }} /> {renderValue(isXs, xchatStatus.name)}
           </span>
-        </Dropdown>
-      </Fragment>
-    );
+          {env === "dev" ? (
+            <Link to="/_" className={styles.action}>
+              <Icon type="code" /> {renderValue(isXs, "Test")}
+            </Link>
+          ) : (
+            undefined
+          )}
+          <span className={styles.action} onClick={this.handleSettingUI}>
+            <Icon type="setting" /> {renderValue(isXs, "界面设置")}
+          </span>
+          <Dropdown overlay={menu}>
+            <span className={`${styles.action} ${styles.account}`}>
+              <Avatar size="small" className={styles.avatar} icon="user" />
+              {renderValue(isXs, staff.name)}
+            </span>
+          </Dropdown>
+        </Fragment>
+      );
+    };
   }
 
   getBottom() {
     const { showSettingModal } = this.state;
     const { ui_settings } = this.props;
-    const gutterSpecs = { xs: 8, sm: 8, md: 8, lg: 12, xl: 12 };
+    const gutterSpecs = { sm: 8, md: 8, lg: 12, xl: 12 };
     const colSpanSpecs = { sm: 24, md: 16, lg: 12, xl: 8 };
+    const colSpanSpecs2 = { sm: 24, md: 16, lg: 12, xl: 12 };
     return showSettingModal ? (
       <Modal
         title="界面设置"
@@ -281,7 +292,7 @@ class Main extends React.Component {
                 />
               </Form.Item>
             </Col>
-            <Col>
+            <Col {...colSpanSpecs}>
               <Form.Item label="脚标">
                 <SwitchComp
                   checkedChildren="显示"
@@ -291,8 +302,8 @@ class Main extends React.Component {
                 />
               </Form.Item>
             </Col>
-            <Col>
-              <Form.Item label="会话时导航栏">
+            <Col {...colSpanSpecs2}>
+              <Form.Item label="会话时Header">
                 <SwitchComp
                   checkedChildren="显示"
                   unCheckedChildren="隐藏"

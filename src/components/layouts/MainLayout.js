@@ -35,35 +35,51 @@ const query = {
   }
 };
 
-function enquireMobile(f) {
-  enquire.register("screen and  (max-width: 991px)", {
+function enquireMinWidth(size, f) {
+  const query = `screen and  (max-width: ${size}px)`;
+  const handler = {
     match() {
       f(true);
     },
     unmatch() {
       f(false);
     }
-  });
+  };
+  enquire.register(query, handler);
+  return () => enquire.unregister(query, handler);
 }
 
+const enquireMobile = f => enquireMinWidth(991, f);
+const enquireXs = f => enquireMinWidth(600, f);
+
 let isMobile;
-enquireMobile(v => {
+let isXs;
+const isMobileUnregister = enquireMobile(v => {
   isMobile = v;
+});
+const isXsUnregister = enquireXs(v => {
+  isXs = v;
 });
 
 @withRouter
 export default class extends React.PureComponent {
   state = {
     collapsed: false,
-    isMobile: isMobile
+    isMobile: isMobile,
+    isXs: isXs
   };
   onCollapse = (collapsed, type) => {
     this.setState({ collapsed });
   };
 
   componentDidMount() {
+    isMobileUnregister();
     enquireMobile(v => {
       this.setState({ isMobile: v });
+    });
+    isXsUnregister();
+    enquireXs(v => {
+      this.setState({ isXs: v });
     });
     this._handleDisableSiderAndCollapse(false, this.props.disableSider);
   }
@@ -146,6 +162,7 @@ export default class extends React.PureComponent {
               onCollapse={this.onCollapse}
               onLogoClick={onLogoClick}
               headerMenu={headerMenu}
+              isXs={this.state.isXs}
             />
           )}
           <Content className={contentClassName} style={contentStyle}>
@@ -155,7 +172,7 @@ export default class extends React.PureComponent {
             </div>
           </Content>
           {disableFooter ? "" : <Footer className={styles.footer}>webee.yw(webee.yw@gmail.com) @2017</Footer>}
-          {bottom}
+          {typeof bottom === "function" ? bottom() : bottom}
         </Layout>
         {fixed ? "" : <BackTop target={() => document.getElementsByClassName(styles.main)[0]} visibilityHeight={500} />}
       </Layout>

@@ -6,7 +6,7 @@ const { Header } = Layout;
 
 export default class extends React.PureComponent {
   render() {
-    const { root_path, hideSider, headerMenu, collapsed, onCollapse, onLogoClick } = this.props;
+    const { root_path, hideSider, isXs, headerMenu, collapsed, onCollapse, onLogoClick } = this.props;
     return (
       <Header className={styles.header}>
         {hideSider && (
@@ -22,7 +22,9 @@ export default class extends React.PureComponent {
           type={collapsed ? "menu-unfold" : "menu-fold"}
           onClick={() => onCollapse(!collapsed)}
         />
-        <div className={styles.right}>{headerMenu}</div>
+        <div className={styles.right}>
+          {typeof headerMenu === "function" ? headerMenu({ styles, isXs }) : headerMenu}
+        </div>
       </Header>
     );
   }
