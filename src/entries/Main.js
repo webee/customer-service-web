@@ -131,6 +131,8 @@ const xchatStatuses = {
   [XCHAT_STATUS.CLOSED]: { name: "已关闭", color: "grey" }
 };
 
+const negTrans = v => !v;
+
 class Main extends React.Component {
   state = {
     showSettingModal: false
@@ -144,16 +146,10 @@ class Main extends React.Component {
     });
   };
 
-  toggleBreadcrumb = checked => {
-    this.updateUISettings({ disable_breadcrumb: !checked });
-  };
-
-  toggleFooter = checked => {
-    this.updateUISettings({ disable_footer: !checked });
-  };
-
-  toggleSessionHeader = checked => {
-    this.updateUISettings({ disable_session_header: !checked });
+  genUISettingHandler = (name, transformer = v => v) => {
+    return value => {
+      this.updateUISettings({ [name]: transformer(value) });
+    };
   };
 
   updateSettingModalState = show => {
@@ -266,12 +262,22 @@ class Main extends React.Component {
         <Form className={styles.settingForm}>
           <Row gutter={gutterSpecs}>
             <Col {...colSpanSpecs}>
+              <Form.Item label="侧边栏">
+                <SwitchComp
+                  checkedChildren="显示"
+                  unCheckedChildren="隐藏"
+                  defaultChecked={!ui_settings.disable_sider}
+                  onChange={this.genUISettingHandler("disable_sider", negTrans)}
+                />
+              </Form.Item>
+            </Col>
+            <Col {...colSpanSpecs}>
               <Form.Item label="面包屑">
                 <SwitchComp
                   checkedChildren="显示"
                   unCheckedChildren="隐藏"
                   defaultChecked={!ui_settings.disable_breadcrumb}
-                  onChange={this.toggleBreadcrumb}
+                  onChange={this.genUISettingHandler("disable_breadcrumb", negTrans)}
                 />
               </Form.Item>
             </Col>
@@ -281,7 +287,7 @@ class Main extends React.Component {
                   checkedChildren="显示"
                   unCheckedChildren="隐藏"
                   defaultChecked={!ui_settings.disable_footer}
-                  onChange={this.toggleFooter}
+                  onChange={this.genUISettingHandler("disable_footer", negTrans)}
                 />
               </Form.Item>
             </Col>
@@ -291,7 +297,7 @@ class Main extends React.Component {
                   checkedChildren="显示"
                   unCheckedChildren="隐藏"
                   defaultChecked={!ui_settings.disable_session_header}
-                  onChange={this.toggleSessionHeader}
+                  onChange={this.genUISettingHandler("disable_session_header", negTrans)}
                 />
               </Form.Item>
             </Col>
@@ -318,6 +324,7 @@ class Main extends React.Component {
       <MainLayout
         navData={navData}
         headerMenu={this.getHeaderMenu()}
+        disableSider={ui_settings.disable_sider}
         disableBreadcrumb={ui_settings.disable_breadcrumb}
         disableFooter={ui_settings.disable_footer}
         onLogoClick={this.onLogoClick}

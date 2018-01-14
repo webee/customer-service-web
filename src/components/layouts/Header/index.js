@@ -6,10 +6,10 @@ const { Header } = Layout;
 
 export default class extends React.PureComponent {
   render() {
-    const { root_path, isMobile, headerMenu, collapsed, onCollapse, onLogoClick } = this.props;
+    const { root_path, hideSider, headerMenu, collapsed, onCollapse, onLogoClick } = this.props;
     return (
       <Header className={styles.header}>
-        {isMobile && (
+        {hideSider && (
           <Fragment>
             <Link to={root_path} className={styles.logo}>
               <Icon type="rocket" style={{ color: "green", fontSize: "32px" }} onClick={onLogoClick} />

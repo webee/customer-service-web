@@ -65,12 +65,26 @@ export default class extends React.PureComponent {
     enquireMobile(v => {
       this.setState({ isMobile: v });
     });
+    this._handleDisableSiderAndCollapse(false, this.props.disableSider);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this._handleDisableSiderAndCollapse(this.props.disableSider, nextProps.disableSider);
+  }
+
+  _handleDisableSiderAndCollapse(cur, next) {
+    if (!cur && next) {
+      this.onCollapse(true);
+    } else if (cur && !next) {
+      this.onCollapse(false);
+    }
   }
 
   render() {
     const { match, location, headerMenu, navData, onLogoClick } = this.props;
     const { title: name } = navData;
     const { bottom } = this.props;
+    const { isMobile } = this.state;
     // 以navData为基础生成1. 导航菜单，2. 面包屑 3. routes
     console.debug("MainLayout, navData: ", navData);
     const root_path = getRootPath(match.path);
@@ -84,7 +98,9 @@ export default class extends React.PureComponent {
 
     const disableBreadcrumb = this.props.disableBreadcrumb || urlData.noBreadcrumb;
     const disableFooter = this.props.disableFooter || urlData.noFooter;
-    const disableHeader = this.props.disableHeader || urlData.noHeader;
+    const hideSider = isMobile || this.props.disableSider;
+    // 隐藏sider时强制显示header
+    const disableHeader = hideSider ? false : this.props.disableHeader || urlData.noHeader;
     const fixed = urlData.fixed;
 
     const withTrigger = disableHeader;
@@ -100,6 +116,9 @@ export default class extends React.PureComponent {
         ? `calc(${fullViewport}vh - 64px)`
         : `calc(${fullViewport}vh - 64px - 48px)`;
     }
+    if (hideSider) {
+      contentStyle["margin"] = "8px 0 0 0";
+    }
 
     const layout = (
       <Layout className={`${styles.layout}`}>
@@ -107,7 +126,7 @@ export default class extends React.PureComponent {
           root_path={root_path}
           path={path}
           name={name}
-          isMobile={this.state.isMobile}
+          hideSider={hideSider}
           collapsed={this.state.collapsed}
           onCollapse={this.onCollapse}
           onLogoClick={onLogoClick}
@@ -122,7 +141,7 @@ export default class extends React.PureComponent {
           ) : (
             <Header
               root_path={root_path}
-              isMobile={this.state.isMobile}
+              hideSider={hideSider}
               collapsed={this.state.collapsed}
               onCollapse={this.onCollapse}
               onLogoClick={onLogoClick}

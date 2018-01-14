@@ -133,8 +133,7 @@ class SiderMenu extends React.PureComponent {
 }
 
 export default props => {
-  console.log("open:", props.isMobile, !props.collapsed);
-  return props.isMobile ? (
+  return props.hideSider ? (
     <DrawerMenu
       parent={null}
       level={null}
