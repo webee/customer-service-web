@@ -89,7 +89,7 @@ export default class extends React.PureComponent {
       <Button
         key={af.name}
         type="primary"
-        style={{ fontSize: "14pt" }}
+        style={{ fontSize: "16px" }}
         loading={loading}
         onClick={e => this.accessFunction(af.name)}
       >

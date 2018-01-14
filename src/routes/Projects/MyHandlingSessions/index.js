@@ -42,9 +42,9 @@ export default class View extends React.Component {
       <SplitPane
         className={styles.splitPane}
         split="vertical"
-        defaultSize={280}
-        minSize={280}
-        maxSize={320}
+        defaultSize={270}
+        minSize={270}
+        maxSize={300}
         paneClassName={styles.main}
       >
         <SessionList dispatch={dispatch} appData={appData} data={data} myHandlingData={myHandlingData} />

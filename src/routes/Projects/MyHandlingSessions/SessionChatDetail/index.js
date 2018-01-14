@@ -19,7 +19,7 @@ export default class View extends Component {
   };
 
   state = {
-    sessionChatInfoSize: 320
+    sessionChatInfoSize: 300
   };
 
   componentDidMount() {
@@ -52,8 +52,8 @@ export default class View extends Component {
             primary="second"
             split="vertical"
             defaultSize={this.state.sessionChatInfoSize}
-            minSize={320}
-            maxSize={360}
+            minSize={300}
+            maxSize={350}
             paneClassName={styles.main}
             onChange={size => this.setState({ sessionChatInfoSize: size })}
           >
@@ -63,7 +63,7 @@ export default class View extends Component {
               split="horizontal"
               defaultSize={120}
               minSize={100}
-              maxSize={300}
+              maxSize={240}
               paneClassName={styles.main}
             >
               <MessageList

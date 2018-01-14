@@ -11,7 +11,7 @@
       display: flex;
 
       .avatar {
-        flex: 0 0 60px;
+        flex: 0 0 50px;
 
         display: flex;
         justify-content: center;
@@ -19,6 +19,10 @@
         .online {
           background-color: #87d068;
         }
+        :global(.ant-badge:not(.ant-badge-status)) {
+          margin-right: 0;
+        }
+        margin-right: 8px;
       }
 
       .description {
@@ -39,21 +43,18 @@
           align-items: flex-end;
           .title {
             flex: auto;
-            line-height: 1.5em;
-            font-size: 14px;
+            font-size: 13.5px;
 
             overflow: hidden;
           }
           .ts {
             flex: 0 0 auto;
-            line-height: 1.5em;
             font-size: 12px;
           }
         }
         .bottom {
           flex: auto;
           font-size: 12px;
-          line-height: 1.5em;
           color: Grey;
 
           overflow: hidden;
