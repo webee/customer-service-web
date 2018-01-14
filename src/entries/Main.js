@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from "react";
 import Loader from "~/components/Loader";
 import { connect } from "dva";
+import { XCHAT_STATUS } from "xchat-client";
 import { Route, Link, Switch, Redirect } from "dva/router";
 import { Menu, Icon, Switch as SwitchComp, Modal, Form, Row, Col, Avatar, Dropdown } from "antd";
 import { getRootPath } from "../commons/router";
@@ -123,6 +124,13 @@ function getNavData(title, projectDomains, settings) {
   return navData;
 }
 
+const xchatStatuses = {
+  [XCHAT_STATUS.DISCONNECTED]: { name: "已断开", color: "red" },
+  [XCHAT_STATUS.CONNECTING]: { name: "连接中...", color: "blue" },
+  [XCHAT_STATUS.CONNECTED]: { name: "已连接", color: "LightGreen" },
+  [XCHAT_STATUS.CLOSED]: { name: "已关闭", color: "grey" }
+};
+
 class Main extends React.Component {
   state = {
     showSettingModal: false
@@ -165,6 +173,13 @@ class Main extends React.Component {
     this.updateSettingModalState(false);
   };
 
+  handleXChatStatus = () => {
+    const { dispatch, xchatStatusInfo } = this.props;
+    if (xchatStatusInfo.status !== XCHAT_STATUS.CONNECTED) {
+      dispatch({ type: "app/retryXChat" });
+    }
+  };
+
   componentDidMount() {
     const { dispatch } = this.props;
     // load ui settings
@@ -183,12 +198,13 @@ class Main extends React.Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { location, ui_settings, staff, app, projectDomains } = this.props;
+    const { location, ui_settings, staff, app, projectDomains, xchatStatusInfo } = this.props;
     return !(
       location == nextProps.location &&
       ui_settings == nextProps.ui_settings &&
+      xchatStatusInfo == nextProps.xchatStatusInfo &&
       (staff && nextProps.staff && staff.updated == nextProps.staff.updated) &&
-      app.updated == nextProps.app.updated
+      (app && nextProps.app && app.updated == nextProps.app.updated)
     );
   }
 
@@ -198,7 +214,7 @@ class Main extends React.Component {
   };
 
   getHeaderMenu() {
-    const { staff, location } = this.props;
+    const { staff, location, xchatStatusInfo } = this.props;
     const menu = (
       <Menu selectedKeys={[]} onClick={this.onMenuClick}>
         <Menu.Item key="user/logout">
@@ -209,17 +225,21 @@ class Main extends React.Component {
       </Menu>
     );
 
+    const xchatStatus = xchatStatuses[xchatStatusInfo.status];
     return (
       <Fragment>
+        <span className={LayoutHeaderStyles.action} onClick={this.handleXChatStatus}>
+          <Icon type="wifi" style={{ color: xchatStatus.color }} /> {xchatStatus.name}
+        </span>
         {env === "dev" ? (
           <Link to="/_" className={LayoutHeaderStyles.action}>
-            <Icon type="code" />Test
+            <Icon type="code" /> Test
           </Link>
         ) : (
           undefined
         )}
         <span className={LayoutHeaderStyles.action} onClick={this.handleSettingUI}>
-          <Icon type="setting" />界面设置
+          <Icon type="setting" /> 界面设置
         </span>
         <Dropdown overlay={menu}>
           <span className={`${LayoutHeaderStyles.action} ${LayoutHeaderStyles.account}`}>
@@ -309,12 +329,13 @@ class Main extends React.Component {
 
 function mapStateToProps(state) {
   const appData = state.app;
-  const { staff } = appData;
+  const { ui_settings, staff, app, projectDomains, xchatStatusInfo } = appData;
   return {
-    ui_settings: appData.ui_settings,
+    ui_settings,
     staff,
-    app: appData.app,
-    projectDomains: appData.projectDomains
+    app,
+    projectDomains,
+    xchatStatusInfo
   };
 }
 

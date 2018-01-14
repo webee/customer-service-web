@@ -1,6 +1,6 @@
 import { notification } from "antd";
 import { toPromiseEffects } from "./utils";
-import { XChatClient, wampDebug, XCHAT_STATUS } from "xchat-client";
+import { XChatClient, wampDebug } from "xchat-client";
 import { listToDict } from "./utils";
 import * as appService from "../services/app";
 import * as xfilesService from "../services/xfiles";
@@ -112,6 +112,9 @@ export default {
       xchatClient.close();
       xchatClient.setup(xchatInfo.ws_url, xchatInfo.token);
       xchatClient.open();
+    },
+    *retryXChat(action, { call, put }) {
+      xchatClient.retry();
     },
     *closeXChat(action, { call, put }) {
       xchatClient.close();
