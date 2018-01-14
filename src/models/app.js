@@ -16,7 +16,6 @@ export default {
   namespace: "app",
 
   state: {
-    ui_settings: {},
     staff: {},
     app: null,
     // project domain type tree
@@ -34,9 +33,6 @@ export default {
     xchatStatusInfo: {}
   },
   reducers: {
-    saveUISettings(state, { payload }) {
-      return { ...state, ui_settings: { ...state.ui_settings, ...payload } };
-    },
     saveAppInfo(state, { payload: { app, staff, project_domains: projectDomains } }) {
       const domains = {};
       projectDomains.forEach(pd => {
@@ -75,15 +71,6 @@ export default {
     }
   },
   effects: toPromiseEffects({
-    *setUISettings({ payload }, { call, select, put }) {
-      yield put({ type: "saveUISettings", payload });
-      const ui_settings = yield select(state => state.app.ui_settings);
-      yield call(appService.saveUISettings, ui_settings);
-    },
-    *loadUISettings(action, { call, put }) {
-      const ui_settings = yield call(appService.loadUISettings);
-      yield put({ type: "saveUISettings", payload: ui_settings });
-    },
     *fetchAppInfo({ payload }, { all, call, put }) {
       const staffAppInfo = yield call(appService.fetchStaffAppInfo);
       // init project state
