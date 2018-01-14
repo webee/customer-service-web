@@ -288,7 +288,7 @@ export default class extends React.PureComponent {
     //   isInRead = scrollDirection > 0 && stopIndex && messages.length - 1 - stopIndex < 0;
     // }
     // if (prevIsInRead !== isInRead) {
-    //   console.log("render: ", startIndex, stopIndex);
+    //   console.debug("render: ", startIndex, stopIndex);
     //   this.setState({ isInRead });
     // dispatchDomainType(this.context, this.props, "myHandling/updateOpenedSessionState", {
     //   id: session.id,
@@ -362,7 +362,7 @@ export default class extends React.PureComponent {
       <AutoSizer onResize={this.onResize}>
         {({ width, height }) => {
           // FIXME: 高度变成0之后不能再检查到改变
-          // console.log({width, height});
+          // console.debug({width, height});
           return (
             <div className={styles.main} style={{ width, height }}>
               {this.state.lightboxIsOpen && this.renderLightbox()}
@@ -443,7 +443,7 @@ export default class extends React.PureComponent {
   _updateIsInReadState(isInRead) {
     if (this.state.isInRead !== isInRead) {
       const { session } = this.props;
-      // console.log("scroll: ", clientHeight, scrollHeight, scrollTop);
+      // console.debug("scroll: ", clientHeight, scrollHeight, scrollTop);
       this.setState({ isInRead });
       dispatchDomainType(this.context, this.props, "myHandling/updateOpenedSessionState", {
         id: session.id,

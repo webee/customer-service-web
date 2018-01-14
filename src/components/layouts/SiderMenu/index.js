@@ -1,6 +1,8 @@
+import "rc-drawer-menu/assets/index.css";
 import React from "react";
 import { Link } from "dva/router";
 import { Menu, Icon, Layout } from "antd";
+import DrawerMenu from "rc-drawer-menu";
 const { Sider } = Layout;
 import MediaQuery from "react-responsive";
 import Media from "react-media";
@@ -34,7 +36,7 @@ function findSelectedKey(path, menuData) {
   return selectedKey;
 }
 
-function genMenuItems(items) {
+function genMenuItems(items, onLinkClick = undefined) {
   return items.map(
     item =>
       item.items ? (
@@ -51,11 +53,11 @@ function genMenuItems(items) {
             )
           }
         >
-          {genMenuItems(item.items)}
+          {genMenuItems(item.items, onLinkClick)}
         </SubMenu>
       ) : (
         <Menu.Item key={item.key}>
-          <Link to={item.path}>
+          <Link to={item.path} onClick={onLinkClick}>
             {item.icon && <Icon type={item.icon} />}
             <span>{item.title}</span>
           </Link>
@@ -64,8 +66,8 @@ function genMenuItems(items) {
   );
 }
 
-export const SiderMenuComp = ({ collapsed, root_path, path, theme, mode, menuData }) => {
-  const openKeys = findOpenKeys(path, menuData);
+export const SiderMenuComp = ({ collapsed, root_path, path, theme, mode, menuData, onLinkClick }) => {
+  const openKeys = collapsed ? [] : findOpenKeys(path, menuData);
   const selectedKeys = [findSelectedKey(path, menuData)];
   console.debug("SiderMenuComp, path: ", path);
   console.debug("SiderMenuComp, menuData: ", menuData);
@@ -87,14 +89,14 @@ export const SiderMenuComp = ({ collapsed, root_path, path, theme, mode, menuDat
       defaultOpenKeys={openKeys}
       mode={mode}
     >
-      {genMenuItems(menuData)}
+      {genMenuItems(menuData, onLinkClick)}
     </Menu>
   );
 };
 
 const noOp = () => {};
 
-export default class extends React.PureComponent {
+class SiderMenu extends React.PureComponent {
   render() {
     const {
       root_path,
@@ -106,13 +108,14 @@ export default class extends React.PureComponent {
       mode,
       menuData,
       onLogoClick = noOp,
+      onLinkClick,
       withTrigger = false
     } = this.props;
     return (
       <Sider
         className={styles.sider}
         collapsible
-        breakpoint="lg"
+        breakpoint="xl"
         trigger={withTrigger ? undefined : null}
         collapsed={collapsed}
         onCollapse={onCollapse}
@@ -123,8 +126,28 @@ export default class extends React.PureComponent {
             <h1>{name}</h1>
           </Link>
         </div>
-        <SiderMenuComp {...{ collapsed, root_path, path, theme, mode, menuData }} />
+        <SiderMenuComp {...{ collapsed, root_path, path, theme, mode, menuData, onLinkClick }} />
       </Sider>
     );
   }
 }
+
+export default props => {
+  console.log("open:", props.isMobile, !props.collapsed);
+  return props.isMobile ? (
+    <DrawerMenu
+      parent={null}
+      level={null}
+      iconChild={null}
+      open={!props.collapsed}
+      onMaskClick={() => {
+        props.onCollapse(true);
+      }}
+      width="200px"
+    >
+      <SiderMenu {...props} collapsed={false} onLinkClick={() => props.onCollapse(true)} />
+    </DrawerMenu>
+  ) : (
+    <SiderMenu {...props} />
+  );
+};

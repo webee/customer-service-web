@@ -1,30 +1,71 @@
 import React, { Component } from "react";
 import classNames from "classnames";
 import DocumentTitle from "react-document-title";
+import { ContainerQuery } from "react-container-query";
+import enquire from "enquire.js";
 import { withRouter, Route, Link, Switch, Redirect } from "dva/router";
 import { getRootPath, Routes } from "../../commons/router";
 import { getURLDataMapFromNavData, getMenuDataFromNavData } from "../../commons/nav";
-import { Layout, Menu, Icon, Avatar, Dropdown, BackTop } from "antd";
+import { Layout, Menu, Icon, Avatar, Dropdown, BackTop, Divider } from "antd";
 import Breadcrumb from "./Breadcrumb";
 import SiderMenu from "./SiderMenu";
+import Header from "./Header";
 import styles from "./MainLayout.less";
 import { fullViewport } from "../../settings";
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
+
+const query = {
+  "screen-xs": {
+    maxWidth: 575
+  },
+  "screen-sm": {
+    minWidth: 576,
+    maxWidth: 767
+  },
+  "screen-md": {
+    minWidth: 768,
+    maxWidth: 991
+  },
+  "screen-lg": {
+    minWidth: 992,
+    maxWidth: 1199
+  },
+  "screen-xl": {
+    minWidth: 1200
+  }
+};
+
+function enquireMobile(f) {
+  enquire.register("screen and  (max-width: 991px)", {
+    match() {
+      f(true);
+    },
+    unmatch() {
+      f(false);
+    }
+  });
+}
+
+let isMobile;
+enquireMobile(v => {
+  isMobile = v;
+});
 
 @withRouter
 export default class extends React.PureComponent {
   state = {
-    collapsed: false
+    collapsed: false,
+    isMobile: isMobile
   };
   onCollapse = (collapsed, type) => {
     this.setState({ collapsed });
   };
 
-  toggleCollapse = () => {
-    this.setState({
-      collapsed: !this.state.collapsed
+  componentDidMount() {
+    enquireMobile(v => {
+      this.setState({ isMobile: v });
     });
-  };
+  }
 
   render() {
     const { match, location, headerMenu, navData, onLogoClick } = this.props;
@@ -55,15 +96,18 @@ export default class extends React.PureComponent {
     });
     const contentStyle = {};
     if (fixed) {
-      contentStyle["height"] = disableFooter ? `calc(${fullViewport}vh - 64px)` : `calc(${fullViewport}vh - 64px - 48px)`;
+      contentStyle["height"] = disableFooter
+        ? `calc(${fullViewport}vh - 64px)`
+        : `calc(${fullViewport}vh - 64px - 48px)`;
     }
 
     const layout = (
-      <Layout className={`ant-layout-has-sider ${styles.layout}`}>
+      <Layout className={`${styles.layout}`}>
         <SiderMenu
           root_path={root_path}
           path={path}
           name={name}
+          isMobile={this.state.isMobile}
           collapsed={this.state.collapsed}
           onCollapse={this.onCollapse}
           onLogoClick={onLogoClick}
@@ -76,14 +120,14 @@ export default class extends React.PureComponent {
           {disableHeader ? (
             ""
           ) : (
-            <Header className={styles.header}>
-              <Icon
-                className={styles.trigger}
-                type={this.state.collapsed ? "menu-unfold" : "menu-fold"}
-                onClick={this.toggleCollapse}
-              />
-              {headerMenu}
-            </Header>
+            <Header
+              root_path={root_path}
+              isMobile={this.state.isMobile}
+              collapsed={this.state.collapsed}
+              onCollapse={this.onCollapse}
+              onLogoClick={onLogoClick}
+              headerMenu={headerMenu}
+            />
           )}
           <Content className={contentClassName} style={contentStyle}>
             {disableBreadcrumb ? "" : <Breadcrumb root_path={root_path} path={path} urlDataMap={urlDataMap} />}
@@ -103,6 +147,10 @@ export default class extends React.PureComponent {
     if (urlData) {
       title = `${urlData.title} - ${name}`;
     }
-    return <DocumentTitle title={title}>{layout}</DocumentTitle>;
+    return (
+      <DocumentTitle title={title}>
+        <ContainerQuery query={query}>{params => <div className={classNames(params)}>{layout}</div>}</ContainerQuery>
+      </DocumentTitle>
+    );
   }
 }

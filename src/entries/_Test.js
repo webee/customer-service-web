@@ -1,8 +1,8 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { Menu, Dropdown, Avatar, Icon } from "antd";
 import { Link } from "dva/router";
 import MainLayout from "../components/layouts/MainLayout";
-import MainLayoutStyles from "../components/layouts/MainLayout.less";
+import LayoutHeaderStyles from "../components/layouts/Header/index.less";
 
 const navData = {
   icon: "rocket",
@@ -91,7 +91,7 @@ const navData = {
 export default class _Test extends React.Component {
   getHeaderMenu() {
     const menu = (
-      <Menu className={MainLayoutStyles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
+      <Menu selectedKeys={[]} onClick={this.onMenuClick}>
         <Menu.Item disabled>
           <Icon type="user" />个人中心
         </Menu.Item>
@@ -113,17 +113,17 @@ export default class _Test extends React.Component {
     );
 
     return (
-      <div className={MainLayoutStyles.right}>
-        <Link to="/" className={MainLayoutStyles.action}>
+      <Fragment>
+        <Link to="/" className={LayoutHeaderStyles.action}>
           <Icon type="home" />App
         </Link>
         <Dropdown overlay={menu}>
-          <span className={`${MainLayoutStyles.action} ${MainLayoutStyles.account}`}>
-            <Avatar size="small" className={MainLayoutStyles.avatar} icon="user" />
+          <span className={`${LayoutHeaderStyles.action} ${LayoutHeaderStyles.account}`}>
+            <Avatar size="small" className={LayoutHeaderStyles.avatar} icon="user" />
             {"test"}
           </span>
         </Dropdown>
-      </div>
+      </Fragment>
     );
   }
 

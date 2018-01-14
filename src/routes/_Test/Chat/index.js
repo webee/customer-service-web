@@ -26,7 +26,7 @@ export default class View extends Component {
   onTabChange = key => {
     const { dispatch } = this.props;
     this.setState({ key });
-    console.log(`tab ${key} selected`);
+    console.debug(`tab ${key} selected`);
   };
 
   onToggleExpand = () => {

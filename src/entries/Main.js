@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import Loader from "~/components/Loader";
 import { connect } from "dva";
 import { Route, Link, Switch, Redirect } from "dva/router";
@@ -7,7 +7,7 @@ import { getRootPath } from "../commons/router";
 const { SubMenu, ItemGroup } = Menu;
 import { env } from "../config";
 import MainLayout from "../components/layouts/MainLayout";
-import MainLayoutStyles from "../components/layouts/MainLayout.less";
+import LayoutHeaderStyles from "../components/layouts/Header/index.less";
 import styles from "./Main.less";
 
 // function getProjectDomainNavData(projectDomains) {
@@ -91,7 +91,7 @@ function getNavData(title, projectDomains, settings) {
   if (_prevData.title == title && _prevData.projectDomains == projectDomains && _prevData.settings == settings) {
     return _prevData.navData;
   }
-  console.log("getNavData: ", title, projectDomains, settings);
+  console.debug("getNavData: ", title, projectDomains, settings);
   const navData = {
     icon: "rocket",
     title: title,
@@ -200,7 +200,7 @@ class Main extends React.Component {
   getHeaderMenu() {
     const { staff, location } = this.props;
     const menu = (
-      <Menu className={MainLayoutStyles.menu} selectedKeys={[]} onClick={this.onMenuClick}>
+      <Menu selectedKeys={[]} onClick={this.onMenuClick}>
         <Menu.Item key="user/logout">
           <Link to={{ pathname: "/auth/logout", state: { state: { from: location } } }}>
             <Icon type="logout" />退出登录
@@ -210,24 +210,24 @@ class Main extends React.Component {
     );
 
     return (
-      <div className={MainLayoutStyles.right}>
+      <Fragment>
         {env === "dev" ? (
-          <Link to="/_" className={MainLayoutStyles.action}>
+          <Link to="/_" className={LayoutHeaderStyles.action}>
             <Icon type="code" />Test
           </Link>
         ) : (
           undefined
         )}
-        <span className={MainLayoutStyles.action} onClick={this.handleSettingUI}>
+        <span className={LayoutHeaderStyles.action} onClick={this.handleSettingUI}>
           <Icon type="setting" />界面设置
         </span>
         <Dropdown overlay={menu}>
-          <span className={`${MainLayoutStyles.action} ${MainLayoutStyles.account}`}>
-            <Avatar size="small" className={MainLayoutStyles.avatar} icon="user" />
+          <span className={`${LayoutHeaderStyles.action} ${LayoutHeaderStyles.account}`}>
+            <Avatar size="small" className={LayoutHeaderStyles.avatar} icon="user" />
             {staff.name}
           </span>
         </Dropdown>
-      </div>
+      </Fragment>
     );
   }
 

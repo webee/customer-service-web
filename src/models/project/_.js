@@ -386,7 +386,6 @@ function* handleRipeMsg({ projectMsgs, txMsg, createAction }, { call, put }) {
 }
 
 function* handleRawMsg({ txMsg, createAction, createEffectAction }, { call, put }) {
-  console.log("raw: ", txMsg);
   const { tx_id, state } = txMsg;
   try {
     const cookedTxMsg = yield call(msgCookService.cookTxMsg, txMsg, { createAction });

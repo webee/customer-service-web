@@ -266,7 +266,7 @@ export default class View extends Component {
           <Search
             placeholder="uid/name"
             style={{ width: "100%" }}
-            onSearch={value => console.log(value)}
+            onSearch={value => console.debug(value)}
           />
           <Checkbox>在线</Checkbox>
           <Checkbox>待回</Checkbox>

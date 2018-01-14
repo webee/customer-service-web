@@ -4,7 +4,7 @@ import Upload from "~/components/Upload";
 
 export default class extends React.Component {
   onUploadChange = e => {
-    console.log("files: ", e.target.files);
+    console.debug("files: ", e.target.files);
   };
 
   render() {
