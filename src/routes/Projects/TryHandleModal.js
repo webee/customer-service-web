@@ -9,13 +9,13 @@ export default class extends React.PureComponent {
     projectType: PropTypes.string
   };
   state = {
-    current_project_id: undefined,
-    showTryHandleModal: false,
     isTryHandleLoading: false
   };
 
   render() {
-    const { showTryHandleModal, isTryHandleLoading } = this.state;
+    const { isTryHandleLoading } = this.state;
+    const {projectID} = this.props;
+    const showTryHandleModal = !!projectID;
     return (
       <Modal
         title="接待"
@@ -31,19 +31,16 @@ export default class extends React.PureComponent {
     );
   }
 
-  activate = current_project_id => {
-    this.setState({ showTryHandleModal: true, current_project_id });
-  };
-
   cancel = () => {
-    this.setState({ showTryHandleModal: false, current_project_id: undefined, isTryHandleLoading: false });
+    this.props.onCancel();
+    this.setState({ isTryHandleLoading: false });
   };
 
   tryHandle = async () => {
-    const { current_project_id } = this.state;
+    const { projectID } = this.projectID;
     try {
       this.setState({ isTryHandleLoading: true });
-      await dispatchDomainTypeEffect(this.context, this.props, "_/tryHandleProject", current_project_id);
+      await dispatchDomainTypeEffect(this.context, this.props, "_/tryHandleProject", projectID);
     } catch (e) {
       notification.error({
         placement: "bottomRight",
