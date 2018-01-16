@@ -5,7 +5,10 @@ import ContextLabelSelect from "~/components/ContextLabelSelect";
 import DateTimeRange from "~/components/DateTimeRange";
 import NumberRange from "~/components/NumberRange";
 import UserSelect from "~/components/UserSelect";
+import { withContainerContext } from "~/components/utils";
 import styles from "./SearchForm.less";
+
+const ConSelect = withContainerContext(Select);
 
 @Form.create()
 export default class extends React.Component {
@@ -64,10 +67,10 @@ export default class extends React.Component {
           <Col {...{ sm: 8, md: 8, lg: 4, xl: 4 }}>
             <Form.Item label="我" colon={false}>
               {getFieldDecorator("filter_self")(
-                <Select allowClear>
+                <ConSelect allowClear>
                   <Select.Option value="only">仅我接待</Select.Option>
                   <Select.Option value="exclude">除我接待</Select.Option>
-                </Select>
+                </ConSelect>
               )}
             </Form.Item>
           </Col>

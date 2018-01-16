@@ -1,10 +1,19 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Select } from "antd";
 import styles from "./index.less";
 
 export default class extends React.Component {
   state = {
     value: undefined
+  };
+
+  static contextTypes = {
+    _container: PropTypes.object
+  };
+
+  _getContainer = () => {
+    return this.context._container || document.body;
   };
 
   componentWillReceiveProps(nextProps) {
@@ -27,6 +36,7 @@ export default class extends React.Component {
         placeholder={placeholder}
         onChange={this.onChange}
         optionFilterProp="title"
+        getPopupContainer={this._getContainer}
       >
         {users.map(user => (
           <Select.Option key={user.uid} title={user.name}>

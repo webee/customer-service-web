@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import PropTypes from "prop-types";
 import { Cascader, Select } from "antd";
 import { LabelType, pathMatchContextLabels } from "../../utils/pathLabels";
 import styles from "./index.less";
@@ -144,6 +145,14 @@ export default class extends React.Component {
     };
   }
 
+  static contextTypes = {
+    _container: PropTypes.object
+  };
+
+  _getContainer = () => {
+    return this.context._container || document.body;
+  };
+
   componentWillReceiveProps(nextProps) {
     const { labelTree, contextLabels, user } = this.props;
     if (nextProps.labelTree != labelTree || nextProps.contextLabels != contextLabels || nextProps.user != user) {
@@ -206,6 +215,7 @@ export default class extends React.Component {
           expandTrigger={expandTrigger}
           placeholder={pathLabelPlaceholder}
           onChange={this.onCascaderChange}
+          getPopupContainer={this._getContainer}
         />
         <Select
           disabled={disableSelect}
@@ -215,6 +225,7 @@ export default class extends React.Component {
           mode="multiple"
           allowClear
           onChange={this.onSelectChange}
+          getPopupContainer={this._getContainer}
         >
           {this.renderUserOptions()}
         </Select>

@@ -5,6 +5,7 @@ import { dispatchDomainTypeEffect, dispatchDomainType, domainTypeName } from "..
 import * as msgRendererService from "~/services/msgRenderer";
 import EllipsisText from "~/components/EllipsisText";
 import TryHandleModal from "../TryHandleModal";
+import SessionChatDetailModal from "../SessionChatDetailModal";
 import { Card, Table, Icon, Pagination, Divider, Button, Badge } from "antd";
 import SearchForm from "./SearchForm";
 import styles from "./index.css";
@@ -30,12 +31,26 @@ export default class extends React.Component {
   };
   state = {
     params: {},
+    SessionChatDetailSessionID: undefined,
     tryHandleProjectID: undefined
   };
+
+  static childContextTypes = {
+    _container: PropTypes.object
+  };
+
+  getChildContext() {
+    const { _container } = this;
+    return { _container };
+  }
 
   componentDidMount() {
     this.fetchSessions("componentDidMount");
   }
+
+  updateSessionChatDetailSessionID = sessionID => {
+    this.setState({ SessionChatDetailSessionID: sessionID });
+  };
 
   updateTryHandleProjectID = projectID => {
     this.setState({ tryHandleProjectID: projectID });
@@ -44,7 +59,7 @@ export default class extends React.Component {
   renderActions(item) {
     return (
       <span>
-        <Button ghost type="primary" disabled>
+        <Button ghost type="primary" onClick={() => this.updateSessionChatDetailSessionID(item.id)}>
           查看
         </Button>
         <Divider type="vertical" />
@@ -196,7 +211,12 @@ export default class extends React.Component {
     const { isFetching, pagination } = handlingData;
 
     return (
-      <div className={styles.main}>
+      <div
+        className={styles.main}
+        ref={r => {
+          this._container = r;
+        }}
+      >
         <SearchForm
           loading={isFetching}
           onSearch={this.onSearch}
@@ -217,6 +237,11 @@ export default class extends React.Component {
           dispatch={dispatch}
           projectID={this.state.tryHandleProjectID}
           onCancel={this.updateTryHandleProjectID}
+        />
+        <SessionChatDetailModal
+          dispatch={dispatch}
+          sessionID={this.state.SessionChatDetailSessionID}
+          onCancel={this.updateSessionChatDetailSessionID}
         />
       </div>
     );

@@ -114,13 +114,19 @@ export default class extends React.Component {
     const isFetching = loading.effects["staffs/fetchStaffs"];
 
     return (
-      <div className={styles.main}>
+      <div
+        className={styles.main}
+        ref={r => {
+          this.container = r;
+        }}
+      >
         <SearchForm
           loading={isFetching}
           onSearch={this.onSearch}
           staff={staff}
           staffs={Object.values(staffs)}
           staffLabelTree={staff_label_tree}
+          getContainer={() => this.container}
         />
         <Table
           loading={isFetching}

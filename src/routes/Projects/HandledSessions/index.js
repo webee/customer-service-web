@@ -23,6 +23,15 @@ export default class extends React.Component {
     params: {}
   };
 
+  static childContextTypes = {
+    _container: PropTypes.object
+  };
+
+  getChildContext() {
+    const { _container } = this;
+    return { _container };
+  }
+
   componentDidMount() {
     this.fetchSessions("componentDidMount");
   }
@@ -168,7 +177,12 @@ export default class extends React.Component {
     const { isFetching, pagination } = handledData;
 
     return (
-      <div className={styles.main}>
+      <div
+        className={styles.main}
+        ref={r => {
+          this._container = r;
+        }}
+      >
         <SearchForm
           loading={isFetching}
           onSearch={this.onSearch}

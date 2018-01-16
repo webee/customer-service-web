@@ -23,7 +23,7 @@ export default class extends React.Component {
   };
 
   render() {
-    const { staff, staffs, staffLabelTree, loading } = this.props;
+    const { staff, staffs, staffLabelTree, loading, getContainer } = this.props;
     const selectStaffs = staffs.filter(u =>
       contextLabelsMatchContextLabels(staff.uid, staff.context_labels, u.uid, u.context_labels)
     );
@@ -36,7 +36,9 @@ export default class extends React.Component {
         <Row gutter={gutterSpecs}>
           <Col {...colSpanSpecs}>
             <Form.Item label="客服" colon={false}>
-              {getFieldDecorator("uid")(<UserSelect placeholder="选择客服" users={selectStaffs} />)}
+              {getFieldDecorator("uid")(
+                <UserSelect placeholder="选择客服" users={selectStaffs} getPopupContainer={getContainer} />
+              )}
             </Form.Item>
           </Col>
           <Col sm={24} md={24} lg={24} xl={18}>
@@ -49,6 +51,7 @@ export default class extends React.Component {
                   contextLabels={staff.context_labels}
                   user={staff}
                   users={selectStaffs}
+                  getPopupContainer={getContainer}
                 />
               )}
             </Form.Item>

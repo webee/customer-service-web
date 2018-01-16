@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { reduxRouter } from "dva/router";
-import { connect } from "dva";
 import { dispatchDomainType } from "~/services/project";
 import * as projectWorkers from "~/services/projectWorkers";
 import SplitPane from "react-split-pane";
@@ -29,7 +28,16 @@ export default class View extends Component {
 
   render() {
     const { projectDomain, projectType } = this.context;
-    const { dispatch, appData, session, project, projMsgs, projTxMsgIDs, txMsgs, isCurrentOpened } = this.props;
+    const {
+      dispatch,
+      appData,
+      session,
+      project,
+      projMsgs,
+      isCurrentOpened = true,
+      projTxMsgIDs = [],
+      txMsgs = {}
+    } = this.props;
     const { staffs, customers, domains, app } = appData;
     const { access_functions } = app;
     return (
