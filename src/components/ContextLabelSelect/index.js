@@ -248,10 +248,14 @@ export default class extends React.Component {
         user = lastOption.item.user;
       }
       exceed = lastOption.exceed;
+      const alias_to = lastOption.item.alias_to;
 
-      path = this.filterSelectedOptions(selectedOptions)
-        .map(o => o.value)
-        .join(".");
+      path =
+        typeof alias_to === "string"
+          ? alias_to
+          : this.filterSelectedOptions(selectedOptions)
+              .map(o => o.value)
+              .join(".");
     }
     const { path: prevPath, uids: prevUids } = this.state;
     const uids = user ? [user.uid] : exceed ? [] : path === prevPath ? prevUids : [];
