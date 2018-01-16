@@ -59,12 +59,14 @@ export default class extends React.PureComponent {
   }
 
   handleFailedMsg = msg => () => {
-    const { session } = this.props;
-    dispatchDomainTypeEffect(this.context, this.props, "_/resendFailedMsg", {
-      projectID: session.project_id,
-      sessionID: session.id,
-      msg
-    });
+    const { session, isMyHandling } = this.props;
+    if (isMyHandling) {
+      dispatchDomainTypeEffect(this.context, this.props, "_/resendFailedMsg", {
+        projectID: session.project_id,
+        sessionID: session.id,
+        msg
+      });
+    }
   };
 
   onClickMsg = msg => () => {
@@ -442,13 +444,15 @@ export default class extends React.PureComponent {
 
   _updateIsInReadState(isInRead) {
     if (this.state.isInRead !== isInRead) {
-      const { session } = this.props;
+      const { session, isMyHandling } = this.props;
       // console.debug("scroll: ", clientHeight, scrollHeight, scrollTop);
       this.setState({ isInRead });
-      dispatchDomainType(this.context, this.props, "myHandling/updateOpenedSessionState", {
-        id: session.id,
-        sessionState: { isInRead }
-      });
+      if (isMyHandling) {
+        dispatchDomainType(this.context, this.props, "myHandling/updateOpenedSessionState", {
+          id: session.id,
+          sessionState: { isInRead }
+        });
+      }
     }
   }
 
@@ -481,8 +485,8 @@ export default class extends React.PureComponent {
   }
 
   _syncMsgID(msg_id) {
-    const { session } = this.props;
-    if (msg_id > session.sync_msg_id) {
+    const { session, isMyHandling } = this.props;
+    if (msg_id > session.sync_msg_id && isMyHandling) {
       dispatchDomainType(this.context, this.props, "_/updateSessionSyncMsgID", {
         id: session.id,
         sync_msg_id: msg_id

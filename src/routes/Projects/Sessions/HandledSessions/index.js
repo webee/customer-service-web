@@ -33,10 +33,6 @@ export default class extends React.Component {
     return { _container };
   }
 
-  componentDidMount() {
-    this.fetchSessions("componentDidMount");
-  }
-
   updateTryHandleProjectID = projectID => {
     this.setState({ tryHandleProjectID: projectID });
   };

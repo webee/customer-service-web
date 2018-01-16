@@ -35,10 +35,11 @@ export default class View extends Component {
     const { currentOpenedSession } = myHandlingData;
     const session = sessions[id];
     const project = projects[session.project_id];
-    const projMsgs = projectMsgs[session.project_id] || {};
-    const projTxMsgIDs = projectTxMsgIDs[session.project_id] || [];
+    const projMsgs = projectMsgs[session.project_id];
+    const projTxMsgIDs = projectTxMsgIDs[session.project_id];
     return (
       <SessionChatDetail
+        isMyHandling={true}
         dispatch={dispatch}
         appData={appData}
         session={session}

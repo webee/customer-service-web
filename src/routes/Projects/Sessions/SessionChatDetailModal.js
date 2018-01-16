@@ -1,7 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { Modal, notification } from "antd";
+import { Button, Modal, notification } from "antd";
 import { dispatchDomainTypeEffect } from "~/services/project";
+import SessionChatDetail from "./MyHandlingSessions/SessionChatDetail";
+import TryHandleModal from "./TryHandleModal";
 import styles from "./SessionChatDetailModal.less";
 
 export default class extends React.PureComponent {
@@ -9,25 +11,52 @@ export default class extends React.PureComponent {
     projectDomain: PropTypes.string,
     projectType: PropTypes.string
   };
-  state = {};
+  state = {
+    tryHandleProjectID: undefined
+  };
+
+  updateTryHandleProjectID = projectID => {
+    this.setState({ tryHandleProjectID: projectID });
+  };
+
+  renderSessionChatDetail() {
+    const { dispatch, appData, session, project, projMsgs } = this.props;
+    const senderArea = (
+      <div>
+        <Button ghost type="danger" size="large" onClick={() => this.updateTryHandleProjectID(project.id)}>
+          接待会话
+        </Button>
+        <TryHandleModal
+          dispatch={dispatch}
+          projectID={this.state.tryHandleProjectID}
+          onCancel={this.updateTryHandleProjectID}
+        />
+      </div>
+    );
+    return (
+      <SessionChatDetail
+        tabs={{ default: "info", info: true }}
+        dispatch={dispatch}
+        appData={appData}
+        session={session}
+        project={project}
+        projMsgs={projMsgs}
+        senderArea={senderArea}
+      />
+    );
+  }
 
   render() {
-    const { isTryHandleLoading } = this.state;
-    const { sessionID } = this.props;
-    const showModal = !!sessionID;
     return (
       <Modal
-        visible={showModal}
+        visible={true}
         wrapClassName={styles.wrap}
         style={{ top: "8vh" }}
         width="75vw"
         footer={null}
         onCancel={this.cancel}
       >
-        <p>
-          XXXXXXXXXXXX我我我我我中中中国国国国我我我我我中中中国国国国国我我我我我中中中国国国国国我我我我我中中中国国国国国我我我我我中中中国国国国国我我我我我中中中国国国国国我我我我我中中中国国国国国国我我我我我中中中国国我我我我我中中中国国国国国国国国:{" "}
-          {sessionID}
-        </p>
+        {this.renderSessionChatDetail()}
       </Modal>
     );
   }

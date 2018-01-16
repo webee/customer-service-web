@@ -5,6 +5,7 @@ import * as msgCodecService from "../../services/msgCodec";
 import * as msgCookService from "../../services/msgCook";
 import { newSingletonContext } from "../../utils/notify";
 import { asYieldFunc } from "../../utils/commons";
+import { updateSessionList } from "./commons";
 
 const ns = "_";
 const msgTypeInitialStatus = {
@@ -54,18 +55,21 @@ export const reducer = collectTypeReducers(
       return { ...state, sessions: { ...state.sessions, ...sessions } };
     },
     removeSession(state, { payload: id }) {
-      const sessions = { ...state.sessions };
-      delete sessions[id];
-      return { ...state, sessions };
+      const session = state.sessions[id];
+      if (session) {
+        const sessions = { ...state.sessions };
+        const projects = { ...state.projects };
+        const projectMsgs = { ...state.projectMsgs };
+        delete sessions[id];
+        delete projects[session.project_id];
+        delete projectMsgs[session.project_id];
+        return { ...state, sessions, projects, projectMsgs };
+      }
+      return state;
     },
     updateProjects(state, { payload: projectList }) {
       const projects = listToDict(projectList, o => o.id);
       return { ...state, projects: { ...state.projects, ...projects } };
-    },
-    clearProjectMsgs(state, { payload: id }) {
-      const projectMsgs = { ...state.projectMsgs };
-      delete projectMsgs[id];
-      return { ...state, projectMsgs };
     },
     updateProjectMsgsIsFetching(state, { payload: { id, isFetchingNew, isFetchingHistory } }) {
       const projectMsgs = { ...state.projectMsgs };
@@ -99,6 +103,7 @@ export const reducer = collectTypeReducers(
       return { ...state, projectMsgs };
     },
     insertProjectMsgs(state, { payload: { id, msgs, noMore } }) {
+      console.log("state: ", state, id);
       const project = state.projects[id];
       const session = state.sessions[project.current_session_id] || {};
       const projectMsgs = { ...state.projectMsgs };
@@ -120,11 +125,6 @@ export const reducer = collectTypeReducers(
         }
       });
       projectMsgs[id] = { lid, rid, msgs: newMsgs, noMore: newNoMore };
-      return { ...state, projectMsgs };
-    },
-    removeProjMsgs(state, { payload: id }) {
-      const projectMsgs = { ...state.projectMsgs };
-      delete projectMsgs[id];
       return { ...state, projectMsgs };
     },
     removeProjectMsg(state, { payload: { id, msg_id } }) {
@@ -212,6 +212,9 @@ export const reducer = collectTypeReducers(
 
 // effects
 export const effectFunc = createNSSubEffectFunc(ns, {
+  *updateSessionList({ createAction, payload: sessionList }, { call, put }) {
+    yield updateSessionList({ createAction, payload: sessionList }, { call, put });
+  },
   *loadProjectHistoryMsgs(
     { projectDomain, projectType, createAction, payload: { projectID, limit = 256 } },
     { select, call, put }

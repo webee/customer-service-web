@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { delay } from "~/utils/commons";
 import { dispatchDomainTypeEffect } from "~/services/project";
 import * as projectService from "~/services/project";
@@ -52,7 +52,7 @@ export default class extends React.PureComponent {
   };
 
   render() {
-    const { projectDomain, projectType, domains, access_functions, project, customers } = this.props;
+    const { projectDomain, projectType, isMyHandling, domains, access_functions, project, customers } = this.props;
     const domain = domains[projectDomain];
     const type = domain.types[projectType];
     const owner = customers[project.owner];
@@ -66,18 +66,22 @@ export default class extends React.PureComponent {
         <div className={styles.toobar}>
           {access_functions.slice(0, MAX_ACCESS_FUNCTIONS).map(this.renderAcctionFunctionButton)}
           {this.renderMoreAccessFunctions(access_functions.slice(MAX_ACCESS_FUNCTIONS))}
-          <Button type="danger" ghost onClick={() => this.setState({ showCloseSession: true })}>
-            结束接待
-          </Button>
-          <Modal
-            title="结束接待"
-            visible={this.state.showCloseSession}
-            confirmLoading={this.state.closeSessionConfirmLoading}
-            onOk={this.finishHandling}
-            onCancel={() => this.setState({ showCloseSession: false })}
-          >
-            <p>确定完成接待了?</p>
-          </Modal>
+          {isMyHandling && (
+            <Fragment>
+              <Button type="danger" ghost onClick={() => this.setState({ showCloseSession: true })}>
+                结束接待
+              </Button>
+              <Modal
+                title="结束接待"
+                visible={this.state.showCloseSession}
+                confirmLoading={this.state.closeSessionConfirmLoading}
+                onOk={this.finishHandling}
+                onCancel={() => this.setState({ showCloseSession: false })}
+              >
+                <p>确定完成接待了?</p>
+              </Modal>
+            </Fragment>
+          )}
         </div>
       </div>
     );

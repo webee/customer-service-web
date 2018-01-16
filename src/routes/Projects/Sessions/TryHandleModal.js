@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Modal, notification } from "antd";
 import { dispatchDomainTypeEffect } from "~/services/project";
+import styles from "./TryHandleModal.less";
 
 export default class extends React.PureComponent {
   static contextTypes = {
@@ -18,6 +19,7 @@ export default class extends React.PureComponent {
     const showTryHandleModal = !!projectID;
     return (
       <Modal
+        wrapClassName={styles.verticalCenter}
         title="接待"
         visible={showTryHandleModal}
         closable={!isTryHandleLoading}

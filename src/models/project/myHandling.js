@@ -1,6 +1,7 @@
 import { collectTypeReducers, createNSSubEffectFunc } from "../utils";
 import * as projectService from "../../services/project";
 import * as msgCodecService from "../../services/msgCodec";
+import { normalizePrject, normalizeSession, updateProjectList, updateSessionList } from "./commons";
 
 const DEFAULT_SESSION_STATE = { isInRead: false };
 const ns = "myHandling";
@@ -147,49 +148,13 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     yield put(createAction(`${ns}/closeOpenedSession`, sessionID));
     yield put(createAction(`${ns}/removeFromListSessions`, sessionID));
     yield put(createAction(`_/removeSession`, sessionID));
-    yield put(createAction(`_/removeProjMsgs`, projectID));
+  },
+  *removeSession({ projectDomain, projectType, createAction, payload: { sessionID } }, { select, call, put }) {
+    const data = yield select(state => state.project[projectDomain][projectType].myHandling);
+    const { listSessions } = data;
+    if (listSessions.indexOf(sessionID) < 0) {
+      // 只能清除不在接待列表中的会话
+      yield put(createAction(`_/removeSession`, sessionID));
+    }
   }
 });
-
-function* updateProjectList({ createAction, payload: projectList }, { call, put }) {
-  yield put(
-    createAction(
-      `_/updateProjects`,
-      projectList.map(p => ({
-        ...p,
-        owner: p.owner.uid,
-        leader: p.leader.uid,
-        customers: p.customers.map(c => c.uid)
-      }))
-    )
-  );
-
-  const staffs = [];
-  const customers = [];
-  projectList.forEach(p => {
-    // staffs
-    staffs.push(p.leader);
-    // customers
-    customers.push(p.owner);
-    customers.push(...p.customers);
-  });
-  yield put({ type: "app/updateStaffs", payload: staffs });
-  yield put({ type: "app/updateCustomers", payload: customers });
-}
-
-function* updateSessionList({ createAction, payload: sessionList }, { call, put }) {
-  yield put(
-    createAction(
-      `_/updateSessions`,
-      sessionList.map(s => ({ ...s, project_id: s.project.id, project: undefined, handler: s.handler.uid }))
-    )
-  );
-  const projectList = sessionList.map(s => s.project);
-  yield updateProjectList({ createAction, payload: projectList }, { call, put });
-  const staffs = [];
-  sessionList.forEach(s => {
-    // staffs
-    staffs.push(s.handler);
-  });
-  yield put({ type: "app/updateStaffs", payload: staffs });
-}

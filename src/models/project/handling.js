@@ -1,7 +1,7 @@
 import { collectTypeReducers, createNSSubEffectFunc } from "../utils";
-import * as service from "../../services/project";
-import * as msgCodecService from "../../services/msgCodec";
-import { extractFilter } from "../../utils/filters";
+import * as service from "~/services/project";
+import * as msgCodecService from "~/services/msgCodec";
+import { extractFilter } from "~/utils/filters";
 
 const ns = "handling";
 // reducers

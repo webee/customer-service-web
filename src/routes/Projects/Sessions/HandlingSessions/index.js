@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import moment from "moment";
 import { dispatchDomainTypeEffect, dispatchDomainType, domainTypeName } from "~/services/project";
 import * as msgRendererService from "~/services/msgRenderer";
+import { normalizePrject, normalizeSession } from "~/models/project/commons";
 import EllipsisText from "~/components/EllipsisText";
 import TryHandleModal from "../TryHandleModal";
 import SessionChatDetailModal from "../SessionChatDetailModal";
@@ -31,7 +32,7 @@ export default class extends React.Component {
   };
   state = {
     params: {},
-    SessionChatDetailSessionID: undefined,
+    sessionChatDetailSession: undefined,
     tryHandleProjectID: undefined
   };
 
@@ -44,22 +45,25 @@ export default class extends React.Component {
     return { _container };
   }
 
-  componentDidMount() {
-    this.fetchSessions("componentDidMount");
-  }
-
-  updateSessionChatDetailSessionID = sessionID => {
-    this.setState({ SessionChatDetailSessionID: sessionID });
+  updateSessionChatDetailSession = session => {
+    dispatchDomainTypeEffect(this.context, this.props, "_/updateSessionList", [session]);
+    this.setState({ sessionChatDetailSession: session });
+  };
+  cancelSessionChatDetailModal = () => {
+    const { sessionChatDetailSession: session } = this.state;
+    this.setState({ sessionChatDetailSession: undefined }, () => {
+      dispatchDomainTypeEffect(this.context, this.props, "myHandling/removeSession", { sessionID: session.id });
+    });
   };
 
   updateTryHandleProjectID = projectID => {
     this.setState({ tryHandleProjectID: projectID });
   };
 
-  renderActions(item) {
+  renderActions(item, idx) {
     return (
       <span>
-        <Button ghost type="primary" onClick={() => this.updateSessionChatDetailSessionID(item.id)}>
+        <Button ghost type="primary" onClick={() => this.updateSessionChatDetailSession(item)}>
           查看
         </Button>
         <Divider type="vertical" />
@@ -68,6 +72,26 @@ export default class extends React.Component {
         </Button>
       </span>
     );
+  }
+
+  renderSessionChatDetailModal() {
+    const { sessionChatDetailSession: session } = this.state;
+    if (!!session) {
+      const { dispatch, appData, data, handlingData } = this.props;
+      const { project } = session;
+      const { projectMsgs, txMsgs } = data;
+      const projMsgs = projectMsgs[project.id];
+      return (
+        <SessionChatDetailModal
+          onCancel={this.cancelSessionChatDetailModal}
+          dispatch={dispatch}
+          appData={appData}
+          session={normalizeSession(session)}
+          project={normalizePrject(project)}
+          projMsgs={projMsgs}
+        />
+      );
+    }
   }
 
   get columns() {
@@ -193,7 +217,7 @@ export default class extends React.Component {
         key: "actions",
         fixed: "right",
         width: 200,
-        render: (_, item) => this.renderActions(item)
+        render: (_, item, idx) => this.renderActions(item, idx)
       }
     ];
   }
@@ -238,11 +262,7 @@ export default class extends React.Component {
           projectID={this.state.tryHandleProjectID}
           onCancel={this.updateTryHandleProjectID}
         />
-        <SessionChatDetailModal
-          dispatch={dispatch}
-          sessionID={this.state.SessionChatDetailSessionID}
-          onCancel={this.updateSessionChatDetailSessionID}
-        />
+        {this.renderSessionChatDetailModal()}
       </div>
     );
   }

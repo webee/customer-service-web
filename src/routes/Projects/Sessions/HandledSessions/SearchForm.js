@@ -13,6 +13,17 @@ const ConSelect = withContainerContext(Select);
 export default class extends React.Component {
   handleSearch = e => {
     e.preventDefault();
+    this.search();
+  };
+  handleReset = () => {
+    this.props.form.resetFields();
+  };
+
+  componentDidMount() {
+    this.search();
+  }
+
+  search() {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         const { onSearch } = this.props;
@@ -21,10 +32,7 @@ export default class extends React.Component {
         }
       }
     });
-  };
-  handleReset = () => {
-    this.props.form.resetFields();
-  };
+  }
 
   render() {
     const { loading, staff, staffs, staffLabelTree } = this.props;
@@ -60,7 +68,7 @@ export default class extends React.Component {
           </Col>
           <Col {...{ sm: 8, md: 8, lg: 4, xl: 4 }}>
             <Form.Item label="我" colon={false}>
-              {getFieldDecorator("filter_self")(
+              {getFieldDecorator("filter_self", { initialValue: "exclude" })(
                 <ConSelect allowClear>
                   <Select.Option value="only">仅我接待</Select.Option>
                   <Select.Option value="exclude">除我接待</Select.Option>
