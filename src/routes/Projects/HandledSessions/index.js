@@ -20,7 +20,8 @@ export default class extends React.Component {
     projectType: PropTypes.string
   };
   state = {
-    params: {}
+    params: {},
+    tryHandleProjectID: undefined
   };
 
   static childContextTypes = {
@@ -36,6 +37,10 @@ export default class extends React.Component {
     this.fetchSessions("componentDidMount");
   }
 
+  updateTryHandleProjectID = projectID => {
+    this.setState({ tryHandleProjectID: projectID });
+  };
+
   renderActions(item) {
     return (
       <span>
@@ -43,7 +48,7 @@ export default class extends React.Component {
           查看
         </Button>
         <Divider type="vertical" />
-        <Button ghost type="primary" onClick={() => this.tryHandleModal.activate(item.project.id)}>
+        <Button ghost type="primary" onClick={() => this.updateTryHandleProjectID(item.project.id)}>
           接待
         </Button>
       </span>
@@ -199,7 +204,11 @@ export default class extends React.Component {
           dataSource={this.data}
           onChange={this.handleTableChange}
         />
-        <TryHandleModal ref={i => (this.tryHandleModal = i)} dispatch={dispatch} />
+        <TryHandleModal
+          dispatch={dispatch}
+          projectID={this.state.tryHandleProjectID}
+          onCancel={this.updateTryHandleProjectID}
+        />
       </div>
     );
   }

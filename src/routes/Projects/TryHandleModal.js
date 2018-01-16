@@ -14,7 +14,7 @@ export default class extends React.PureComponent {
 
   render() {
     const { isTryHandleLoading } = this.state;
-    const {projectID} = this.props;
+    const { projectID } = this.props;
     const showTryHandleModal = !!projectID;
     return (
       <Modal
@@ -37,7 +37,7 @@ export default class extends React.PureComponent {
   };
 
   tryHandle = async () => {
-    const { projectID } = this.projectID;
+    const { projectID } = this.props;
     try {
       this.setState({ isTryHandleLoading: true });
       await dispatchDomainTypeEffect(this.context, this.props, "_/tryHandleProject", projectID);
