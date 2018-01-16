@@ -40,7 +40,7 @@ export default class extends React.Component {
     return (
       <Form className={styles.main} onSubmit={this.handleSearch}>
         <Row gutter={gutterSpecs}>
-          <Col sm={24} md={24} lg={20} xl={14}>
+          <Col sm={24} md={24} lg={20} xl={12}>
             <Form.Item label="定位标签" colon={false}>
               {getFieldDecorator("context_label", { initialValue: null })(
                 <ContextLabelSelect
@@ -59,16 +59,6 @@ export default class extends React.Component {
               {getFieldDecorator("handler")(<UserSelect placeholder="选择客服" users={selectStaffs} />)}
             </Form.Item>
           </Col>
-          <Col {...colSpanSpecs}>
-            <Form.Item label="所属用户" colon={false}>
-              {getFieldDecorator("owner")(<Input placeholder="用户名/手机号/用户ID" />)}
-            </Form.Item>
-          </Col>
-          <Col {...colSpanSpecs}>
-            <Form.Item label="参与用户" colon={false}>
-              {getFieldDecorator("customer")(<Input placeholder="用户名/手机号/用户ID" />)}
-            </Form.Item>
-          </Col>
           <Col {...{ sm: 8, md: 8, lg: 4, xl: 4 }}>
             <Form.Item label="我" colon={false}>
               {getFieldDecorator("filter_self")(
@@ -77,6 +67,16 @@ export default class extends React.Component {
                   <Select.Option value="exclude">除我接待</Select.Option>
                 </ConSelect>
               )}
+            </Form.Item>
+          </Col>
+          <Col {...colSpanSpecs}>
+            <Form.Item label="所属用户" colon={false}>
+              {getFieldDecorator("owner")(<Input placeholder="用户名/手机号/用户ID" />)}
+            </Form.Item>
+          </Col>
+          <Col {...colSpanSpecs}>
+            <Form.Item label="参与用户" colon={false}>
+              {getFieldDecorator("customer")(<Input placeholder="用户名/手机号/用户ID" />)}
             </Form.Item>
           </Col>
           <Col {...colSpanSpecs}>
