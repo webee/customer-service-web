@@ -19,7 +19,7 @@ export default class extends React.PureComponent {
       <Modal
         visible={showModal}
         wrapClassName={styles.wrap}
-        style={{ top: "10vh" }}
+        style={{ top: "8vh" }}
         width="75vw"
         footer={null}
         onCancel={this.cancel}

@@ -37,7 +37,7 @@ const asProjectDomainType = (projectDomain, projectType) => {
   );
 };
 
-function getProjectDomainNavData(projectDomains, ui = {}) {
+function getProjectDomainNavData(projectDomains) {
   // NOTE: 这里也可以消除domain这一级，铺平pathname
   return projectDomains.map(d => {
     return {
@@ -56,7 +56,7 @@ function getProjectDomainNavData(projectDomains, ui = {}) {
             pathname: ":tab",
             component: asProjectDomainType(d.name, t.name)(require("../routes/Projects/Sessions").default),
             fixed: true,
-            noHeader: !!ui.settings.disable_session_header,
+            noHeader: "disable_session_header",
             noBreadcrumb: true,
             noFooter: true,
             menuless: true,
@@ -87,11 +87,11 @@ function getProjectDomainNavData(projectDomains, ui = {}) {
 
 const _prevData = {};
 
-function getNavData(title, projectDomains, ui) {
-  if (_prevData.title == title && _prevData.projectDomains == projectDomains && _prevData.ui == ui) {
+function getNavData(title, projectDomains) {
+  if (_prevData.title == title && _prevData.projectDomains == projectDomains) {
     return _prevData.navData;
   }
-  console.debug("getNavData: ", title, projectDomains, ui);
+  console.debug("getNavData: ", title, projectDomains);
   const navData = {
     icon: "rocket",
     title: title,
@@ -111,7 +111,7 @@ function getNavData(title, projectDomains, ui) {
         exact: true,
         component: require("../routes/Projects").default
       },
-      ...getProjectDomainNavData(projectDomains, ui),
+      ...getProjectDomainNavData(projectDomains),
       {
         icon: "team",
         title: "客服",
@@ -126,7 +126,7 @@ function getNavData(title, projectDomains, ui) {
       }
     ]
   };
-  Object.assign(_prevData, { title, projectDomains, ui, navData });
+  Object.assign(_prevData, { title, projectDomains, navData });
   return navData;
 }
 
@@ -343,18 +343,16 @@ class Main extends React.Component {
       return <Loader />;
     }
 
-    const navData = getNavData(app.title, projectDomains, ui);
+    const navData = getNavData(app.title, projectDomains);
 
     return (
       <MainLayout
         navData={navData}
         headerMenu={this.getHeaderMenu()}
-        disableSider={ui.settings.disable_sider}
-        disableBreadcrumb={ui.settings.disable_breadcrumb}
-        disableFooter={ui.settings.disable_footer}
+        uiSettings={ui.settings}
+        layoutInfo={ui.layoutInfo}
         onLogoClick={this.onLogoClick}
         bottom={this.getBottom()}
-        layoutInfo={ui.layoutInfo}
         onLayoutInfoUpdate={this.onLayoutInfoUpdate}
       />
     );

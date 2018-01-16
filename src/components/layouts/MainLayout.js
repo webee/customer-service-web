@@ -84,11 +84,11 @@ export default class extends React.PureComponent {
     enquireXs(v => {
       this.props.onLayoutInfoUpdate("screen", { isXs: v });
     });
-    this._handleDisableSiderAndCollapse(false, this.props.disableSider);
+    this._handleDisableSiderAndCollapse(false, this.props.uiSettings.disable_sider);
   }
 
   componentWillReceiveProps(nextProps) {
-    this._handleDisableSiderAndCollapse(this.props.disableSider, nextProps.disableSider);
+    this._handleDisableSiderAndCollapse(this.props.uiSettings.disable_sider, nextProps.uiSettings.disable_sider);
   }
 
   _handleDisableSiderAndCollapse(cur, next) {
@@ -100,7 +100,7 @@ export default class extends React.PureComponent {
   }
 
   render() {
-    const { match, location, headerMenu, navData, onLogoClick, layoutInfo } = this.props;
+    const { match, location, headerMenu, navData, onLogoClick, layoutInfo, uiSettings } = this.props;
     const { title: name } = navData;
     const { bottom } = this.props;
     const { isMobile, isXs } = layoutInfo.screen;
@@ -115,11 +115,14 @@ export default class extends React.PureComponent {
     console.debug("MainLayout, path: ", path);
     const urlData = urlDataMap[path === "/" ? "" : path] || {};
 
-    const disableBreadcrumb = this.props.disableBreadcrumb || urlData.noBreadcrumb;
-    const disableFooter = this.props.disableFooter || urlData.noFooter;
-    const hideSider = isMobile || this.props.disableSider;
+    const disableBreadcrumb = uiSettings.disable_breadcrumb || urlData.noBreadcrumb;
+    const disableFooter = uiSettings.disable_footer || urlData.noFooter;
+    const hideSider = isMobile || uiSettings.disable_sider;
     // 隐藏sider时强制显示header
-    const disableHeader = hideSider ? false : this.props.disableHeader || urlData.noHeader;
+    const disableHeader = hideSider
+      ? false
+      : uiSettings.disable_header ||
+        (typeof urlData.noHeader === "string" ? uiSettings[urlData.noHeader] : urlData.noHeader);
     const fixed = urlData.fixed;
 
     const withTrigger = disableHeader;
