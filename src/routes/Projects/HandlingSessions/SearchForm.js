@@ -64,6 +64,11 @@ export default class extends React.Component {
               {getFieldDecorator("owner")(<Input placeholder="用户名/手机号/用户ID" />)}
             </Form.Item>
           </Col>
+          <Col {...colSpanSpecs}>
+            <Form.Item label="参与用户" colon={false}>
+              {getFieldDecorator("customer")(<Input placeholder="用户名/手机号/用户ID" />)}
+            </Form.Item>
+          </Col>
           <Col {...{ sm: 8, md: 8, lg: 4, xl: 4 }}>
             <Form.Item label="我" colon={false}>
               {getFieldDecorator("filter_self")(

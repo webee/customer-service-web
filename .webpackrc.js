@@ -1,10 +1,15 @@
-const ENV = process.env.ENV || "development";
+const ENV = process.env.ENV || "dev";
+let NODE_ENV = "production";
+process.env.NODE_ENV = NODE_ENV;
 let outputPath = "dist";
 let extraBabelPlugins = ["transform-remove-console"];
-if (ENV !== "production") {
+if (ENV !== "prod") {
+  NODE_ENV = "development";
+  process.env.NODE_ENV = NODE_ENV;
   outputPath = `debug-dist/${ENV}`;
   extraBabelPlugins = [];
 }
+
 console.log(`env: ${ENV} -> ${outputPath}`);
 export default {
   entry: "src/index.js",
@@ -19,7 +24,8 @@ export default {
     ["import", { libraryName: "antd", libraryDirectory: "es", style: true }]
   ],
   define: {
-    "process.env.ENV": ENV
+    "process.env.ENV": ENV,
+    "process.env.NODE_ENV": NODE_ENV
   },
   env: {
     development: {

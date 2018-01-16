@@ -8,8 +8,8 @@
   ],
   "scripts": {
     "precommit": "echo \"npm run lint-staged\"",
-    "start": "DISABLE_ESLINT=true roadhog dev",
-    "start:no-proxy": "DISABLE_ESLINT=true NO_PROXY=true roadhog dev",
+    "start": "DISABLE_ESLINT=true ENV=dev roadhog dev",
+    "start:no-proxy": "DISABLE_ESLINT=true ENV=dev NO_PROXY=true roadhog dev",
     "build": "DISABLE_ESLINT=true ENV=production roadhog build",
     "debug-build": "DISABLE_ESLINT=true roadhog build",
     "site": "roadhog-api-doc static && gh-pages -d dist",
