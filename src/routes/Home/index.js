@@ -1,5 +1,5 @@
 import { Card } from 'antd';
-import styles from './index.css';
+import styles from './index.less';
 
 
 export default () => {

@@ -41,7 +41,7 @@ function getProjectDomainNavData(projectDomains, ui = {}) {
   // NOTE: 这里也可以消除domain这一级，铺平pathname
   return projectDomains.map(d => {
     return {
-      icon: "message",
+      icon: "customer-service",
       title: d.title,
       pathname: `projects/${d.name}`,
       open: true,
@@ -54,7 +54,7 @@ function getProjectDomainNavData(projectDomains, ui = {}) {
           defPath: "my_handling",
           instance: {
             pathname: ":tab",
-            component: asProjectDomainType(d.name, t.name)(require("../routes/Projects").default),
+            component: asProjectDomainType(d.name, t.name)(require("../routes/Projects/Sessions").default),
             fixed: true,
             noHeader: !!ui.settings.disable_session_header,
             noBreadcrumb: true,
@@ -103,6 +103,13 @@ function getNavData(title, projectDomains, ui) {
         title: "首页",
         pathname: "",
         component: require("../routes/Home").default
+      },
+      {
+        icon: "database",
+        title: "项目",
+        pathname: "projects",
+        exact: true,
+        component: require("../routes/Projects").default
       },
       ...getProjectDomainNavData(projectDomains, ui),
       {

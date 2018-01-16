@@ -10,6 +10,7 @@ export function getRouteDataFromNavData(root_path, navItems, noMatch) {
     let { pathname, component, render, defPath, items, instance } = item;
     let exact = pathname === "";
     let path = !exact ? `${root_path}/${pathname}` : root_path || "/";
+    exact = exact || !!item.exact;
     if (items) {
       render = ({ match }) => <Routes path={match.path} navItems={items} defPath={defPath} noMatch={noMatch} />;
     } else {

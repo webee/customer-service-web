@@ -1,24 +1,14 @@
 import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 import moment from "moment";
-import { dispatchDomainTypeEffect, dispatchDomainType, domainTypeName } from "../../../services/project";
+import { dispatchDomainTypeEffect, dispatchDomainType, domainTypeName } from "~/services/project";
 import * as msgRendererService from "~/services/msgRenderer";
 import EllipsisText from "~/components/EllipsisText";
-import TryHandleModal from "../TryHandleModal";
-import SessionChatDetailModal from "../SessionChatDetailModal";
 import { Card, Table, Icon, Pagination, Divider, Button, Badge } from "antd";
+import TryHandleModal from "../TryHandleModal";
 import SearchForm from "./SearchForm";
 import styles from "./index.css";
-import {
-  renderBoolean,
-  renderNotBoolean,
-  renderTsFromNow,
-  renderTs,
-  renderMsgTs,
-  renderLastMsg,
-  renderStaff,
-  renderCustomer
-} from "../commons";
+import { renderBoolean, renderNotBoolean, renderTsFromNow, renderTs, renderStaff, renderCustomer } from "../commons";
 
 function getSorterOrder(sorter, key) {
   return sorter.key == key ? sorter.order : false;
@@ -31,7 +21,6 @@ export default class extends React.Component {
   };
   state = {
     params: {},
-    SessionChatDetailSessionID: undefined,
     tryHandleProjectID: undefined
   };
 
@@ -48,10 +37,6 @@ export default class extends React.Component {
     this.fetchSessions("componentDidMount");
   }
 
-  updateSessionChatDetailSessionID = sessionID => {
-    this.setState({ SessionChatDetailSessionID: sessionID });
-  };
-
   updateTryHandleProjectID = projectID => {
     this.setState({ tryHandleProjectID: projectID });
   };
@@ -59,7 +44,7 @@ export default class extends React.Component {
   renderActions(item) {
     return (
       <span>
-        <Button ghost type="primary" onClick={() => this.updateSessionChatDetailSessionID(item.id)}>
+        <Button ghost type="primary" disabled>
           查看
         </Button>
         <Divider type="vertical" />
@@ -71,8 +56,8 @@ export default class extends React.Component {
   }
 
   get columns() {
-    const { handlingData } = this.props;
-    const { filters, sorter } = handlingData;
+    const { handledData } = this.props;
+    const { filters, sorter } = handledData;
     return [
       {
         title: "所有者",
@@ -124,43 +109,6 @@ export default class extends React.Component {
         render: renderStaff
       },
       {
-        title: "最后消息",
-        dataIndex: "msg",
-        key: "msg",
-        width: 300,
-        render: msg => renderLastMsg(msg, "-")
-      },
-      {
-        title: "最后消息时间",
-        dataIndex: "msg",
-        key: "msg.ts",
-        sorter: true,
-        sortOrder: getSorterOrder(sorter, "msg.ts"),
-        width: 180,
-        render: msg => renderMsgTs(msg, "-", "YYYY-MM-DD HH:mm:ss")
-      },
-      {
-        title: "未读",
-        dataIndex: "unsynced_count",
-        sorter: true,
-        width: 110,
-        sortOrder: getSorterOrder(sorter, "unsynced_count")
-      },
-      {
-        title: "未回",
-        dataIndex: "unhandled_count",
-        sorter: true,
-        width: 110,
-        sortOrder: getSorterOrder(sorter, "unhandled_count")
-      },
-      {
-        title: "全部",
-        dataIndex: "msg_count",
-        sorter: true,
-        width: 110,
-        sortOrder: getSorterOrder(sorter, "msg_count")
-      },
-      {
         title: "负责人",
         dataIndex: "project.leader",
         key: "project.leader",
@@ -175,6 +123,29 @@ export default class extends React.Component {
         sortOrder: getSorterOrder(sorter, "created"),
         width: 180,
         render: ts => renderTs(ts, "", "YYYY-MM-DD HH:mm:ss")
+      },
+      {
+        title: "会话结束时间",
+        dataIndex: "closed",
+        key: "closed",
+        sorter: true,
+        sortOrder: getSorterOrder(sorter, "closed"),
+        width: 180,
+        render: ts => renderTs(ts, "", "YYYY-MM-DD HH:mm:ss")
+      },
+      {
+        title: "起始id",
+        dataIndex: "start_msg_id",
+        sorter: true,
+        width: 120,
+        sortOrder: getSorterOrder(sorter, "start_msg_id")
+      },
+      {
+        title: "全部",
+        dataIndex: "msg_count",
+        sorter: true,
+        width: 110,
+        sortOrder: getSorterOrder(sorter, "msg_count")
       },
       {
         title: "项目Tags",
@@ -199,16 +170,16 @@ export default class extends React.Component {
   }
 
   get data() {
-    const { handlingData } = this.props;
-    const { sessions } = handlingData;
+    const { handledData } = this.props;
+    const { sessions } = handledData;
     return sessions.map((s, i) => ({ key: i, ...s }));
   }
 
   render() {
-    const { appData, handlingData, dispatch } = this.props;
+    const { appData, handledData, dispatch } = this.props;
     const { staff, staffs, app } = appData;
     const staff_label_tree = app.staff_label_tree;
-    const { isFetching, pagination } = handlingData;
+    const { isFetching, pagination } = handledData;
 
     return (
       <div
@@ -226,7 +197,7 @@ export default class extends React.Component {
         />
         <Table
           loading={isFetching}
-          scroll={{ x: 2200 }}
+          scroll={{ x: 1900 }}
           bordered={true}
           pagination={pagination}
           columns={this.columns}
@@ -237,11 +208,6 @@ export default class extends React.Component {
           dispatch={dispatch}
           projectID={this.state.tryHandleProjectID}
           onCancel={this.updateTryHandleProjectID}
-        />
-        <SessionChatDetailModal
-          dispatch={dispatch}
-          sessionID={this.state.SessionChatDetailSessionID}
-          onCancel={this.updateSessionChatDetailSessionID}
         />
       </div>
     );
@@ -254,13 +220,13 @@ export default class extends React.Component {
 
   handleTableChange = (pagination, filters, sorter) => {
     console.debug("handleTableChange: ", pagination, filters, sorter);
-    dispatchDomainType(this.context, this.props, "handling/updateTableInfos", { pagination, filters, sorter });
+    dispatchDomainType(this.context, this.props, "handled/updateTableInfos", { pagination, filters, sorter });
     this.fetchSessions("handleTableChange");
   };
 
   fetchSessions = source => {
     console.debug("fetchSessions: ", source);
     const { params } = this.state;
-    dispatchDomainTypeEffect(this.context, this.props, "handling/fetchSessions", params);
+    dispatchDomainTypeEffect(this.context, this.props, "handled/fetchSessions", params);
   };
 }

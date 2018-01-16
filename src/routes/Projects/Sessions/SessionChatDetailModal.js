@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Modal, notification } from "antd";
-import { dispatchDomainTypeEffect } from "../../services/project";
+import { dispatchDomainTypeEffect } from "~/services/project";
 import styles from "./SessionChatDetailModal.less";
 
 export default class extends React.PureComponent {

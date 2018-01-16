@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { withRouter, routerRedux } from "dva/router";
 import { connect } from "dva";
 import { parseQueryFromSearch } from "~/utils/url";
-import * as projectWorkers from "../../../services/projectWorkers";
+import * as projectWorkers from "~/services/projectWorkers";
 import { List, Avatar, Badge, Tag } from "antd";
 import SplitPane from "react-split-pane";
 import styles from "./index.less";
