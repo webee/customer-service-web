@@ -115,6 +115,15 @@ export default {
       xchatClient.onstatuschange = (status, details) => {
         dispatch({ type: "updateXChatStatusInfo", payload: { status, details } });
       };
+      if (window.addEventListener) {
+        window.addEventListener("online", () => {
+          xchatClient.retry();
+        });
+        window.addEventListener("offline", () => {
+          xchatClient.networkOffline();
+        });
+      }
+
       xchatClient.onmsg = (kind, msg) => {
         console.debug("xchat msg: ", kind, msg);
       };

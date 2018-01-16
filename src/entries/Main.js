@@ -131,10 +131,10 @@ function getNavData(title, projectDomains) {
 }
 
 const xchatStatuses = {
-  [XCHAT_STATUS.DISCONNECTED]: { name: "已断开", color: "red" },
-  [XCHAT_STATUS.CONNECTING]: { name: "连接中...", color: "blue" },
-  [XCHAT_STATUS.CONNECTED]: { name: "已连接", color: "LightGreen" },
-  [XCHAT_STATUS.CLOSED]: { name: "已关闭", color: "grey" }
+  [XCHAT_STATUS.DISCONNECTED]: { name: "已断开", color: "Crimson" },
+  [XCHAT_STATUS.CONNECTING]: { name: "连接中...", color: "DeepSkyBlue" },
+  [XCHAT_STATUS.CONNECTED]: { name: "已连接", color: "LimeGreen" },
+  [XCHAT_STATUS.CLOSED]: { name: "已关闭", color: "DarkGray" }
 };
 
 const negTrans = v => !v;
