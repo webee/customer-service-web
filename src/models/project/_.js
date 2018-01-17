@@ -25,7 +25,7 @@ export const reducer = collectTypeReducers(
     sessions: {},
     // 所有项目by id
     projects: {},
-    // 项目消息by project id: {lid, rid, [msgs], noMore, isFetchingNew, isFetchingHistory}
+    // 项目消息by project id: {lid, rid, [msgs], noMore, isFetchingNew, isFetchingHistory, fetchFailed}
     projectMsgs: {},
     // tx_id, 每次自增1
     tx_id: 0,
@@ -74,7 +74,7 @@ export const reducer = collectTypeReducers(
       const projects = listToDict(projectList, o => o.id);
       return { ...state, projects: { ...state.projects, ...projects } };
     },
-    updateProjectMsgsIsFetching(state, { payload: { id, isFetchingNew, isFetchingHistory } }) {
+    updateProjectMsgsIsFetching(state, { payload: { id, isFetchingNew, isFetchingHistory, fetchFailed } }) {
       const projectMsgs = { ...state.projectMsgs };
       projectMsgs[id] = { ...(projectMsgs[id] || {}) };
       if (isFetchingNew !== undefined) {
@@ -82,6 +82,9 @@ export const reducer = collectTypeReducers(
       }
       if (isFetchingHistory !== undefined) {
         projectMsgs[id].isFetchingHistory = isFetchingHistory;
+      }
+      if (fetchFailed !== undefined) {
+        projectMsgs[id].fetchFailed = fetchFailed;
       }
       return { ...state, projectMsgs };
     },
@@ -222,15 +225,21 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     { projectDomain, projectType, createAction, payload: { projectID, limit = 256 } },
     { select, call, put }
   ) {
+    const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
+    const projectMsg = projectMsgs[projectID] || {};
     try {
-      yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingHistory: true }));
-      const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
-      const projectMsg = projectMsgs[projectID] || {};
       if (projectMsg.noMore) {
         return;
       }
+      if (fetchFailed) {
+        yield put(
+          createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, fetchFailed: false, isFetchingHistory: true })
+        );
+      } else {
+        yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingHistory: true }));
+      }
 
-      const { lid } = projectMsg;
+      const { lid, rid, fetchFailed } = projectMsg;
       const { msgs, no_more } = yield call(projectService.fetchProjectMsgs, projectID, {
         rid: lid,
         limit,
@@ -239,16 +248,27 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       const noMore = no_more || (limit > 0 && msgs.length == 0);
       const decodedMsgs = msgs.map(msg => ({ ...msg, ...msgCodecService.decodeMsg(msg) }));
       yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs: decodedMsgs, noMore }));
+    } catch (e) {
+      if (!lid && !rid) {
+        yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, fetchFailed: true }));
+      }
     } finally {
       yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingHistory: false }));
     }
   },
   *fetchProjectNewMsgs({ projectDomain, projectType, createAction, payload: { projectID } }, { select, call, put }) {
+    const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
+    const projectMsg = projectMsgs[projectID] || {};
+    const { lid, rid, fetchFailed } = projectMsg;
     try {
-      yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingNew: true }));
-      const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
-      const projectMsg = projectMsgs[projectID] || {};
-      const { rid } = projectMsg;
+      if (fetchFailed) {
+        yield put(
+          createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, fetchFailed: false, isFetchingNew: true })
+        );
+      } else {
+        yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingNew: true }));
+      }
+
       let limit = undefined;
       if (!rid) {
         limit = 256;
@@ -266,6 +286,10 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       }
       // 检查刚接收的消息是否为已发送状态的tx消息
       yield put(createAction(`_/checkProjectTxMsgsRxKey`, { projectID, rid }));
+    } catch (e) {
+      if (!lid && !rid) {
+        yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, fetchFailed: true }));
+      }
     } finally {
       yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingNew: false }));
     }

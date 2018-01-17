@@ -82,7 +82,7 @@ export default {
               const { data } = response;
               done(new Error(`${data.code}(${data.message}: ${data.description}, ${data.details})`));
             } else {
-              done(new Error(response.data.message));
+              done(new Error(response.data.message || `${response.status}: ${response.statusText}`));
             }
           } else if (err.request) {
             // The request was made but no response was received

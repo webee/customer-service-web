@@ -187,8 +187,17 @@ export default class extends React.PureComponent {
   };
 
   noRowsRenderer = () => {
-    const { projMsgs } = this.props;
+    const { session, projMsgs, fetchSessionMsgs } = this.props;
     const rowCount = this.getActualRowCount();
+    if (projMsgs.fetchFailed) {
+      return (
+        <EmptyContent type="frown">
+          <Button size="large" style={{ margin: 8 }} onClick={() => fetchSessionMsgs(session)}>
+            点击重新加载
+          </Button>
+        </EmptyContent>
+      );
+    }
     return (
       <Loader loaded={!(rowCount === 0 && projMsgs.isFetchingNew)} type="three-bounce" fadeIn="none">
         <EmptyContent />
@@ -221,7 +230,7 @@ export default class extends React.PureComponent {
       // console.debug("onScroll: ", clientHeight, scrollHeight, scrollTop, scrollDirection);
       if (scrollTop === 0) {
         // console.debug("loadProjectMsgs");
-        const {loadSessionMsgs} = this.props;
+        const { loadSessionMsgs } = this.props;
         loadSessionMsgs(session);
       }
 
