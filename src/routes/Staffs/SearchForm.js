@@ -2,7 +2,6 @@ import React from "react";
 import { Form, Row, Col, Input, Button, Icon } from "antd";
 import { contextLabelsMatchContextLabels } from "../../utils/pathLabels";
 import ContextLabelSelect from "~/components/ContextLabelSelect";
-import UserSelect from "~/components/UserSelect";
 import styles from "./SearchForm.less";
 
 @Form.create()
@@ -34,18 +33,11 @@ export default class extends React.Component {
     return (
       <Form className={styles.main} onSubmit={this.handleSearch}>
         <Row gutter={gutterSpecs}>
-          <Col {...colSpanSpecs}>
-            <Form.Item label="客服" colon={false}>
-              {getFieldDecorator("uid")(
-                <UserSelect placeholder="选择客服" users={selectStaffs} getPopupContainer={getContainer} />
-              )}
-            </Form.Item>
-          </Col>
-          <Col sm={24} md={24} lg={24} xl={18}>
-            <Form.Item label="定位标签" colon={false}>
+          <Col sm={24} md={24} lg={24} xl={12}>
+            <Form.Item label="客服范围" colon={false}>
               {getFieldDecorator("context_label", { initialValue: null })(
                 <ContextLabelSelect
-                  pathLabelPlaceholder="请选择定位标签"
+                  pathLabelPlaceholder="请选择范围"
                   userPlaceholder="请选择客服"
                   labelTree={staffLabelTree}
                   contextLabels={staff.context_labels}
@@ -54,6 +46,11 @@ export default class extends React.Component {
                   getPopupContainer={getContainer}
                 />
               )}
+            </Form.Item>
+          </Col>
+          <Col {...colSpanSpecs}>
+            <Form.Item label="搜索客服" colon={false}>
+              {getFieldDecorator("q_staff")(<Input placeholder="用户ID/用户名" />)}
             </Form.Item>
           </Col>
         </Row>

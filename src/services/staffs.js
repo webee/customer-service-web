@@ -1,18 +1,9 @@
 import request from "../utils/request";
 
 // apis
-export async function fetchStaffs({ page, per_page, uid, context_label, is_online, is_deleted, sorter, order }) {
+export async function fetchStaffs(params) {
   const resp = await request.get("/staffs", {
-    params: {
-      page,
-      per_page,
-      uid,
-      context_label,
-      is_online,
-      is_deleted,
-      sorter,
-      order
-    }
+    params
   });
   return resp.data;
 }

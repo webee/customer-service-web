@@ -161,7 +161,7 @@ export default class extends React.Component {
     }
     // form control
     if (nextProps.value === null) {
-      this.setState({ path: undefined, user: undefined, exceed: true, uids: [], labels: [] });
+      this.setState({ path: undefined, user: undefined, exceed: true, uids: [], labels: [] }, this.triggerChange);
     }
   }
 
@@ -204,7 +204,12 @@ export default class extends React.Component {
   }
 
   render() {
-    const { pathLabelPlaceholder = "选择路径", userPlaceholder = "选择用户", expandTrigger = "click" } = this.props;
+    const {
+      pathLabelPlaceholder = "选择路径",
+      userPlaceholder = "选择用户",
+      expandTrigger = "click",
+      users
+    } = this.props;
     const { options, user, exceed, uids, labels } = this.state;
     const disableSelect = !!(user || exceed);
     return (
@@ -219,18 +224,22 @@ export default class extends React.Component {
           onChange={this.onCascaderChange}
           getPopupContainer={this._getContainer}
         />
-        <Select
-          disabled={disableSelect}
-          optionFilterProp="title"
-          value={uids}
-          placeholder={userPlaceholder}
-          mode="multiple"
-          allowClear
-          onChange={this.onSelectChange}
-          getPopupContainer={this._getContainer}
-        >
-          {this.renderUserOptions()}
-        </Select>
+        {users ? (
+          <Select
+            disabled={disableSelect}
+            optionFilterProp="title"
+            value={uids}
+            placeholder={userPlaceholder}
+            mode="multiple"
+            allowClear
+            onChange={this.onSelectChange}
+            getPopupContainer={this._getContainer}
+          >
+            {this.renderUserOptions()}
+          </Select>
+        ) : (
+          undefined
+        )}
       </Fragment>
     );
   }
@@ -259,8 +268,11 @@ export default class extends React.Component {
               .map(o => o.value)
               .join(".");
     }
+    if (user) {
+      path = `${path}:${user.uid}`;
+    }
     const { path: prevPath, uids: prevUids } = this.state;
-    const uids = user ? [user.uid] : exceed ? [] : path === prevPath ? prevUids : [];
+    const uids = exceed ? [] : path === prevPath ? prevUids : [];
     this.setState({ labels, path, user, exceed, uids }, this.triggerChange);
   };
 
@@ -269,10 +281,9 @@ export default class extends React.Component {
   };
 
   displayRender = (labels, selectedOptions) => {
-    selectedOptions = this.filterSelectedOptions(selectedOptions);
     return selectedOptions.map((o, i) => (
       <Fragment key={i}>
-        {i > 0 ? " / " : ""}
+        {i > 0 ? (o.item.is_user ? " " : " / ") : ""}
         {o.label}
       </Fragment>
     ));

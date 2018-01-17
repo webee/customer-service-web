@@ -45,15 +45,28 @@ export default class extends React.Component {
     const gutterSpecs = { xs: 8, sm: 16, md: 16, lg: 24, xl: 24 };
     const colSpanSpecs = { sm: 24, md: 12, lg: 8, xl: 6 };
     const colSpanSpecs2 = { sm: 24, md: 12, lg: 12, xl: 8 };
+    const colSpanSpecs3 = { sm: 24, md: 24, lg: 12, xl: 8 };
 
     return (
       <Form className={styles.main} onSubmit={this.handleSearch}>
         <Row gutter={gutterSpecs}>
-          <Col sm={24} md={24} lg={20} xl={12}>
-            <Form.Item label="定位标签" colon={false}>
+          <Col {...colSpanSpecs3}>
+            <Form.Item label="项目范围" colon={false}>
               {getFieldDecorator("context_label", { initialValue: null })(
                 <ContextLabelSelect
-                  pathLabelPlaceholder="请选择定位标签"
+                  pathLabelPlaceholder="请选择范围"
+                  labelTree={staffLabelTree}
+                  contextLabels={staff.context_labels}
+                  user={staff}
+                />
+              )}
+            </Form.Item>
+          </Col>
+          <Col {...colSpanSpecs3}>
+            <Form.Item label="接待范围" colon={false}>
+              {getFieldDecorator("handler_context_label", { initialValue: null })(
+                <ContextLabelSelect
+                  pathLabelPlaceholder="请选择范围"
                   userPlaceholder="请选择客服"
                   labelTree={staffLabelTree}
                   contextLabels={staff.context_labels}
@@ -63,18 +76,17 @@ export default class extends React.Component {
               )}
             </Form.Item>
           </Col>
-          <Col {...colSpanSpecs}>
-            <Form.Item label="接待客服" colon={false}>
-              {getFieldDecorator("handler")(<UserSelect placeholder="选择客服" users={selectStaffs} />)}
-            </Form.Item>
-          </Col>
-          <Col {...{ sm: 8, md: 8, lg: 4, xl: 4 }}>
-            <Form.Item label="我" colon={false}>
-              {getFieldDecorator("filter_self", { initialValue: "exclude" })(
-                <ConSelect allowClear>
-                  <Select.Option value="only">仅我接待</Select.Option>
-                  <Select.Option value="exclude">除我接待</Select.Option>
-                </ConSelect>
+          <Col {...colSpanSpecs3}>
+            <Form.Item label="负责范围" colon={false}>
+              {getFieldDecorator("leader_context_label", { initialValue: null })(
+                <ContextLabelSelect
+                  pathLabelPlaceholder="请选择范围"
+                  userPlaceholder="请选择客服"
+                  labelTree={staffLabelTree}
+                  contextLabels={staff.context_labels}
+                  user={staff}
+                  users={selectStaffs}
+                />
               )}
             </Form.Item>
           </Col>
@@ -88,14 +100,34 @@ export default class extends React.Component {
               {getFieldDecorator("customer")(<Input placeholder="用户名/手机号/用户ID" />)}
             </Form.Item>
           </Col>
-          <Col {...colSpanSpecs}>
-            <Form.Item label="未回复数" colon={false}>
-              {getFieldDecorator("unhandled_msg_count_range")(<NumberRange min={0} transformer={Math.floor} />)}
+          <Col {...{ sm: 8, md: 8, lg: 4, xl: 4 }}>
+            <Form.Item label="我接待" colon={false}>
+              {getFieldDecorator("handler_filter_self", { initialValue: "exclude" })(
+                <ConSelect allowClear>
+                  <Select.Option value="only">仅我接待</Select.Option>
+                  <Select.Option value="exclude">除我接待</Select.Option>
+                </ConSelect>
+              )}
+            </Form.Item>
+          </Col>
+          <Col {...{ sm: 8, md: 8, lg: 4, xl: 4 }}>
+            <Form.Item label="我负责" colon={false}>
+              {getFieldDecorator("leader_filter_self")(
+                <ConSelect allowClear>
+                  <Select.Option value="only">仅我负责</Select.Option>
+                  <Select.Option value="exclude">除我负责</Select.Option>
+                </ConSelect>
+              )}
             </Form.Item>
           </Col>
           <Col {...colSpanSpecs2}>
-            <Form.Item label="项目标签" colon={false}>
-              {getFieldDecorator("tag")(<Input />)}
+            <Form.Item label="项目Tag" colon={false}>
+              {getFieldDecorator("tag")(<Input placeholder="tag" />)}
+            </Form.Item>
+          </Col>
+          <Col {...colSpanSpecs}>
+            <Form.Item label="未回复数" colon={false}>
+              {getFieldDecorator("unhandled_msg_count_range")(<NumberRange min={0} transformer={Math.floor} />)}
             </Form.Item>
           </Col>
           <Col {...colSpanSpecs2}>
