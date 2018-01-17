@@ -3,9 +3,11 @@ import PropTypes from "prop-types";
 import moment from "moment";
 import { dispatchDomainTypeEffect, dispatchDomainType, domainTypeName } from "~/services/project";
 import * as msgRendererService from "~/services/msgRenderer";
+import { normalizeProject, normalizeSession } from "~/models/project/commons";
 import EllipsisText from "~/components/EllipsisText";
 import { Card, Table, Icon, Pagination, Divider, Button, Badge } from "antd";
 import TryHandleModal from "../TryHandleModal";
+import SessionChatDetailModal from "../SessionChatDetailModal";
 import SearchForm from "./SearchForm";
 import styles from "./index.css";
 import { renderBoolean, renderNotBoolean, renderTsFromNow, renderTs, renderStaff, renderCustomer } from "../commons";
@@ -21,6 +23,7 @@ export default class extends React.Component {
   };
   state = {
     params: {},
+    sessionChatDetailSession: undefined,
     tryHandleProjectID: undefined
   };
 
@@ -40,15 +43,46 @@ export default class extends React.Component {
   renderActions(item) {
     return (
       <span>
-        <Button ghost type="primary" disabled>
+        <Button ghost type="primary" disabled onClick={() => this.updateSessionChatDetailSession(item)}>
           查看
         </Button>
         <Divider type="vertical" />
-        <Button ghost type="primary" onClick={() => this.updateTryHandleProjectID(item.project.id)}>
+        <Button ghost type="danger" onClick={() => this.updateTryHandleProjectID(item.project.id)}>
           接待
         </Button>
       </span>
     );
+  }
+
+  updateSessionChatDetailSession = session => {
+    dispatchDomainTypeEffect(this.context, this.props, "_/updateSessionList", [session]);
+    this.setState({ sessionChatDetailSession: session });
+  };
+  cancelSessionChatDetailModal = () => {
+    const { sessionChatDetailSession: session } = this.state;
+    this.setState({ sessionChatDetailSession: undefined }, () => {
+      dispatchDomainTypeEffect(this.context, this.props, "myHandling/removeSession", { sessionID: session.id });
+    });
+  };
+
+  renderSessionChatDetailModal() {
+    const { sessionChatDetailSession: session } = this.state;
+    if (!!session) {
+      const { dispatch, appData, data, handlingData } = this.props;
+      const { project } = session;
+      const { projectMsgs, txMsgs } = data;
+      const projMsgs = projectMsgs[project.id];
+      return (
+        <SessionChatDetailModal
+          onCancel={this.cancelSessionChatDetailModal}
+          dispatch={dispatch}
+          appData={appData}
+          session={normalizeSession(session)}
+          project={normalizeProject(project)}
+          projMsgs={projMsgs}
+        />
+      );
+    }
   }
 
   get columns() {
@@ -205,6 +239,7 @@ export default class extends React.Component {
           projectID={this.state.tryHandleProjectID}
           onCancel={this.updateTryHandleProjectID}
         />
+        {this.renderSessionChatDetailModal()}
       </div>
     );
   }

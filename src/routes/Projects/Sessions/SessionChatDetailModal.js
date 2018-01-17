@@ -20,7 +20,7 @@ export default class extends React.PureComponent {
   };
 
   renderSessionChatDetail() {
-    const { dispatch, appData, session, project, projMsgs } = this.props;
+    const { dispatch, appData, session, project, projMsgs, loadSessionMsgs, fetchSessionMsgs } = this.props;
     const senderArea = (
       <div>
         <Button ghost type="danger" size="large" onClick={() => this.updateTryHandleProjectID(project.id)}>
@@ -42,6 +42,8 @@ export default class extends React.PureComponent {
         project={project}
         projMsgs={projMsgs}
         senderArea={senderArea}
+        loadSessionMsgs={loadSessionMsgs}
+        fetchSessionMsgs={fetchSessionMsgs}
       />
     );
   }

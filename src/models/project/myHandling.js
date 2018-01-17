@@ -1,7 +1,7 @@
 import { collectTypeReducers, createNSSubEffectFunc } from "../utils";
 import * as projectService from "../../services/project";
 import * as msgCodecService from "../../services/msgCodec";
-import { normalizePrject, normalizeSession, updateProjectList, updateSessionList } from "./commons";
+import { normalizeSession, updateProjectList, updateSessionList } from "./commons";
 
 const DEFAULT_SESSION_STATE = { isInRead: false };
 const ns = "myHandling";

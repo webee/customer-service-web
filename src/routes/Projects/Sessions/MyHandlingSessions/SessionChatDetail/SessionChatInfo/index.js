@@ -5,7 +5,7 @@ import { Tabs } from "antd";
 import styles from "./index.less";
 import ProjectInfo from "./ProjectInfo";
 
-export const defaultTabs = { default: "info", info: true, history: true, replies: true, opLog: true };
+export const defaultTabs = { default: "info", info: true, history: false, replies: false, opLog: false };
 export default class extends React.Component {
   static contextTypes = {
     projectDomain: PropTypes.string,

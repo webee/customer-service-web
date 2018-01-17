@@ -2,7 +2,7 @@ export function normalizeSession(s) {
   return { ...s, project_id: s.project.id, project: undefined, handler: s.handler.uid };
 }
 
-export function normalizePrject(p) {
+export function normalizeProject(p) {
   return {
     ...p,
     owner: p.owner.uid,
@@ -12,7 +12,7 @@ export function normalizePrject(p) {
 }
 
 export function* updateProjectList({ createAction, payload: projectList }, { call, put }) {
-  yield put(createAction(`_/updateProjects`, projectList.map(normalizePrject)));
+  yield put(createAction(`_/updateProjects`, projectList.map(normalizeProject)));
 
   const staffs = [];
   const customers = [];

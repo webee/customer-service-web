@@ -244,7 +244,7 @@ class Main extends React.Component {
         </Menu>
       );
 
-      const xchatStatus = xchatStatuses[xchatStatusInfo.status];
+      const xchatStatus = xchatStatuses[xchatStatusInfo.status] || {};
       return (
         <Fragment>
           <span className={styles.action} onClick={this.handleXChatStatus}>

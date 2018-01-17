@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "dva";
+import * as projectWorkers from "~/services/projectWorkers";
 import { Tabs } from "antd";
 import { dispatchDomainType, dispatchDomainTypeEffect } from "~/services/project";
 import EmptyContent from "~/components/EmptyContent";
@@ -48,9 +49,19 @@ export default class View extends Component {
         projMsgs={projMsgs}
         projTxMsgIDs={projTxMsgIDs}
         txMsgs={txMsgs}
+        loadSessionMsgs={this.loadSessionMsgs}
+        fetchSessionMsgs={this.fetchSessionMsgs}
       />
     );
   }
+
+  fetchSessionMsgs = session => {
+    projectWorkers.fetchProjectMsgs(this.context, this.props, session.project_id);
+  };
+
+  loadSessionMsgs = session => {
+    projectWorkers.loadProjectMsgs(this.context, this.props, session.project_id);
+  };
 
   getSessionName(id) {
     const { data, appData } = this.props;

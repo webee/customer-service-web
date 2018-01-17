@@ -13,6 +13,9 @@ const msgTypeInitialStatus = {
   ripe: "ready"
 };
 
+function genSessionStartMsg(id) {
+  return { domain: "system", type: "divider", msg: `会话#${id}开始` };
+}
 const CURRENT_SESSION_START_MSG = { domain: "system", type: "divider", msg: "当前会话开始" };
 
 // reducers
@@ -103,9 +106,8 @@ export const reducer = collectTypeReducers(
       return { ...state, projectMsgs };
     },
     insertProjectMsgs(state, { payload: { id, msgs, noMore } }) {
-      console.log("state: ", state, id);
       const project = state.projects[id];
-      const session = state.sessions[project.current_session_id] || {};
+      const currentSession = state.sessions[project.current_session_id] || {};
       const projectMsgs = { ...state.projectMsgs };
       let { lid, rid, msgs: _msgs, noMore: _noMore } = projectMsgs[id] || {};
       _msgs = _msgs || [];
@@ -114,9 +116,10 @@ export const reducer = collectTypeReducers(
       msgs.forEach(msg => {
         if (!lid || msg.msg_id < lid) {
           lid = msg.msg_id;
-          if (lid === session.start_msg_id) {
+          if (lid === currentSession.start_msg_id) {
             newMsgs.unshift(CURRENT_SESSION_START_MSG);
           }
+
           newMsgs.unshift({ ...msg, is_rx: true });
         }
 

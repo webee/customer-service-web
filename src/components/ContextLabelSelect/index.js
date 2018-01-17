@@ -176,8 +176,10 @@ export default class extends React.Component {
       const { path, exceed, uids } = this.state;
       if (exceed) {
         onChange(undefined);
-      } else {
+      } else if (uids.length > 0) {
         onChange(`${path},${uids.join("|")}`);
+      } else {
+        onChange(path);
       }
     }
   };

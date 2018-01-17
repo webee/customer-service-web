@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { reduxRouter } from "dva/router";
-import * as projectWorkers from "~/services/projectWorkers";
 import SplitPane from "react-split-pane";
 import List from "react-virtualized/dist/commonjs/List";
 import SessionChatHeader from "./SessionChatHeader";
@@ -21,15 +20,15 @@ export default class View extends Component {
   };
 
   componentDidMount() {
-    const { session } = this.props;
-    projectWorkers.fetchProjectMsgs(this.context, this.props, session.project_id);
+    const { session, fetchSessionMsgs } = this.props;
+    fetchSessionMsgs(session);
   }
 
   componentDidUpdate() {
     const { session, projMsgs } = this.props;
     if (!projMsgs) {
       // 防止消息被删除了
-      projectWorkers.fetchProjectMsgs(this.context, this.props, session.project_id);
+      fetchSessionMsgs(session);
     }
   }
 
@@ -112,12 +111,15 @@ export default class View extends Component {
     txMsgs,
     isCurrentOpened
   }) {
+    const { loadSessionMsgs, fetchSessionMsgs } = this.props;
     const msgList = (
       <MessageList
         ref={r => {
           this.msg_list = r;
         }}
         isMyHandling={isMyHandling}
+        loadSessionMsgs={loadSessionMsgs}
+        fetchSessionMsgs={fetchSessionMsgs}
         dispatch={dispatch}
         session={session}
         staffs={staffs}

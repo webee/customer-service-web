@@ -221,7 +221,8 @@ export default class extends React.PureComponent {
       // console.debug("onScroll: ", clientHeight, scrollHeight, scrollTop, scrollDirection);
       if (scrollTop === 0) {
         // console.debug("loadProjectMsgs");
-        projectWorkers.loadProjectMsgs(this.context, this.props, session.project_id);
+        const {loadSessionMsgs} = this.props;
+        loadSessionMsgs(session);
       }
 
       let isInRead = prevIsInRead;
