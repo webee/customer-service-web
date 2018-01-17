@@ -88,7 +88,7 @@ export default class extends React.Component {
     const { sessionChatDetailSession: s } = this.state;
     if (!!s) {
       const { dispatch, appData, data, handlingData } = this.props;
-      const { sessions, projects, projectMsgs, txMsgs } = data;
+      const { sessions, projects, projectMsgs } = data;
       const session = sessions[s.id];
       const project = projects[session.project_id];
       const projMsgs = projectMsgs[session.project_id];
@@ -237,8 +237,8 @@ export default class extends React.Component {
 
   get data() {
     const { handlingData } = this.props;
-    const { sessions } = handlingData;
-    return sessions.map((s, i) => ({ key: i, ...s }));
+    const { items } = handlingData;
+    return items.map((s, i) => ({ key: i, ...s }));
   }
 
   render() {

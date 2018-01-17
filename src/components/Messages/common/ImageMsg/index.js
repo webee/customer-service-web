@@ -79,9 +79,16 @@ export default class extends React.PureComponent {
     const maxWidth = width - 180;
     const sizeSpecs = { minWidth: 64, maxWidth, minHeight: 64, maxHeight: 300 };
     const [xw, xh] = resize(w, h, sizeSpecs);
+    const errorStyle = this.state.error ? { backgroundColor: "pink" } : {};
     return (
       <div className={styles.main} style={sizeSpecs}>
-        <img onLoad={this.onLoad} onError={this.onError} src={url} alt={this.alt} style={{ width: xw, height: xh }} />
+        <img
+          onLoad={this.onLoad}
+          onError={this.onError}
+          src={url}
+          alt={this.alt}
+          style={{ width: xw, height: xh, ...errorStyle }}
+        />
       </div>
     );
   }

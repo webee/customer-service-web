@@ -24,6 +24,7 @@ export default class extends React.Component {
   state = {
     params: {},
     sessionChatDetailSession: undefined,
+    sessionChatDetailProjMsgsManager: undefined,
     tryHandleProjectID: undefined
   };
 
@@ -43,7 +44,7 @@ export default class extends React.Component {
   renderActions(item) {
     return (
       <span>
-        <Button ghost type="primary" disabled onClick={() => this.updateSessionChatDetailSession(item)}>
+        <Button ghost type="primary" onClick={() => this.updateSessionChatDetailSession(item)}>
           查看
         </Button>
         <Divider type="vertical" />
@@ -55,34 +56,45 @@ export default class extends React.Component {
   }
 
   updateSessionChatDetailSession = session => {
-    dispatchDomainTypeEffect(this.context, this.props, "_/updateSessionList", [session]);
+    dispatchDomainTypeEffect(this.context, this.props, "handled/updateSessionList", [session]);
     this.setState({ sessionChatDetailSession: session });
   };
   cancelSessionChatDetailModal = () => {
-    const { sessionChatDetailSession: session } = this.state;
-    this.setState({ sessionChatDetailSession: undefined }, () => {
-      dispatchDomainTypeEffect(this.context, this.props, "myHandling/removeSession", { sessionID: session.id });
-    });
+    this.setState({ sessionChatDetailSession: undefined, sessionChatDetailProjMsgsManager: undefined });
+  };
+
+  loadSessionMsgs = session => {
+    // 使用原始session对象调用
+    dispatchDomainTypeEffect(this.context, this.props, "handled/loadSessionHistoryMsgs", { session: session._s });
   };
 
   renderSessionChatDetailModal() {
-    const { sessionChatDetailSession: session } = this.state;
-    if (!!session) {
-      const { dispatch, appData, data, handlingData } = this.props;
-      const { project } = session;
-      const { projectMsgs, txMsgs } = data;
-      const projMsgs = projectMsgs[project.id];
+    const { sessionChatDetailSession: s } = this.state;
+    if (!!s) {
+      const { dispatch, appData, handledData } = this.props;
+      const { sessions, projects, sessionMsgs } = handledData;
+      const session = sessions[s.id];
+      // 设置原始session对象
+      session._s = s;
+      const project = projects[session.project_id];
+      const projMsgs = sessionMsgs[s.id];
       return (
         <SessionChatDetailModal
           onCancel={this.cancelSessionChatDetailModal}
           dispatch={dispatch}
           appData={appData}
-          session={normalizeSession(session)}
-          project={normalizeProject(project)}
+          session={session}
+          project={project}
           projMsgs={projMsgs}
+          loadSessionMsgs={this.loadSessionMsgs}
+          fetchSessionMsgs={this.loadSessionMsgs}
         />
       );
     }
+  }
+
+  componentWillUnmount() {
+    dispatchDomainType(this.context, this.props, "handled/clearSessionMsgsData");
   }
 
   get columns() {
@@ -201,8 +213,8 @@ export default class extends React.Component {
 
   get data() {
     const { handledData } = this.props;
-    const { sessions } = handledData;
-    return sessions.map((s, i) => ({ key: i, ...s }));
+    const { items } = handledData;
+    return items.map((s, i) => ({ key: i, ...s }));
   }
 
   render() {

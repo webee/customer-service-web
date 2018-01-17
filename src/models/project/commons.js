@@ -11,8 +11,8 @@ export function normalizeProject(p) {
   };
 }
 
-export function* updateProjectList({ createAction, payload: projectList }, { call, put }) {
-  yield put(createAction(`_/updateProjects`, projectList.map(normalizeProject)));
+export function* updateProjectList({ ns = "_", createAction, payload: projectList }, { call, put }) {
+  yield put(createAction(`${ns}/updateProjects`, projectList.map(normalizeProject)));
 
   const staffs = [];
   const customers = [];
@@ -27,10 +27,10 @@ export function* updateProjectList({ createAction, payload: projectList }, { cal
   yield put({ type: "app/updateCustomers", payload: customers });
 }
 
-export function* updateSessionList({ createAction, payload: sessionList }, { call, put }) {
-  yield put(createAction(`_/updateSessions`, sessionList.map(normalizeSession)));
+export function* updateSessionList({ ns = "_", createAction, payload: sessionList }, { call, put }) {
+  yield put(createAction(`${ns}/updateSessions`, sessionList.map(normalizeSession)));
   const projectList = sessionList.map(s => s.project);
-  yield updateProjectList({ createAction, payload: projectList }, { call, put });
+  yield updateProjectList({ ns, createAction, payload: projectList }, { call, put });
   const staffs = [];
   sessionList.forEach(s => {
     // staffs

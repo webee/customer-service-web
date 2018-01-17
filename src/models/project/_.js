@@ -4,7 +4,6 @@ import * as projectService from "../../services/project";
 import * as msgCodecService from "../../services/msgCodec";
 import * as msgCookService from "../../services/msgCook";
 import { newSingletonContext } from "../../utils/notify";
-import { asYieldFunc } from "../../utils/commons";
 import { updateSessionList } from "./commons";
 
 const ns = "_";
@@ -13,9 +12,6 @@ const msgTypeInitialStatus = {
   ripe: "ready"
 };
 
-function genSessionStartMsg(id) {
-  return { domain: "system", type: "divider", msg: `会话#${id}开始` };
-}
 const CURRENT_SESSION_START_MSG = { domain: "system", type: "divider", msg: "当前会话开始" };
 
 // reducers
@@ -90,8 +86,7 @@ export const reducer = collectTypeReducers(
     },
     appendProjectMsgs(state, { payload: { id, msgs } }) {
       const projectMsgs = { ...state.projectMsgs };
-      let { lid, rid, msgs: _msgs, noMore } = projectMsgs[id] || {};
-      _msgs = _msgs || [];
+      let { lid, rid, msgs: _msgs = [], noMore } = projectMsgs[id] || {};
       let newMsgs = [..._msgs];
       msgs.forEach(msg => {
         if (!lid) {
@@ -112,8 +107,7 @@ export const reducer = collectTypeReducers(
       const project = state.projects[id];
       const currentSession = state.sessions[project.current_session_id] || {};
       const projectMsgs = { ...state.projectMsgs };
-      let { lid, rid, msgs: _msgs, noMore: _noMore } = projectMsgs[id] || {};
-      _msgs = _msgs || [];
+      let { lid, rid, msgs: _msgs = [], noMore: _noMore } = projectMsgs[id] || {};
       const newNoMore = noMore === undefined ? _noMore : noMore;
       let newMsgs = [..._msgs];
       msgs.forEach(msg => {
@@ -227,6 +221,7 @@ export const effectFunc = createNSSubEffectFunc(ns, {
   ) {
     const projectMsgs = yield select(state => state.project[projectDomain][projectType]._.projectMsgs);
     const projectMsg = projectMsgs[projectID] || {};
+    const { lid, rid, fetchFailed } = projectMsg;
     try {
       if (projectMsg.noMore) {
         return;
@@ -239,7 +234,6 @@ export const effectFunc = createNSSubEffectFunc(ns, {
         yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingHistory: true }));
       }
 
-      const { lid, rid, fetchFailed } = projectMsg;
       const { msgs, no_more } = yield call(projectService.fetchProjectMsgs, projectID, {
         rid: lid,
         limit,
@@ -249,6 +243,7 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       const decodedMsgs = msgs.map(msg => ({ ...msg, ...msgCodecService.decodeMsg(msg) }));
       yield put(createAction(`_/insertProjectMsgs`, { id: projectID, msgs: decodedMsgs, noMore }));
     } catch (e) {
+      console.error(e);
       if (!lid && !rid) {
         yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, fetchFailed: true }));
       }
@@ -287,6 +282,7 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       // 检查刚接收的消息是否为已发送状态的tx消息
       yield put(createAction(`_/checkProjectTxMsgsRxKey`, { projectID, rid }));
     } catch (e) {
+      console.error(e);
       if (!lid && !rid) {
         yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, fetchFailed: true }));
       }

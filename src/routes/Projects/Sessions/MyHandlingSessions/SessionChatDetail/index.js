@@ -25,7 +25,7 @@ export default class View extends Component {
   }
 
   componentDidUpdate() {
-    const { session, projMsgs } = this.props;
+    const { session, projMsgs, fetchSessionMsgs } = this.props;
     if (!projMsgs) {
       // 防止消息被删除了
       fetchSessionMsgs(session);
@@ -70,7 +70,7 @@ export default class View extends Component {
             split="vertical"
             defaultSize={this.state.sessionChatInfoSize}
             minSize={300}
-            maxSize={350}
+            maxSize={400}
             paneClassName={styles.main}
             onChange={size => this.setState({ sessionChatInfoSize: size })}
           >

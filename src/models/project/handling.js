@@ -8,7 +8,7 @@ const ns = "handling";
 export const reducer = collectTypeReducers(
   {
     isFetching: false,
-    sessions: [],
+    items: [],
     pagination: {
       defaultPageSize: 10,
       current: 1,
@@ -23,7 +23,7 @@ export const reducer = collectTypeReducers(
   },
   {
     saveFetchResult(state, { payload: { items, pagination } }) {
-      return { ...state, sessions: items, pagination: { ...state.pagination, ...pagination } };
+      return { ...state, items, pagination: { ...state.pagination, ...pagination } };
     },
     updateTableInfos(state, { payload: { isFetching, pagination, filters, sorter } }) {
       const newState = { ...state };
