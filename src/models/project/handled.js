@@ -170,7 +170,7 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       }
 
       const { msgs, no_more } = yield call(projectService.fetchProjectMsgs, project.id, {
-        rid: lid || session.msg_id,
+        rid: lid || session.msg_id + 1,
         limit,
         desc: true
       });
