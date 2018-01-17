@@ -52,6 +52,7 @@ export default class extends React.Component {
             <Form.Item label="项目范围" colon={false}>
               {getFieldDecorator("context_label", { initialValue: null })(
                 <ContextLabelSelect
+                  userAlias={true}
                   pathLabelPlaceholder="请选择范围"
                   labelTree={staffLabelTree}
                   contextLabels={staff.context_labels}
@@ -120,7 +121,7 @@ export default class extends React.Component {
           </Col>
           <Col {...colSpanSpecs2}>
             <Form.Item label="项目Tag" colon={false}>
-              {getFieldDecorator("tag")(<Input placeholder="tag"/>)}
+              {getFieldDecorator("tag")(<Input placeholder="tag" />)}
             </Form.Item>
           </Col>
           <Col {...colSpanSpecs2}>

@@ -259,10 +259,11 @@ export default class extends React.Component {
         user = lastOption.item.user;
       }
       exceed = lastOption.exceed;
+      const { userAlias } = this.props;
       const alias_to = lastOption.item.alias_to;
 
       path =
-        typeof alias_to === "string"
+        userAlias && typeof alias_to === "string"
           ? alias_to
           : this.filterSelectedOptions(selectedOptions)
               .map(o => o.value)
