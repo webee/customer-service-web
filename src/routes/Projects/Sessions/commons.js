@@ -1,6 +1,6 @@
 import moment from "moment";
 import { Fragment } from "react";
-import { Icon, Badge } from "antd";
+import { Icon, Badge, Tag } from "antd";
 import * as msgRendererService from "~/services/msgRenderer";
 import EllipsisText from "~/components/EllipsisText";
 
@@ -45,4 +45,29 @@ export const renderCustomer = (user, width = 200) => {
   const name = genCustomerMobileName(user, "-");
   const text = <Badge status={user.is_online ? "success" : "default"} text={name} />;
   return <EllipsisText text={text} tipText={name} maxWidth={width} />;
+};
+
+export const TagRenderer = ({ tag, maxWidth, ...props }) => {
+  return (
+    <Tag color="geekblue" {...props}>
+      <EllipsisText text={tag} maxWidth={maxWidth} />
+    </Tag>
+  );
+};
+
+export const TagsRenderer = ({ tags, ...props }) => {
+  return tags.map((tag, i) => <TagRenderer key={i} tag={tag} {...props} />);
+};
+
+export const PathLabelRenderer = ({ pathLabel, maxWidth, ...props }) => {
+  const [type, path] = pathLabel;
+  return (
+    <Tag color="purple" {...props}>
+      <EllipsisText text={`${type} / ${path}`} maxWidth={maxWidth} />
+    </Tag>
+  );
+};
+
+export const PathLabelsRenderer = ({ pathLabels, ...props }) => {
+  return pathLabels.map((pathLabel, i) => <PathLabelRenderer key={i} pathLabel={pathLabel} {...props} />);
 };

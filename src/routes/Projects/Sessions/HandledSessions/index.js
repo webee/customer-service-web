@@ -10,7 +10,15 @@ import TryHandleModal from "../TryHandleModal";
 import SessionChatDetailModal from "../SessionChatDetailModal";
 import SearchForm from "./SearchForm";
 import styles from "./index.css";
-import { renderBoolean, renderNotBoolean, renderTsFromNow, renderTs, renderStaff, renderCustomer } from "../commons";
+import {
+  renderBoolean,
+  renderNotBoolean,
+  renderTsFromNow,
+  renderTs,
+  renderStaff,
+  renderCustomer,
+  TagsRenderer
+} from "../commons";
 
 function getSorterOrder(sorter, key) {
   return sorter.key == key ? sorter.order : false;
@@ -191,15 +199,9 @@ export default class extends React.Component {
       },
       {
         title: "项目Tags",
-        dataIndex: "xxx",
-        width: 100,
-        render: v => "#TODO"
-      },
-      {
-        title: "范围标签",
-        dataIndex: "yyy",
-        width: 100,
-        render: v => "#TODO"
+        dataIndex: "project.tags",
+        width: 200,
+        render: tags => <TagsRenderer tags={tags} maxWidth={184} />
       },
       {
         title: "操作",
@@ -239,7 +241,7 @@ export default class extends React.Component {
         />
         <Table
           loading={isFetching}
-          scroll={{ x: 1900 }}
+          scroll={{ x: 1930 }}
           bordered={true}
           pagination={pagination}
           columns={this.columns}

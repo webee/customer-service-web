@@ -4,6 +4,7 @@ import moment from "moment";
 import { Card, Table, Icon, Pagination } from "antd";
 import SearchForm from "./SearchForm";
 import styles from "./index.css";
+import { PathLabelsRenderer } from "~/routes/Projects/Sessions/commons";
 
 const renderBoolean = val => {
   return <Icon type={val ? "check-circle" : "close-circle"} style={{ color: val ? "green" : "black" }} />;
@@ -92,12 +93,14 @@ export default class extends React.Component {
         key: "last_online_ts",
         sorter: true,
         sortOrder: getSorterOrder(sorter, "last_online_ts"),
-        width: 300,
+        width: 200,
         render: ts => renderTs(ts, <span style={{ color: "grey" }}>未上线过</span>)
       },
       {
         title: "定位标签",
-        dataIndex: "context_labels"
+        dataIndex: "context_labels",
+        width: 300,
+        render: context_labels => <PathLabelsRenderer pathLabels={context_labels} maxWidth={284} />
       }
     ];
   }

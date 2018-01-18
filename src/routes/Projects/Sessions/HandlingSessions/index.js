@@ -19,7 +19,8 @@ import {
   renderMsgTs,
   renderLastMsg,
   renderStaff,
-  renderCustomer
+  renderCustomer,
+  TagsRenderer
 } from "../commons";
 
 function getSorterOrder(sorter, key) {
@@ -214,16 +215,15 @@ export default class extends React.Component {
         render: ts => renderTs(ts, "", "YYYY-MM-DD HH:mm:ss")
       },
       {
-        title: "项目Tags",
-        dataIndex: "xxx",
-        width: 100,
-        render: v => "#TODO"
+        title: "会话ID",
+        dataIndex: "id",
+        width: 100
       },
       {
-        title: "范围标签",
-        dataIndex: "yyy",
-        width: 100,
-        render: v => "#TODO"
+        title: "项目Tags",
+        dataIndex: "project.tags",
+        width: 200,
+        render: tags => <TagsRenderer tags={tags} maxWidth={184} />
       },
       {
         title: "操作",
@@ -263,7 +263,7 @@ export default class extends React.Component {
         />
         <Table
           loading={isFetching}
-          scroll={{ x: 2200 }}
+          scroll={{ x: 2450 }}
           bordered={true}
           pagination={pagination}
           columns={this.columns}

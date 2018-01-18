@@ -2,7 +2,8 @@ import React from "react";
 import classNames from "classnames";
 import moment from "moment";
 import EllipsisText from "~/components/EllipsisText";
-import { Avatar, Badge, Tag } from "antd";
+import { Avatar, Badge } from "antd";
+import { TagsRenderer } from "../commons";
 import styles from "./SessionItem.less";
 
 export default class extends React.PureComponent {
@@ -31,11 +32,7 @@ export default class extends React.PureComponent {
             </div>
           </div>
         </div>
-        {tags.map((t, i) => (
-          <Tag key={i} className={styles.tag} color="geekblue">
-            <EllipsisText text={t} maxWidth={width - 50} onUpdate={() => measure()} />
-          </Tag>
-        ))}
+        <TagsRenderer tags={tags} maxWidth={width - 50} className={styles.tag} />
       </div>
     );
   }

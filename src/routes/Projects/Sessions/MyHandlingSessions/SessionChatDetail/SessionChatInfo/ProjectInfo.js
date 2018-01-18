@@ -7,7 +7,7 @@ import LabelList from "~/components/LabelList";
 import EllipsisText from "~/components/EllipsisText";
 import styles from "./ProjectInfo.less";
 import { accessFunction } from "../accessFunctions";
-import { renderTs, renderStaff, renderBoolean } from "../../../commons";
+import { renderTs, renderStaff, renderBoolean, TagsRenderer } from "../../../commons";
 
 const labelListDefaultStyle = {
   labelStyle: { color: "gray" },
@@ -75,7 +75,7 @@ export default class extends React.Component {
   }
 
   render() {
-    const { session, project, staffs, customers } = this.props;
+    const { session, project, staffs, customers, size } = this.props;
     const { tags } = project;
     return (
       <Fragment>
@@ -84,7 +84,12 @@ export default class extends React.Component {
         </CompactCard>
         {tags.length > 0 && (
           <CompactCard title="标签" bordered={false}>
-            {project.tags.map(this.renderTag)}
+            <TagsRenderer
+              tags={project.tags}
+              maxWidth={size - 60}
+              onUpdate={() => measure}
+              style={{ fontSize: 14, margin: 4 }}
+            />
           </CompactCard>
         )}
         <CompactCard title="参与用户" bordered={false}>
@@ -148,15 +153,6 @@ export default class extends React.Component {
       >
         {c.name || c.mobile}
       </Button>
-    );
-  };
-
-  renderTag = (tag, i) => {
-    const { size } = this.props;
-    return (
-      <Tag key={i} color="geekblue" style={{ fontSize: 14, margin: 4 }}>
-        <EllipsisText text={tag} maxWidth={size - 60} />
-      </Tag>
     );
   };
 
