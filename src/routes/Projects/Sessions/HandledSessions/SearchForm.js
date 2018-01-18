@@ -80,6 +80,7 @@ export default class extends React.Component {
                 <ContextLabelSelect
                   userAlias={true}
                   pathLabelPlaceholder="请选择范围"
+                  userPlaceholder="请选择客服"
                   labelTree={staffLabelTree}
                   contextLabels={staff.context_labels}
                   user={staff}
