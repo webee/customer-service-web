@@ -17,9 +17,16 @@ export default class extends React.Component {
   }
 
   render() {
+    const { ranges } = this.props;
     const { value } = this.state;
     return (
-      <RangePicker value={value} showTime={{ format: "HH:mm" }} format="YYYY-MM-DD HH:mm" onChange={this.onChange} />
+      <RangePicker
+        ranges={ranges}
+        value={value}
+        showTime={{ format: "HH:mm" }}
+        format="YYYY-MM-DD HH:mm"
+        onChange={this.onChange}
+      />
     );
   }
 

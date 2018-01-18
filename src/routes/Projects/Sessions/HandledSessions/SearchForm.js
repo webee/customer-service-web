@@ -1,4 +1,5 @@
 import React from "react";
+import moment from "moment";
 import { Form, Row, Col, Input, Button, Icon, Switch, Radio, Select } from "antd";
 import { contextLabelsMatchContextLabels } from "~/utils/pathLabels";
 import ContextLabelSelect from "~/components/ContextLabelSelect";
@@ -8,6 +9,31 @@ import { withContainerContext } from "~/components/utils";
 import styles from "./SearchForm.less";
 
 const ConSelect = withContainerContext(Select);
+const ranges = {
+  今天: [moment().startOf("day"), moment().endOf("day")],
+  昨天: [
+    moment()
+      .subtract(1, "day")
+      .startOf("day"),
+    moment()
+      .subtract(1, "day")
+      .endOf("day")
+  ],
+  最近两天: [
+    moment()
+      .subtract(1, "day")
+      .startOf("day"),
+    moment().endOf("day")
+  ],
+  最近三天: [
+    moment()
+      .subtract(2, "day")
+      .startOf("day"),
+    moment().endOf("day")
+  ],
+  本周: [moment().startOf("week"), moment().endOf("day")],
+  本月: [moment().startOf("month"), moment().endOf("day")]
+};
 
 @Form.create()
 export default class extends React.Component {
@@ -127,7 +153,7 @@ export default class extends React.Component {
           </Col>
           <Col {...colSpanSpecs2}>
             <Form.Item label="结束时间" colon={false}>
-              {getFieldDecorator("closed_ts_range")(<DateTimeRange />)}
+              {getFieldDecorator("closed_ts_range")(<DateTimeRange ranges={ranges} />)}
             </Form.Item>
           </Col>
         </Row>
