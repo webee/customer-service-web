@@ -14,7 +14,7 @@ export const renderTs = (ts, def = "-", format = "LLLL") => (ts ? moment.unix(ts
 export const renderMsgTs = (msg, def = "-", format = "LLLL") => (msg ? renderTs(msg.ts, def, format) : def);
 export const renderTsFromNow = (ts, def) => (ts ? moment.unix(ts).fromNow() : def);
 
-export function renderLastMsg(msg, def = "-") {
+export function renderLastMsg(msg, def = "-", maxWidth) {
   if (!msg) {
     return def;
   }
@@ -26,7 +26,7 @@ export function renderLastMsg(msg, def = "-") {
       <span style={{ color: "grey" }}>{userType}:</span> {msgDesc}
     </Fragment>
   );
-  return <EllipsisText text={text} width={280} />;
+  return <EllipsisText text={text} maxWidth={maxWidth} />;
 }
 
 export function genCustomerMobileName({ name, mobile }, def = "") {

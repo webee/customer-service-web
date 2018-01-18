@@ -4,7 +4,6 @@ import moment from "moment";
 import { dispatchDomainTypeEffect, dispatchDomainType, domainTypeName } from "~/services/project";
 import * as msgRendererService from "~/services/msgRenderer";
 import { normalizeProject, normalizeSession } from "~/models/project/commons";
-import EllipsisText from "~/components/EllipsisText";
 import { Card, Table, Icon, Pagination, Divider, Button, Badge } from "antd";
 import TryHandleModal from "../TryHandleModal";
 import SessionChatDetailModal from "../SessionChatDetailModal";

@@ -5,7 +5,6 @@ import { dispatchDomainTypeEffect, dispatchDomainType, domainTypeName } from "~/
 import * as projectWorkers from "~/services/projectWorkers";
 import * as msgRendererService from "~/services/msgRenderer";
 import { normalizeProject, normalizeSession } from "~/models/project/commons";
-import EllipsisText from "~/components/EllipsisText";
 import TryHandleModal from "../TryHandleModal";
 import SessionChatDetailModal from "../SessionChatDetailModal";
 import { Card, Table, Icon, Pagination, Divider, Button, Badge } from "antd";
@@ -166,7 +165,7 @@ export default class extends React.Component {
         dataIndex: "msg",
         key: "msg",
         width: 300,
-        render: msg => renderLastMsg(msg, "-")
+        render: msg => renderLastMsg(msg, "-", 284)
       },
       {
         title: "最后消息时间",

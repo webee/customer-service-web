@@ -4,7 +4,6 @@ import { Tabs, Icon, Tag, Button, Badge } from "antd";
 import { dispatchDomainTypeEffect } from "~/services/project";
 import CompactCard from "~/components/CompactCard";
 import LabelList from "~/components/LabelList";
-import EllipsisText from "~/components/EllipsisText";
 import styles from "./ProjectInfo.less";
 import { accessFunction } from "../accessFunctions";
 import { renderTs, renderStaff, renderBoolean, TagsRenderer } from "../../../commons";
