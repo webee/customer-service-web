@@ -93,13 +93,12 @@ export default class extends React.Component {
         key: "last_online_ts",
         sorter: true,
         sortOrder: getSorterOrder(sorter, "last_online_ts"),
-        width: 200,
+        width: 300,
         render: ts => renderTs(ts, <span style={{ color: "grey" }}>未上线过</span>)
       },
       {
         title: "定位标签",
         dataIndex: "context_labels",
-        width: 300,
         render: context_labels => <PathLabelsRenderer pathLabels={context_labels} maxWidth={284} />
       }
     ];

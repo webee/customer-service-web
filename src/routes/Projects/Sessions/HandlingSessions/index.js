@@ -221,8 +221,7 @@ export default class extends React.Component {
       {
         title: "项目Tags",
         dataIndex: "project.tags",
-        width: 200,
-        render: tags => <TagsRenderer tags={tags} maxWidth={184} />
+        render: tags => <TagsRenderer tags={tags} maxWidth={200} />
       },
       {
         title: "操作",
@@ -262,7 +261,7 @@ export default class extends React.Component {
         />
         <Table
           loading={isFetching}
-          scroll={{ x: 2450 }}
+          scroll={{ x: 2500 }}
           bordered={true}
           pagination={pagination}
           columns={this.columns}
