@@ -84,6 +84,7 @@ export default class extends React.Component {
                   contextLabels={staff.context_labels}
                   user={staff}
                   users={selectStaffs}
+                  onlyMember={true}
                 />
               )}
             </Form.Item>

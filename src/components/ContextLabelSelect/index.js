@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 import { Cascader, Select } from "antd";
-import { LabelType, pathMatchContextLabels } from "../../utils/pathLabels";
+import { LabelType, pathMatchContextLabels, pathIsSelfOfContextLabels } from "../../utils/pathLabels";
 import styles from "./index.less";
 
 function getNodeInfo(tree, labels) {
@@ -193,14 +193,13 @@ export default class extends React.Component {
         </Select.Option>
       );
     }
-    const { users } = this.props;
-    return users
-      .filter(user => path === undefined || pathMatchContextLabels(path, user.uid, user.context_labels))
-      .map(user => (
-        <Select.Option key={user.uid} title={user.name}>
-          {user.name}
-        </Select.Option>
-      ));
+    const { users, onlyMember } = this.props;
+    const filterFunc = onlyMember ? pathIsSelfOfContextLabels : pathMatchContextLabels;
+    return users.filter(user => path !== undefined && filterFunc(path, user.uid, user.context_labels)).map(user => (
+      <Select.Option key={user.uid} title={user.name}>
+        {user.name}
+      </Select.Option>
+    ));
   }
 
   render() {

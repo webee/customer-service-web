@@ -29,6 +29,30 @@ export function pathMatchContextLabels(path, uid, context_labels) {
   return false;
 }
 
+export function pathIsSelfOfContextLabel(path, uid, t, label) {
+  if (label === null) {
+    return false;
+  }
+
+  switch (t) {
+    case LabelType.self_plus:
+    case LabelType.member:
+      return label === path;
+    case LabelType.self:
+    default:
+      return false;
+  }
+}
+
+export function pathIsSelfOfContextLabels(path, uid, context_labels) {
+  for (const [t, label] of context_labels) {
+    if (pathIsSelfOfContextLabel(path, uid, t, label)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function contextLabelMatchContextLabels(uid1, context_label, uid2, context_labels) {
   const [t, path] = context_label;
   switch (t) {
