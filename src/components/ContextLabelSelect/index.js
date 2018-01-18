@@ -1,7 +1,12 @@
 import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 import { Cascader, Select } from "antd";
-import { LabelType, pathMatchContextLabels, pathIsSelfOfContextLabels } from "../../utils/pathLabels";
+import {
+  LabelType,
+  pathMatchContextLabels,
+  pathIsStaffOfContextLabels,
+  getContextLabelsStaffsOfPath
+} from "../../utils/pathLabels";
 import styles from "./index.less";
 
 function getNodeInfo(tree, labels) {
@@ -92,7 +97,7 @@ function calcContextLabelTree(labelTree, contextLabels, user) {
         mergeTree(tree, getFullSubTree(labelTree, labels, { exceed: true }));
       }
     } else if (t === LabelType.member) {
-      const children = { [user.uid]: { name: `:${user.name}`, is_user: true, user } };
+      const children = { [user.uid]: { name: ":" + user.name, is_user: true, user } };
       if (path === "") {
         Object.assign(tree, { "": { name: "/", exceed: true, children } });
         continue;
@@ -184,22 +189,40 @@ export default class extends React.Component {
     }
   };
 
+  _prefix(x) {
+    const { onlyStaff } = this.props;
+    return onlyStaff ? ":" + x : x;
+  }
+
   renderUserOptions() {
     const { path, user } = this.state;
     if (user) {
       return (
-        <Select.Option key={user.uid} title={user.name}>
-          {user.name}
+        <Select.Option key={this._prefix(user.uid)} title={this._prefix(user.name)}>
+          {this._prefix(user.name)}
         </Select.Option>
       );
     }
-    const { users, onlyMember } = this.props;
-    const filterFunc = onlyMember ? pathIsSelfOfContextLabels : pathMatchContextLabels;
-    return users.filter(user => path !== undefined && filterFunc(path, user.uid, user.context_labels)).map(user => (
-      <Select.Option key={user.uid} title={user.name}>
-        {user.name}
-      </Select.Option>
-    ));
+    const { users, onlyStaff } = this.props;
+    if (onlyStaff) {
+      return users
+        .filter(user => path !== undefined && pathIsStaffOfContextLabels(path, user.context_labels))
+        .map(user =>
+          getContextLabelsStaffsOfPath(path, user.context_labels).map(s => (
+            <Select.Option key={`${s}${user.uid}`} title={`${s}${user.name}`}>
+              {`${s}${user.name}`}
+            </Select.Option>
+          ))
+        );
+    } else {
+      return users
+        .filter(user => path !== undefined && pathMatchContextLabels(path, user.uid, user.context_labels))
+        .map(user => (
+          <Select.Option key={user.uid} title={user.name}>
+            {user.name}
+          </Select.Option>
+        ));
+    }
   }
 
   render() {
@@ -268,11 +291,8 @@ export default class extends React.Component {
               .map(o => o.value)
               .join(".");
     }
-    if (user) {
-      path = `${path}:${user.uid}`;
-    }
     const { path: prevPath, uids: prevUids } = this.state;
-    const uids = exceed ? [] : path === prevPath ? prevUids : [];
+    const uids = user ? [this._prefix(user.uid)] : exceed ? [] : path === prevPath ? prevUids : [];
     this.setState({ labels, path, user, exceed, uids }, this.triggerChange);
   };
 
@@ -281,9 +301,9 @@ export default class extends React.Component {
   };
 
   displayRender = (labels, selectedOptions) => {
-    return selectedOptions.map((o, i) => (
+    return this.filterSelectedOptions(selectedOptions).map((o, i) => (
       <Fragment key={i}>
-        {i > 0 ? (o.item.is_user ? " " : " / ") : ""}
+        {i > 0 ? " / " : ""}
         {o.label}
       </Fragment>
     ));

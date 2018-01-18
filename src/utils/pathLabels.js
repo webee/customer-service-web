@@ -29,28 +29,38 @@ export function pathMatchContextLabels(path, uid, context_labels) {
   return false;
 }
 
-export function pathIsSelfOfContextLabel(path, uid, t, label) {
-  if (label === null) {
-    return false;
-  }
-
-  switch (t) {
-    case LabelType.self_plus:
-    case LabelType.member:
-      return label === path;
-    case LabelType.self:
-    default:
-      return false;
-  }
-}
-
-export function pathIsSelfOfContextLabels(path, uid, context_labels) {
-  for (const [t, label] of context_labels) {
-    if (pathIsSelfOfContextLabel(path, uid, t, label)) {
+export function pathIsStaffOfContextLabels(path, context_labels) {
+  for (const [_, label] of context_labels) {
+    if (path === label) {
       return true;
     }
   }
   return false;
+}
+
+export function getContextLabelStaffsOfPath(path, t, label) {
+  if (label !== path) {
+    return [];
+  }
+
+  switch (t) {
+    case LabelType.self:
+      return ["="];
+    case LabelType.self_plus:
+      return ["=", ":"];
+    case LabelType.member:
+      return [":"];
+    default:
+      return [];
+  }
+}
+
+export function getContextLabelsStaffsOfPath(path, context_labels) {
+  const staffs = [];
+  for (const [t, label] of context_labels) {
+    staffs.push(...getContextLabelStaffsOfPath(path, t, label));
+  }
+  return staffs;
 }
 
 export function contextLabelMatchContextLabels(uid1, context_label, uid2, context_labels) {
