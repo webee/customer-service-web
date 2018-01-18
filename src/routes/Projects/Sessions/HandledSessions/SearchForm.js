@@ -57,6 +57,7 @@ export default class extends React.Component {
                   labelTree={staffLabelTree}
                   contextLabels={staff.context_labels}
                   user={staff}
+                  users={selectStaffs}
                 />
               )}
             </Form.Item>
