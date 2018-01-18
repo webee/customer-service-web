@@ -86,7 +86,6 @@ export default class extends React.Component {
             <TagsRenderer
               tags={project.tags}
               maxWidth={size - 60}
-              onUpdate={() => measure}
               style={{ fontSize: 14, margin: 4 }}
             />
           </CompactCard>
