@@ -1,14 +1,17 @@
 .wrap {
-  :global(.ant-modal-close-x) {
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
-  }
-  :global(.ant-modal-body) {
-    height: 84vh;
-    min-height: 600px;
-    padding: 0;
-    padding-top: 24px;
-    display: flex;
+  :global(.ant-modal) {
+    min-width: 750px;
+    :global(.ant-modal-close-x) {
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+    }
+    :global(.ant-modal-body) {
+      height: 84vh;
+      min-height: 600px;
+      padding: 0;
+      padding-top: 24px;
+      display: flex;
+    }
   }
 }
