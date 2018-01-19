@@ -30,7 +30,6 @@ export default class extends React.Component {
     // Should be a controlled component.
     if ("value" in nextProps) {
       if (!nextProps.value) {
-        console.log("value: ", nextProps.value);
         this.setState({ start: undefined, end: undefined });
       }
     }

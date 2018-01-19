@@ -48,7 +48,7 @@ export function fetchProjectItem({ projectDomain, projectType }, { dispatch }, p
     await dispatchDomainTypeEffect(
       { projectDomain, projectType },
       { dispatch },
-      "myHandling/fetchProjectItem",
+      "_/fetchProjectItem",
       projectID
     );
   });

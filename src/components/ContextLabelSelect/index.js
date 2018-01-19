@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { Cascader, Select } from "antd";
 import {
   LabelType,
-  pathMatchContextLabels,
+  targetMatchContextLabels,
   pathIsStaffOfContextLabels,
   getContextLabelsStaffsOfPath
 } from "../../utils/pathLabels";
@@ -216,7 +216,7 @@ export default class extends React.Component {
         );
     } else {
       return users
-        .filter(user => path !== undefined && pathMatchContextLabels(path, user.uid, user.context_labels))
+        .filter(user => path !== undefined && targetMatchContextLabels(path, user.uid, user.context_labels))
         .map(user => (
           <Select.Option key={user.uid} title={user.name}>
             {user.name}

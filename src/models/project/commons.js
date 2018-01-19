@@ -11,8 +11,8 @@ export function normalizeProject(p) {
   };
 }
 
-export function* updateProjectList({ ns = "_", createAction, payload: projectList }, { call, put }) {
-  yield put(createAction(`${ns}/updateProjects`, projectList.map(normalizeProject)));
+export function* updateProjectList({ ns = "_", isUpdate = false, createAction, payload: projectList }, { call, put }) {
+  yield put(createAction(`${ns}/updateProjects`, { projectList: projectList.map(normalizeProject), isUpdate }));
 
   const staffs = [];
   const customers = [];

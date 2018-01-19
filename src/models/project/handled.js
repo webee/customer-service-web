@@ -75,7 +75,11 @@ export const reducer = collectTypeReducers(
       const sessions = listToDict(sessionList, o => o.id);
       return { ...state, sessions: { ...state.sessions, ...sessions } };
     },
-    updateProjects(state, { payload: projectList }) {
+    updateProjects(state, { payload: { projectList, isUpdate } }) {
+      if (isUpdate) {
+      // 必须要求已经存在
+        projectList = projectList.filter(o => o.id in state.projects);
+      }
       const projects = listToDict(projectList, o => o.id);
       return { ...state, projects: { ...state.projects, ...projects } };
     },

@@ -4,7 +4,7 @@ import * as projectService from "../../services/project";
 import * as msgCodecService from "../../services/msgCodec";
 import * as msgCookService from "../../services/msgCook";
 import { newSingletonContext } from "../../utils/notify";
-import { updateSessionList } from "./commons";
+import { updateProjectList, updateSessionList } from "./commons";
 
 const ns = "_";
 const msgTypeInitialStatus = {
@@ -66,7 +66,7 @@ export const reducer = collectTypeReducers(
       }
       return state;
     },
-    updateProjects(state, { payload: projectList }) {
+    updateProjects(state, { payload: { projectList } }) {
       const projects = listToDict(projectList, o => o.id);
       return { ...state, projects: { ...state.projects, ...projects } };
     },
@@ -289,6 +289,13 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     } finally {
       yield put(createAction(`_/updateProjectMsgsIsFetching`, { id: projectID, isFetchingNew: false }));
     }
+  },
+  *fetchProjectItem({ createAction, payload: projectID }, { call, put }) {
+    const p = yield call(projectService.fetchProjectItem, projectID);
+
+    yield updateProjectList({ createAction, payload: [p] }, { call, put });
+    // NOTE: 同时尝试更新handled的projects
+    yield updateProjectList({ ns: "handled", isUpdate: true, createAction, payload: [p] }, { call, put });
   },
   *tryHandleProject({ payload: projectID }, { call, put }) {
     const { domain, type, current_session_id } = yield call(projectService.tryHandleProject, projectID);
