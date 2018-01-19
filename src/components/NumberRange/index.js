@@ -30,6 +30,7 @@ export default class extends React.Component {
     // Should be a controlled component.
     if ("value" in nextProps) {
       if (!nextProps.value) {
+        console.log("value: ", nextProps.value);
         this.setState({ start: undefined, end: undefined });
       }
     }
@@ -63,12 +64,20 @@ export default class extends React.Component {
   }
 
   onStartChange = val => {
-    const start = this.transformerValue(val);
+    let start = this.transformerValue(val);
+    const { start: prevStart, end } = this.state;
+    if (end !== undefined && start > end) {
+      start = end;
+    }
     this.setState({ start }, this.triggerChange);
   };
 
   onEndChange = val => {
-    const end = this.transformerValue(val);
+    let end = this.transformerValue(val);
+    let { start, end: prevEnd } = this.state;
+    if (start !== undefined && end < start) {
+      end = prevEnd === undefined ? start : undefined;
+    }
     this.setState({ end }, this.triggerChange);
   };
 
