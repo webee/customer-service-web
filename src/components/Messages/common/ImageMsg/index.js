@@ -94,7 +94,7 @@ export default class extends React.PureComponent {
   }
 
   renderDescription() {
-    const { msg: { name } } = this.props;
-    return `[图片] ${name}`;
+    const { msg: { name, url } } = this.props;
+    return `[图片] ${name || url}`;
   }
 }

@@ -15,11 +15,12 @@ export default class extends React.PureComponent {
 
   render() {
     const { msg, as_description } = this.props;
+    const { duration } = msg;
     if (as_description) {
-      return `[语音] ${msg.duration/1000}s`;
+      return typeof duration === "number" ? `[语音] ${msg.duration / 1000}s` : "语音";
     }
 
-    const { url, duration } = msg;
+    const { url } = msg;
 
     return (
       <div className={styles.main}>
