@@ -118,6 +118,9 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       if (s.msg) {
         s.msg = { ...s.msg, ...msgCodecService.decodeMsg(s.msg) };
       }
+      if (s.last_session_msg) {
+        s.last_session_msg = { ...s.last_session_msg, ...msgCodecService.decodeMsg(s.last_session_msg) };
+      }
     });
     yield updateSessionList({ createAction, payload: sessionList }, { call, put });
     yield put(createAction(`${ns}/saveListSessions`, sessionList.map(s => s.id)));
@@ -130,6 +133,9 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     const s = yield call(projectService.fetchSessionItem, sessionID);
     if (s.msg) {
       s.msg = { ...s.msg, ...msgCodecService.decodeMsg(s.msg) };
+    }
+    if (s.last_session_msg) {
+      s.last_session_msg = { ...s.last_session_msg, ...msgCodecService.decodeMsg(s.last_session_msg) };
     }
 
     yield updateSessionList({ createAction, payload: [s] }, { call, put });

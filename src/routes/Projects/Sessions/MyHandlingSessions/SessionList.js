@@ -18,8 +18,8 @@ import { anyIs } from "~/utils/func";
 const Search = Input.Search;
 
 function get_session_last_msg_ts(s, def = 0) {
-  if (s.msg) {
-    return s.msg.ts;
+  if (s.last_session_msg) {
+    return s.last_session_msg.ts;
   }
   return def;
 }
@@ -240,7 +240,7 @@ export default class View extends Component {
     const { appData } = this.props;
     const { sessionList, currentOpenedSessionState, openedSessionsState } = parent.props;
     const session = sessionList[index];
-    const { msg } = session;
+    const { last_session_msg } = session;
     const project = session.project;
     const owner = appData.customers[project.owner];
     // 当前打开并且不处在阅读状态则未读不显示
@@ -249,7 +249,7 @@ export default class View extends Component {
     const item = {
       id: session.id,
       name: genCustomerMobileName(owner),
-      description: msgRendererService.describeMsg(msg),
+      description: msgRendererService.describeMsg(last_session_msg),
       online: project.is_online,
       ts: get_session_last_msg_ts(session, "-"),
       selected: session.isCurrentOpened,
