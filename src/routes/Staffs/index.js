@@ -29,6 +29,11 @@ export default class extends React.Component {
     this.fetchStaffs();
   }
 
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatch({ type: "staffs/resetCurrentPage" });
+  }
+
   get columns() {
     const { filters, sorter } = this.props;
     return [

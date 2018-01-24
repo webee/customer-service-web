@@ -278,6 +278,11 @@ export default class extends React.Component {
     );
   }
 
+  componentWillUnmount() {
+    const { dispatch } = this.props;
+    dispatchDomainType(this.context, this.props, "handling/resetCurrentPage");
+  }
+
   onSearch = params => {
     console.debug("onSearch: ", params);
     this.setState({ params }, () => this.fetchSessions("onSearch"));

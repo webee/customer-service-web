@@ -27,6 +27,9 @@ export default {
     saveFetchResult(state, { payload: { items, pagination } }) {
       return { ...state, staffs: items, pagination: { ...state.pagination, ...pagination } };
     },
+    resetCurrentPage(state) {
+      return { ...state, pagination: { ...state.pagination, current: 1 } };
+    },
     updateTableInfos(state, { payload: { pagination, filters, sorter } }) {
       const newState = { ...state };
       if (pagination) {

@@ -37,6 +37,9 @@ export const reducer = collectTypeReducers(
     saveFetchResult(state, { payload: { items, pagination } }) {
       return { ...state, items, pagination: { ...state.pagination, ...pagination } };
     },
+    resetCurrentPage(state) {
+      return { ...state, pagination: { ...state.pagination, current: 1 } };
+    },
     updateTableInfos(state, { payload: { isFetching, pagination, filters, sorter } }) {
       const newState = { ...state };
       if (isFetching !== undefined) {
