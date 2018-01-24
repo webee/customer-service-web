@@ -1,3 +1,5 @@
+import * as msgCodecService from "../../services/msgCodec";
+
 export function normalizeSession(s) {
   return { ...s, project_id: s.project.id, project: undefined, handler: s.handler.uid };
 }
@@ -37,4 +39,13 @@ export function* updateSessionList({ ns = "_", createAction, payload: sessionLis
     staffs.push(s.handler);
   });
   yield put({ type: "app/updateStaffs", payload: staffs });
+}
+
+export function decodeSessionMsgs(s) {
+  if (s.msg) {
+    s.msg = { ...s.msg, ...msgCodecService.decodeMsg(s.msg) };
+  }
+  if (s.last_session_msg) {
+    s.last_session_msg = { ...s.last_session_msg, ...msgCodecService.decodeMsg(s.last_session_msg) };
+  }
 }

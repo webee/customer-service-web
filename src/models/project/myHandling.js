@@ -1,7 +1,6 @@
 import { collectTypeReducers, createNSSubEffectFunc } from "../utils";
 import * as projectService from "../../services/project";
-import * as msgCodecService from "../../services/msgCodec";
-import { normalizeSession, updateProjectList, updateSessionList } from "./commons";
+import { normalizeSession, updateProjectList, updateSessionList, decodeSessionMsgs } from "./commons";
 
 const DEFAULT_SESSION_STATE = { isInRead: false };
 const ns = "myHandling";
@@ -114,14 +113,7 @@ export const effectFunc = createNSSubEffectFunc(ns, {
     }
 
     const sessionList = yield call(projectService.fetchMyHandlingSessions, projectDomain, projectType);
-    sessionList.forEach(s => {
-      if (s.msg) {
-        s.msg = { ...s.msg, ...msgCodecService.decodeMsg(s.msg) };
-      }
-      if (s.last_session_msg) {
-        s.last_session_msg = { ...s.last_session_msg, ...msgCodecService.decodeMsg(s.last_session_msg) };
-      }
-    });
+    sessionList.forEach(decodeSessionMsgs);
     yield updateSessionList({ createAction, payload: sessionList }, { call, put });
     yield put(createAction(`${ns}/saveListSessions`, sessionList.map(s => s.id)));
     if (session_id) {
@@ -131,12 +123,7 @@ export const effectFunc = createNSSubEffectFunc(ns, {
   },
   *fetchSessionItem({ createAction, payload: sessionID }, { call, put }) {
     const s = yield call(projectService.fetchSessionItem, sessionID);
-    if (s.msg) {
-      s.msg = { ...s.msg, ...msgCodecService.decodeMsg(s.msg) };
-    }
-    if (s.last_session_msg) {
-      s.last_session_msg = { ...s.last_session_msg, ...msgCodecService.decodeMsg(s.last_session_msg) };
-    }
+    decodeSessionMsgs(s);
 
     yield updateSessionList({ createAction, payload: [s] }, { call, put });
     yield put(createAction(`${ns}/addToListSessions`, s.id));

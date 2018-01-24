@@ -3,7 +3,7 @@ import * as projectService from "../../services/project";
 import * as service from "~/services/project";
 import * as msgCodecService from "~/services/msgCodec";
 import { extractFilter } from "~/utils/filters";
-import { updateSessionList } from "./commons";
+import { updateSessionList, decodeSessionMsgs } from "./commons";
 
 function genSessionStartMsg(id) {
   return { domain: "system", type: "divider", msg: `会话#${id}开始` };
@@ -129,11 +129,7 @@ export const effectFunc = createNSSubEffectFunc(ns, {
         is_online: extractFilter(filters, "is_online", false)
       });
       const { page: current, per_page: pageSize, total, items } = res;
-      items.forEach(item => {
-        if (item.msg) {
-          item.msg = { ...item.msg, ...msgCodecService.decodeMsg(item.msg) };
-        }
-      });
+      items.forEach(decodeSessionMsgs);
       yield put(createAction("handled/saveFetchResult", { items, pagination: { current, pageSize, total } }));
     } finally {
       yield put(createAction("handled/updateTableInfos", { isFetching: false }));
