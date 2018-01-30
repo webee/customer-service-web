@@ -310,7 +310,9 @@ export default class extends React.PureComponent {
 
     // 同步已读消息id
     const message = messages[stopIndex < messages.length ? stopIndex : messages.length - 1];
-    this._syncMsgID(message.msg_id);
+    if (message) {
+      this._syncMsgID(message.msg_id);
+    }
   };
 
   onDownClicked = () => {

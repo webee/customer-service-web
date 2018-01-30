@@ -19,11 +19,16 @@ export function renderLastMsg(msg, def = "-", maxWidth) {
     return def;
   }
 
+  const { channel } = msg;
   const userType = msg.user_type === "customer" ? "客户" : "客服";
   const msgDesc = msgRendererService.describeMsg(msg);
   const text = (
     <Fragment>
-      <span style={{ color: "grey" }}>{userType}:</span> {msgDesc}
+      <span style={{ color: "grey" }}>
+        {channel ? <Icon type={channel} /> : undefined}
+        {userType}:
+      </span>{" "}
+      {msgDesc}
     </Fragment>
   );
   return <EllipsisText text={text} maxWidth={maxWidth} />;
