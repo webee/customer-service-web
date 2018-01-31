@@ -15,6 +15,10 @@ const statusIconTypes = {
   failed: { type: "exclamation-circle", style: { color: "red" } }
 };
 
+const channelIconTypes = {
+  wechat: { type: "wechat", style: { color: "green" } }
+};
+
 export default class extends React.PureComponent {
   renderStatus(status) {
     let t = statusIconTypes[status];
@@ -60,7 +64,7 @@ export default class extends React.PureComponent {
         <div className={styles.info}>{this.renderStatus(status)}</div>
         <div className={styles.content}>
           <div className={styles.head}>
-            {channel ? <Icon type={channel} /> : undefined}
+            {channel ? <Icon {...channelIconTypes[channel] || {}} /> : undefined}
             {userName}
             <span className={styles.ts}>{moment.unix(ts).format("YYYY-MM-DD HH:mm:ss")}</span>
           </div>
