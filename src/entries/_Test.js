@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import { connect } from "dva";
 import { Menu, Dropdown, Avatar, Icon } from "antd";
 import { Link } from "dva/router";
 import MainLayout from "../components/layouts/MainLayout";
@@ -88,7 +89,21 @@ const navData = {
   ]
 };
 
+@connect(state => {
+  const ui = state.ui;
+  return {
+    ui
+  };
+})
 export default class _Test extends React.Component {
+  onLayoutInfoUpdate = (name, values) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: "ui/updateLayoutInfo",
+      payload: { name, values }
+    });
+  };
+
   getHeaderMenu() {
     const menu = (
       <Menu selectedKeys={[]} onClick={this.onMenuClick}>
@@ -128,6 +143,16 @@ export default class _Test extends React.Component {
   }
 
   render() {
-    return <MainLayout navData={navData} headerMenu={this.getHeaderMenu()} />;
+    const { ui } = this.props;
+    return (
+      <MainLayout
+        navData={navData}
+        headerMenu={this.getHeaderMenu()}
+        uiSettings={ui.settings}
+        layoutInfo={ui.layoutInfo}
+        onLogoClick={this.onLogoClick}
+        onLayoutInfoUpdate={this.onLayoutInfoUpdate}
+      />
+    );
   }
 }
