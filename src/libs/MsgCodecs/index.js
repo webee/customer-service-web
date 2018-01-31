@@ -1,4 +1,4 @@
 export CombinedMsgCodec from "./CombinedMsgCodec";
 export DefaultMsgCodec from "./DefaultMsgCodec";
-export JSONMsgCodec from "./JSONMsgCodec";
+export JSONObjectMsgCodec from "./JSONObjectMsgCodec";
 export DefaultDomainMsgCodecFetcher from "./DefaultDomainMsgCodecFetcher";

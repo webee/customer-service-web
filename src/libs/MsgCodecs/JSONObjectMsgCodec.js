@@ -1,4 +1,4 @@
-export default class JSONMsgCodec {
+export default class JSONObjectMsgCodec {
   constructor(types) {
     this.types = types;
   }
@@ -20,7 +20,11 @@ export default class JSONMsgCodec {
   decode({ type, content }) {
     if (this.types.has(type)) {
       try {
-        return { type, msg: JSON.parse(content) };
+        const msg = JSON.parse(content);
+        if (typeof msg !== "object") {
+          throw new Error("bad json object msg format");
+        }
+        return { type, msg };
       } catch (err) {
         console.warn(err);
       }
