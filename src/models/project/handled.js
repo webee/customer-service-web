@@ -80,7 +80,7 @@ export const reducer = collectTypeReducers(
     },
     updateProjects(state, { payload: { projectList, isUpdate } }) {
       if (isUpdate) {
-      // 必须要求已经存在
+        // 必须要求已经存在
         projectList = projectList.filter(o => o.id in state.projects);
       }
       const projects = listToDict(projectList, o => o.id);
@@ -173,7 +173,7 @@ export const effectFunc = createNSSubEffectFunc(ns, {
       }
 
       const { msgs, no_more } = yield call(projectService.fetchProjectMsgs, project.id, {
-        rid: lid || session.msg_id + 1,
+        rid: lid || (session.msg_id > 0 ? session.msg_id + 1 : session.start_msg_id + 1),
         limit,
         desc: true
       });
