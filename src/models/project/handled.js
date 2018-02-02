@@ -6,7 +6,7 @@ import { extractFilter } from "~/utils/filters";
 import { updateSessionList, decodeSessionMsgs } from "./commons";
 
 function genSessionStartMsg(id) {
-  return { domain: "system", type: "divider", msg: `会话#${id}开始` };
+  return { domain: "system", type: "notify", msg: { content: `会话#${id}开始`, withDivider: true } };
 }
 
 const ns = "handled";
