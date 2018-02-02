@@ -58,16 +58,19 @@ export default class extends React.PureComponent {
     const bodyClassNames = cs(styles.body, {
       [styles.raw]: isRaw
     });
+    const withHeader = channel || userName || ts;
     // TODO: add channel to icon type mapping.
     return (
       <div className={itemClassNames}>
-        <div className={styles.info}>{this.renderStatus(status)}</div>
+        <div className={styles.info}>{status && this.renderStatus(status)}</div>
         <div className={styles.content}>
-          <div className={styles.head}>
-            {channel ? <Icon {...channelIconTypes[channel] || {}} /> : undefined}
-            {userName}
-            <span className={styles.ts}>{moment.unix(ts).format("YYYY-MM-DD HH:mm:ss")}</span>
-          </div>
+          {withHeader && (
+            <div className={styles.head}>
+              {channel ? <Icon {...channelIconTypes[channel] || {}} /> : undefined}
+              {userName}
+              <span className={styles.ts}>{moment.unix(ts).format("YYYY-MM-DD HH:mm:ss")}</span>
+            </div>
+          )}
           <div className={styles.decorate}>
             <div className={bodyClassNames} onClick={onClickMsg}>
               {msgRendererService.renderMsg({ domain, type, msg }, ctx)}
