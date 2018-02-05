@@ -14,9 +14,9 @@ import MessageItem from "./MessageItem";
 import styles from "./MessageList.less";
 
 const ROW_OFFSET = 1;
-const LOAD_MSG = { msg_id: -1, domain: "system", type: "notify", msg: "加载更多" };
-const LOADING_MSG = { msg_id: -2, domain: "system", type: "notify", msg: "加载中..." };
-const NO_MORE_MSG = { msg_id: -3, domain: "system", type: "notify", msg: "没有更多消息了" };
+const LOAD_MSG = { msg_id: -1, domain: "system", type: "notify", msg: { content: "加载更多" } };
+const LOADING_MSG = { msg_id: -2, domain: "system", type: "notify", msg: { content: "加载中..." } };
+const NO_MORE_MSG = { msg_id: -3, domain: "system", type: "notify", msg: { content: "没有更多消息了" } };
 
 export default class extends React.PureComponent {
   static contextTypes = {
